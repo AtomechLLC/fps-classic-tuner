@@ -327,12 +327,12 @@ function fireProjectile(kind, dir) {
 const objLoader = new OBJLoader();
 const mtlLoader = new MTLLoader();
 const gunScene = new THREE.Scene();
-gunScene.add(new THREE.HemisphereLight(0xffffff, 0x556, 2.3));
-const gl2 = new THREE.DirectionalLight(0xfff5e0, 1.8);
-gl2.position.set(-1, 2, 1);
+gunScene.add(new THREE.HemisphereLight(0xffffff, 0x445, 1.6));
+const gl2 = new THREE.DirectionalLight(0xffffff, 2.6);
+gl2.position.set(-0.6, 1.4, 0.8);
 gunScene.add(gl2);
-const gl3 = new THREE.DirectionalLight(0xccd5ff, 0.8);
-gl3.position.set(1, -0.5, 1);
+const gl3 = new THREE.DirectionalLight(0xbfc8ff, 0.7);
+gl3.position.set(1, -0.3, 0.5);
 gunScene.add(gl3);
 const gunMount = new THREE.Group();
 gunScene.add(gunMount);
@@ -365,7 +365,8 @@ async function loadGunModel(name) {
           nm = new THREE.MeshPhongMaterial({ color: tint, specular: 0xdddddd,
             shininess: 26, side: THREE.DoubleSide });
         } else if (lit) {             // vertex-normal lit geometry (gun bodies)
-          nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
+          nm = new THREE.MeshPhongMaterial({ map, specular: 0x8a8a8a, shininess: 30,
+            side: THREE.DoubleSide });
         } else {                      // prelit: baked vertex colours
           nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         }
@@ -386,16 +387,30 @@ async function loadGunModel(name) {
       }
       o.material = Array.isArray(o.material) ? out : out[0];
     });
-    // barrel direction: muzzle flash quads sit at the muzzle in model space
+    // barrel direction: muzzle flash quads sit at the muzzle in model space.
+    // The OBJ is one mesh with material groups, so gather flash-group vertices.
     const all = new THREE.Box3();
     const flash = new THREE.Box3();
+    const v = new THREE.Vector3();
     obj.traverse(o => {
       if (!o.isMesh) return;
       o.geometry.computeBoundingBox();
-      const bb = o.geometry.boundingBox;
-      all.union(bb);
+      all.union(o.geometry.boundingBox);
       const mats = Array.isArray(o.material) ? o.material : [o.material];
-      if (mats.some(m => /_sw0_/.test(m.name))) flash.union(bb);
+      const pos = o.geometry.attributes.position;
+      const idx = o.geometry.index;
+      for (const g of o.geometry.groups || []) {
+        const m = mats[g.materialIndex] || mats[0];
+        if (!/_sw0_/.test(m.name)) continue;
+        for (let i = g.start; i < g.start + g.count; i++) {
+          const vi = idx ? idx.getX(i) : i;
+          flash.expandByPoint(v.fromBufferAttribute(pos, vi));
+        }
+      }
+      if ((!o.geometry.groups || !o.geometry.groups.length)
+          && mats.some(m => /_sw0_/.test(m.name))) {
+        flash.union(o.geometry.boundingBox);
+      }
     });
     return { obj, flashGroups, all, flash };
   })();
@@ -438,19 +453,34 @@ async function selectWeapon(key) {
     dir = flash.getCenter(new THREE.Vector3()).sub(centre);
   } else {
     const size = all.getSize(new THREE.Vector3());
-    dir = new THREE.Vector3(0, 0, size.z >= size.x ? 1 : (0, 1));
-    if (size.x > size.z) dir.set(1, 0, 0);
+    const axis = size.z >= size.x ? 'z' : 'x';
+    // muzzle end is the thinner half: compare vertical extent of each half
+    let hiY = -1e9, loY = 1e9, hiN = 0, loN = 0;
+    obj.traverse(o => {
+      if (!o.isMesh) return;
+      const pos = o.geometry.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const a = axis === 'z' ? pos.getZ(i) : pos.getX(i);
+        const y = pos.getY(i);
+        if (a > centre[axis]) { hiY = Math.max(hiY, Math.abs(y - centre.y)); hiN++; }
+        else { loY = Math.min(loY, 0); loN++; }
+      }
+    });
+    dir = new THREE.Vector3();
+    dir[axis] = 1;                        // default: positive end is muzzle
   }
-  dir.y = 0; dir.normalize();
+  dir.y = 0;
+  if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
+  dir.normalize();
+  // GE positions guns via skeletal idle animation we don't replicate; approximate:
+  // flash-aligned barrel forward, size-normalised, rear anchored bottom-right.
   obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
   obj.position.copy(centre.clone().applyQuaternion(obj.quaternion).negate());
   holder.add(obj);
-  // 2. normalise size: cap height and barrel length
   const wb = new THREE.Box3().setFromObject(holder);
   const wsz = wb.getSize(new THREE.Vector3());
   const sc = Math.min(P.h / Math.max(wsz.y, 1e-3), P.len / Math.max(wsz.z, 1e-3));
   holder.scale.setScalar(sc);
-  // 3. anchor: rear of the gun near the camera, bottom-right
   const wb2 = new THREE.Box3().setFromObject(holder);
   holder.position.set(P.x - (wb2.min.x + wb2.max.x) / 2,
                       P.y - wb2.min.y,
