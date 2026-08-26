@@ -88,6 +88,7 @@ class Decoder:
         self.gunfire = None
         self.cur_switch = -1     # -1 = always-visible geometry
         self.n_switches = 0
+        self.geomode = 0         # RSP geometry mode (G_TEXTURE_GEN etc.)
         self.mtx = {}            # matrix index -> (tx,ty,tz)  (rotations are identity at rest)
         self.cur_mtx = (0.0, 0.0, 0.0)
         # header Switches array: gunfire.c uses Switches[1] as the muzzle-flash
@@ -106,13 +107,17 @@ class Decoder:
         u = s / 32.0 / max(w, 1)
         v = 1.0 - t / 32.0 / max(h, 1)
         self.verts.append((x+translate[0], y+translate[1], z+translate[2]))
-        self.uvs.append((u, v))
         if lit:   # colour slots hold a signed vertex normal
             nx, ny, nz = struct.unpack(">3b", self.d[addr+12:addr+15])
             ln = max((nx*nx+ny*ny+nz*nz) ** 0.5, 1e-6)
-            self.attrs.append((nx/ln, ny/ln, nz/ln))
+            nx, ny, nz = nx/ln, ny/ln, nz/ln
+            self.attrs.append((nx, ny, nz))
+            if self.geomode & 0x40000:   # G_TEXTURE_GEN: UVs come from the normal
+                u = nx * 0.5 + 0.5
+                v = 1.0 - (ny * 0.5 + 0.5)
         else:     # prelit vertex colour
             self.attrs.append((self.d[addr+12]/255, self.d[addr+13]/255, self.d[addr+14]/255))
+        self.uvs.append((u, v))
         self.lit.append(lit)
         return len(self.verts) - 1
 
@@ -131,6 +136,10 @@ class Decoder:
             elif cmd == 0x01:      # G_MTX: load matrix from segment 3 (index = off/64)
                 if (w1 >> 24) == 3:
                     self.cur_mtx = self.mtx.get((w1 & 0xFFFFFF) // 64, (0.0, 0.0, 0.0))
+            elif cmd == 0xB7:      # G_SETGEOMETRYMODE
+                self.geomode |= w1
+            elif cmd == 0xB6:      # G_CLEARGEOMETRYMODE
+                self.geomode &= ~w1
             elif cmd == 0xC0:
                 self.cur_tex = w1 & 0xFFFF
             elif cmd == 0x04:      # G_VTX
@@ -159,14 +168,16 @@ class Decoder:
                     z = (w0 >> (4*k)) & 0xF
                     if x == y == z == 0: continue
                     tris.append((x, y, z))
+                env = bool(self.geomode & 0x40000)
                 for x, y, z in tris:
                     if vbuf[x] < 0 or vbuf[y] < 0 or vbuf[z] < 0: continue
-                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch, lit))
+                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch, lit, env))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
                 ia, ib, ic = vbuf[a//10], vbuf[b//10], vbuf[c//10]
                 if ia >= 0 and ib >= 0 and ic >= 0:
-                    self.faces.append((ia, ib, ic, self.cur_tex, self.cur_switch, lit))
+                    self.faces.append((ia, ib, ic, self.cur_tex, self.cur_switch, lit,
+                                       bool(self.geomode & 0x40000)))
             # everything else (rdp state, matrices) ignored
 
     def calc_matrices(self, addr, parent, seen=None):
@@ -257,16 +268,16 @@ class Decoder:
         if nxt: self.node(nxt, translate)
 
     def export_obj(self, path, name):
-        def mat(tid, sw, lit):
+        def mat(tid, sw, lit, env):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
-            return base + ("_lit" if lit else "")
-        used = sorted(set((f[3], f[4], f[5]) for f in self.faces),
-                      key=lambda x: (str(x[0]), str(x[1]), x[2]))
+            return base + ("_lit" if lit else "") + ("_env" if env else "")
+        used = sorted(set((f[3], f[4], f[5], f[6]) for f in self.faces),
+                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3]))
         with open(path + ".mtl", "w") as m:
-            for tid, sw, lit in used:
-                m.write(f"newmtl {mat(tid, sw, lit)}\n")
+            for tid, sw, lit, env in used:
+                m.write(f"newmtl {mat(tid, sw, lit, env)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
@@ -283,10 +294,10 @@ class Decoder:
                 else:
                     f.write("vn 0 1 0\n")
             last = object()
-            for a, b, c, tid, sw, lit in self.faces:
-                key = (tid, sw, lit)
+            for a, b, c, tid, sw, lit, env in self.faces:
+                key = (tid, sw, lit, env)
                 if key != last:
-                    f.write(f"usemtl {mat(tid, sw, lit)}\n"); last = key
+                    f.write(f"usemtl {mat(tid, sw, lit, env)}\n"); last = key
                 f.write(f"f {a+1}/{a+1}/{a+1} {b+1}/{b+1}/{b+1} {c+1}/{c+1}/{c+1}\n")
 
 def main():

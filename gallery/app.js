@@ -780,13 +780,24 @@ tick();
 // ---- debug hooks (harmless in production) ----
 // --- model inspection: render one gun isolated, framed, on a neutral backdrop ---
 window.__inspect = async (key, view = 'side', w = 560, flat = false) => {
-  const modelName = `G${key}Z`;
+  const modelName = /^[GPC].*Z$/.test(key) ? key : `G${key}Z`;
   const { obj } = await loadGunModel(modelName);
   const scn = new THREE.Scene();
   scn.background = new THREE.Color(0x8a93a0);
   scn.add(new THREE.HemisphereLight(0xffffff, 0x556677, 0.8));
   const dl = new THREE.DirectionalLight(0xffffff, 1.0); dl.position.set(-1, 2, 1.5); scn.add(dl);
   const dl2 = new THREE.DirectionalLight(0xc9d4ff, 0.35); dl2.position.set(1.5, -0.5, -1); scn.add(dl2);
+  // textures load asynchronously: wait for them or the render captures blank/black
+  const maps = [];
+  obj.traverse(o => { if (!o.isMesh) return;
+    (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => {
+      if (m.map) maps.push(m.map);
+    });
+  });
+  const ready = () => maps.every(t => t.image && t.image.width);
+  for (let i = 0; i < 120 && !ready(); i++) await new Promise(r => setTimeout(r, 25));
+  maps.forEach(t => { t.needsUpdate = true; });
+
   const clone = obj.clone(true);
   clone.position.set(0, 0, 0); clone.rotation.set(0, 0, 0); clone.scale.setScalar(1);
   // keep the game's visibility rules (flash + non-default switch states stay hidden)
