@@ -35,6 +35,9 @@ const RICO = SOUNDS.filter(s => /^RICO_/.test(s.name)).map(s => `${EX}/sounds/${
 
 // ---- audio ----
 const actx = new (window.AudioContext || window.webkitAudioContext)();
+const master = actx.createGain();
+master.gain.value = 0.30;                 // master volume (- / = keys)
+master.connect(actx.destination);
 const bufCache = new Map();
 async function loadBuf(url) {
   if (!url) return null;
@@ -43,14 +46,19 @@ async function loadBuf(url) {
   }
   return bufCache.get(url);
 }
-function play(url, { vol = 1, pitch = 1 } = {}) {
+function play(url, { vol = 1, pitch = 1, at = null } = {}) {
   loadBuf(url).then(buf => {
     if (!buf) return;
     const src = actx.createBufferSource();
     src.buffer = buf;
     src.playbackRate.value = pitch;
-    const g = actx.createGain(); g.gain.value = vol;
-    src.connect(g); g.connect(actx.destination);
+    let v = vol;
+    if (at) {                              // distance attenuation
+      const d = cam.position.distanceTo(at);
+      v *= Math.min(1, 9 / Math.max(d, 1));
+    }
+    const g = actx.createGain(); g.gain.value = v;
+    src.connect(g); g.connect(master);
     src.start();
   });
 }
@@ -160,24 +168,121 @@ function buildTargets() {
   }
 }
 
-// ---- impact sounds per material ----
+// ---- impact sounds per material (real GE hit SFX + ricochets) ----
+const sfx = n => soundByName(n);
 const HIT_SOUNDS = {
-  wood:  RICO.filter((_, i) => i % 4 === 0),
-  metal: RICO.filter((_, i) => i % 4 === 1),
-  stone: RICO.filter((_, i) => i % 4 === 2),
-  other: RICO.filter((_, i) => i % 4 === 3),
+  wood:  [sfx('HIT_BULLET_WOOD_SFX'), ...RICO.slice(0, 4)],
+  metal: [sfx('HIT_BULLET_METAL_A_SFX'), sfx('HIT_BULLET_METAL_B_SFX'), ...RICO.slice(4, 8)],
+  stone: RICO.slice(8, 16),
+  other: RICO.slice(16, 20),
 };
+const EXPLO_SOUNDS = ['EXPLOSION_2A_SFX','EXPLOSION_2B_SFX','EXPLOSION_3_SFX','EXPLOSION_4A_SFX']
+  .map(sfx).filter(Boolean);
 
-// ---- sparks / impact fx ----
-const sparks = [];
-const sparkGeo = new THREE.SphereGeometry(0.03, 4, 4);
-const sparkMat = new THREE.MeshBasicMaterial({ color: 0xffcc55 });
-function spawnSpark(p) {
-  const m = new THREE.Mesh(sparkGeo, sparkMat.clone());
-  m.position.copy(p);
-  m.userData.t = 0.12;
+// ---- sparks / tracers / decals / explosions ----
+const fx = [];
+function addFx(mesh, ttl, kind) {
+  mesh.userData = Object.assign(mesh.userData || {}, { t: ttl, ttl, kind });
+  scene.add(mesh); fx.push(mesh);
+  return mesh;
+}
+const sparkGeo = new THREE.SphereGeometry(0.035, 4, 4);
+function spawnSpark(p, big = false) {
+  for (let i = 0; i < (big ? 7 : 3); i++) {
+    const m = new THREE.Mesh(sparkGeo, new THREE.MeshBasicMaterial({ color: 0xffcc55 }));
+    m.position.copy(p);
+    m.userData = { vel: new THREE.Vector3((Math.random()-.5)*4, Math.random()*3.5, (Math.random()-.5)*4) };
+    addFx(m, 0.22 + Math.random()*0.15, 'spark');
+  }
+}
+function spawnTracer(from, to) {
+  const g = new THREE.BufferGeometry().setFromPoints([from, to]);
+  const l = new THREE.Line(g, new THREE.LineBasicMaterial({
+    color: 0xffe9a0, transparent: true, opacity: 0.85 }));
+  addFx(l, 0.06, 'tracer');
+}
+const decalGeo = new THREE.CircleGeometry(0.035, 8);
+function spawnDecal(p, normal) {
+  const m = new THREE.Mesh(decalGeo, new THREE.MeshBasicMaterial({
+    color: 0x111111, transparent: true, opacity: 0.9 }));
+  m.position.copy(p).addScaledVector(normal, 0.01);
+  m.lookAt(p.clone().add(normal));
+  addFx(m, 9, 'decal');
+}
+let shake = 0;
+function explode(p, radius, damage) {
+  play(EXPLO_SOUNDS[Math.floor(Math.random()*EXPLO_SOUNDS.length)],
+       { vol: 1.6, at: p, pitch: 0.95 + Math.random()*0.1 });
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12),
+    new THREE.MeshBasicMaterial({ color: 0xffa63e, transparent: true, opacity: 0.95,
+      blending: THREE.AdditiveBlending, depthWrite: false }));
+  ball.position.copy(p);
+  addFx(ball, 0.35, 'explosion');
+  const light = new THREE.PointLight(0xffa040, 60, radius * 4);
+  light.position.copy(p);
+  addFx(light, 0.25, 'light');
+  spawnSpark(p, true);
+  const d = cam.position.distanceTo(p);
+  shake = Math.min(1.2, shake + 3.5 / Math.max(d * 0.35, 1));
+  for (const t of targets) {
+    const u = t.userData;
+    if (u.hp === Infinity || u.downT > 0) continue;
+    const dist = t.position.distanceTo(p);
+    if (dist < radius) {
+      u.hp -= damage * (1 - dist / radius) * 4;
+      hitReact(t);
+      state.hits++;
+      if (u.hp <= 0) { u.downT = 2.2; state.score += 50; }
+    }
+  }
+  updateHud();
+}
+function hitReact(t) {
+  const u = t.userData;
+  u.wobble = 1;
+  if (u.board) {
+    u.board.material.color.setRGB(1.6, 0.6, 0.6);
+    u.flash = 0.15;
+  }
+}
+function hitMarker() {
+  const el = document.getElementById('crosshair');
+  el.style.color = '#ff2';
+  el.style.fontSize = '30px';
+  setTimeout(() => { el.style.color = '#d33'; el.style.fontSize = '22px'; }, 70);
+}
+
+// ---- projectiles (rocket / grenade rounds) ----
+const projectiles = [];
+const EXPLOSIVE = {
+  rocketlaunch:  { speed: 26, grav: 0,  radius: 7 },
+  grenadelaunch: { speed: 20, grav: 13, radius: 5 },
+};
+function projMesh(kind) {
+  if (kind === 'rocketlaunch') {
+    const g = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.42, 8),
+      new THREE.MeshLambertMaterial({ color: 0x8a8f66 }));
+    body.rotation.x = -Math.PI / 2;
+    const glow = new THREE.Mesh(new THREE.SphereGeometry(0.09, 6, 6),
+      new THREE.MeshBasicMaterial({ color: 0xffb050, blending: THREE.AdditiveBlending,
+        transparent: true, depthWrite: false }));
+    glow.position.z = 0.28;
+    g.add(body, glow);
+    return g;
+  }
+  return new THREE.Mesh(new THREE.SphereGeometry(0.08, 8, 8),
+    new THREE.MeshLambertMaterial({ color: 0x3c4a30 }));
+}
+function fireProjectile(kind, dir) {
+  const spec = EXPLOSIVE[kind];
+  const m = projMesh(kind);
+  m.position.copy(cam.position).addScaledVector(dir, 0.9).add(new THREE.Vector3(0, -0.15, 0));
+  m.lookAt(m.position.clone().add(dir));
+  m.userData = { vel: dir.clone().multiplyScalar(spec.speed), grav: spec.grav,
+                 radius: spec.radius, life: 6 };
   scene.add(m);
-  sparks.push(m);
+  projectiles.push(m);
 }
 
 // ---- weapon view models ----
@@ -292,8 +397,8 @@ function reload() {
   if (state.reloading || !st || st.mag_size <= 0 || state.ammo === st.mag_size) return;
   state.reloading = true;
   updateHud();
-  if (CLIPOUT) play(CLIPOUT, { vol: 0.7 });
-  setTimeout(() => { if (CLIPIN) play(CLIPIN, { vol: 0.7 }); }, 700);
+  if (CLIPOUT) play(CLIPOUT, { vol: 0.45 });
+  setTimeout(() => { if (CLIPIN) play(CLIPIN, { vol: 0.45 }); }, 700);
   setTimeout(() => {
     state.ammo = st.mag_size; state.reloading = false; updateHud();
   }, 1400);
@@ -303,42 +408,57 @@ function shoot(now) {
   const st = state.stats;
   if (!st || state.reloading) return;
   if (state.ammo <= 0) {
-    if (DRYFIRE) play(DRYFIRE, { vol: 0.5 });
+    if (DRYFIRE) play(DRYFIRE, { vol: 0.3 });
     state.nextShot = now + 0.25;
     reload();
     return;
   }
   state.ammo--;
   state.shots++;
-  // sound: sound_trigger_rate throttles repeats in-game; simple per-shot here
-  play(soundById(parseInt(st.sound_id, 16)), { vol: 0.9, pitch: 0.97 + Math.random() * 0.06 });
+  play(soundById(parseInt(st.sound_id, 16)), { vol: 0.55, pitch: 0.97 + Math.random() * 0.06 });
   // spread: inaccuracy in GE arbitrary units; scale to radians
   const spread = st.inaccuracy * 0.0022;
-  const dir = new THREE.Vector3(0, 0, -1)
-    .applyEuler(new THREE.Euler(look.pitch + (Math.random()-0.5)*spread,
-                                look.yaw + (Math.random()-0.5)*spread, 0, 'YX'))
-    .normalize();
-  raycaster.set(cam.position, dir);
-  raycaster.far = 300;
-  const hits = raycaster.intersectObjects(targets, true);
-  if (hits.length) {
-    const h = hits[0];
-    let g = h.object;
-    while (g.parent && !g.userData.hit) g = g.parent;
-    const mat = g.userData.hit || 'other';
-    const set = HIT_SOUNDS[mat];
-    play(set[Math.floor(Math.random() * set.length)], { vol: 0.45, pitch: 0.9 + Math.random()*0.2 });
-    spawnSpark(h.point);
-    if (g.userData.hp !== Infinity && g.userData.downT <= 0) {
-      state.hits++;
-      g.userData.hp -= st.damage;
-      state.score += Math.max(1, Math.round(-g.position.z));
-      if (g.userData.hp <= 0) {
-        g.userData.downT = 2.2;
-        state.score += 50;
+  const pellets = (state.key === 'shotgun' || state.key === 'autoshot') ? 5 : 1;
+  const muzzle = cam.position.clone()
+    .add(new THREE.Vector3(0.22, -0.18, -0.6)
+      .applyEuler(new THREE.Euler(look.pitch, look.yaw, 0, 'YX')));
+  for (let pi = 0; pi < pellets; pi++) {
+    const dir = new THREE.Vector3(0, 0, -1)
+      .applyEuler(new THREE.Euler(look.pitch + (Math.random()-0.5)*spread,
+                                  look.yaw + (Math.random()-0.5)*spread, 0, 'YX'))
+      .normalize();
+    if (EXPLOSIVE[state.key]) { fireProjectile(state.key, dir); continue; }
+    raycaster.set(cam.position, dir);
+    raycaster.far = 300;
+    const hits = raycaster.intersectObjects(targets, true);
+    const end = hits.length ? hits[0].point
+      : cam.position.clone().addScaledVector(dir, 130);
+    spawnTracer(muzzle, end);
+    if (hits.length) {
+      const h = hits[0];
+      let g = h.object;
+      while (g.parent && !g.userData.hit) g = g.parent;
+      const mat = g.userData.hit || 'other';
+      const set = HIT_SOUNDS[mat];
+      play(set[Math.floor(Math.random() * set.length)], { vol: 0.8, at: h.point, pitch: 0.9 + Math.random()*0.2 });
+      spawnSpark(h.point);
+      const n = h.face ? h.face.normal.clone().transformDirection(h.object.matrixWorld)
+                       : dir.clone().negate();
+      spawnDecal(h.point, n);
+      hitReact(g);
+      if (g.userData.hp !== Infinity && g.userData.downT <= 0) {
+        if (pi === 0) state.hits++;
+        hitMarker();
+        g.userData.hp -= st.damage;
+        state.score += Math.max(1, Math.round(-g.position.z));
+        if (g.userData.hp <= 0) {
+          g.userData.downT = 2.2;
+          state.score += 50;
+        }
       }
     }
   }
+  shake = Math.min(1, shake + st.vfx.recoil_up * 0.004 + 0.02);
   // recoil + flash
   state.recoil = Math.min(1.5, state.recoil + st.vfx.recoil_up * 0.012 + 0.05);
   state.kick = Math.min(1, state.kick + st.vfx.recoil_back * 0.05 + 0.15);
@@ -367,6 +487,8 @@ document.addEventListener('mousedown', e => { if (locked && e.button === 0) stat
 document.addEventListener('mouseup', e => { if (e.button === 0) state.firing = false; });
 document.addEventListener('keydown', e => {
   if (e.code === 'KeyR') reload();
+  if (e.code === 'Minus') master.gain.value = Math.max(0, master.gain.value - 0.05);
+  if (e.code === 'Equal') master.gain.value = Math.min(1, master.gain.value + 0.05);
   if (e.code === 'BracketRight') cycle(1);
   if (e.code === 'BracketLeft') cycle(-1);
 });
@@ -414,7 +536,7 @@ function tick() {
     state.flashT -= dt;
     if (state.flashT <= 0) for (const m of state.flashMats) m.visible = false;
   }
-  // targets fall & respawn
+  // targets: fall/respawn, wobble, hit flash
   for (const t of targets) {
     const u = t.userData;
     if (u.downT > 0) {
@@ -423,17 +545,64 @@ function tick() {
       t.rotation.x = -fall * Math.PI / 2;
       if (u.downT <= 0) { u.hp = u.maxhp; t.rotation.x = 0; }
     }
+    if (u.wobble > 0) {
+      u.wobble = Math.max(0, u.wobble - dt * 3.5);
+      t.rotation.z = Math.sin(performance.now() * 0.045) * u.wobble * 0.12;
+      if (u.wobble === 0) t.rotation.z = 0;
+    }
+    if (u.flash > 0) {
+      u.flash -= dt;
+      if (u.flash <= 0 && u.board) u.board.material.color.setRGB(1, 1, 1);
+    }
   }
-  for (let i = sparks.length - 1; i >= 0; i--) {
-    sparks[i].userData.t -= dt;
-    if (sparks[i].userData.t <= 0) { scene.remove(sparks[i]); sparks.splice(i, 1); }
+  // transient fx
+  for (let i = fx.length - 1; i >= 0; i--) {
+    const m = fx[i], u = m.userData;
+    u.t -= dt;
+    if (u.kind === 'spark' && u.vel) {
+      u.vel.y -= 12 * dt;
+      m.position.addScaledVector(u.vel, dt);
+    } else if (u.kind === 'explosion') {
+      const k = 1 - u.t / u.ttl;
+      m.scale.setScalar(0.4 + k * 5.5);
+      m.material.opacity = 0.95 * (1 - k);
+    } else if (u.kind === 'light') {
+      m.intensity = 60 * (u.t / u.ttl);
+    } else if (u.kind === 'decal' && u.t < 2) {
+      m.material.opacity = u.t / 2 * 0.9;
+    }
+    if (u.t <= 0) { scene.remove(m); fx.splice(i, 1); }
   }
+  // projectiles
+  for (let i = projectiles.length - 1; i >= 0; i--) {
+    const p = projectiles[i], u = p.userData;
+    u.vel.y -= u.grav * dt;
+    const step = u.vel.length() * dt;
+    const dir = u.vel.clone().normalize();
+    raycaster.set(p.position, dir);
+    raycaster.far = step + 0.15;
+    const hit = raycaster.intersectObjects(targets, true)[0];
+    p.position.addScaledVector(u.vel, dt);
+    p.lookAt(p.position.clone().add(dir));
+    u.life -= dt;
+    const out = p.position.y <= 0.02 || p.position.z <= -113 || Math.abs(p.position.x) >= 12.8
+      || p.position.z >= 6 || p.position.y >= 6.9;
+    if (hit || out || u.life <= 0) {
+      const at = hit ? hit.point : p.position.clone();
+      at.y = Math.max(at.y, 0.05);
+      scene.remove(p); projectiles.splice(i, 1);
+      explode(at, u.radius, state.stats ? state.stats.damage * 8 : 8);
+    }
+  }
+  shake = Math.max(0, shake - dt * 3);
+  const shx = shake > 0 ? (Math.random() - 0.5) * shake * 0.03 : 0;
+  const shy = shake > 0 ? (Math.random() - 0.5) * shake * 0.03 : 0;
 
   const kickPitch = state.recoil * 0.03;
   cam.rotation.set(0, 0, 0);
   cam.rotation.order = 'YXZ';
-  cam.rotation.y = look.yaw;
-  cam.rotation.x = look.pitch + kickPitch;
+  cam.rotation.y = look.yaw + shy;
+  cam.rotation.x = look.pitch + kickPitch + shx;
 
   // gun pose (own scene, fixed to camera)
   gunMount.position.set(0.26, -0.23 + state.recoil * 0.008, -0.55 + state.kick * 0.05);
