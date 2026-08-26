@@ -41,13 +41,15 @@ master.connect(actx.destination);
 const bufCache = new Map();
 // background music (rendered from the ROM's own sequence + instrument bank)
 const music = { gain: actx.createGain(), src: null, on: true, started: false };
-music.gain.gain.value = 0.5;
+music.gain.gain.value = 0.42;
 music.gain.connect(master);
 async function startMusic() {
   if (music.started) return;
   music.started = true;
   try {
-    const buf = await loadBuf('../extracted/music/track02.wav');
+    // prefer the OC ReMix cover; fall back to the ROM-rendered track
+    let buf = await loadBuf('../extracted/music/facility_hacker_remix.mp3');
+    if (!buf) buf = await loadBuf('../extracted/music/track02.wav');
     if (!buf) { music.started = false; return; }
     const src = actx.createBufferSource();
     src.buffer = buf; src.loop = true;
@@ -58,7 +60,7 @@ async function startMusic() {
 }
 function toggleMusic() {
   music.on = !music.on;
-  music.gain.gain.value = music.on ? 0.5 : 0;
+  music.gain.gain.value = music.on ? 0.42 : 0;
 }
 async function loadBuf(url) {
   if (!url) return null;
