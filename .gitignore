@@ -13,3 +13,6 @@ desktop.ini
 
 # Derived/extracted ROM contents
 extracted/
+
+# Python cache
+__pycache__/
