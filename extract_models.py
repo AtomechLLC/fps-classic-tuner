@@ -88,6 +88,7 @@ class Decoder:
         self.gunfire = None
         self.cur_switch = -1     # -1 = always-visible geometry
         self.n_switches = 0
+        self.vbuf = [-1] * 32    # RSP vertex buffer: persists across nested DLs
         self.geomode = 0         # RSP geometry mode (G_TEXTURE_GEN etc.)
         self.mtx = {}            # matrix index -> (tx,ty,tz)  (rotations are identity at rest)
         self.cur_mtx = (0.0, 0.0, 0.0)
@@ -122,7 +123,7 @@ class Decoder:
         return len(self.verts) - 1
 
     def run_dl(self, o, vtx_base, translate, depth=0, lit=False):
-        vbuf = [0]*32
+        vbuf = self.vbuf
         if depth > 8: return
         while o + 8 <= len(self.d):
             w0, w1 = struct.unpack(">2I", self.d[o:o+8])
