@@ -327,11 +327,11 @@ function fireProjectile(kind, dir) {
 const objLoader = new OBJLoader();
 const mtlLoader = new MTLLoader();
 const gunScene = new THREE.Scene();
-gunScene.add(new THREE.HemisphereLight(0xffffff, 0x445, 1.6));
-const gl2 = new THREE.DirectionalLight(0xffffff, 2.6);
+gunScene.add(new THREE.HemisphereLight(0xffffff, 0x556677, 0.75));
+const gl2 = new THREE.DirectionalLight(0xffffff, 0.95);
 gl2.position.set(-0.6, 1.4, 0.8);
 gunScene.add(gl2);
-const gl3 = new THREE.DirectionalLight(0xbfc8ff, 0.7);
+const gl3 = new THREE.DirectionalLight(0xc9d4ff, 0.35);
 gl3.position.set(1, -0.3, 0.5);
 gunScene.add(gl3);
 const gunMount = new THREE.Group();
@@ -359,12 +359,17 @@ async function loadGunModel(name) {
         let nm;
         const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
         const ie = IMAGES[tid];
+        const flatCol = ie && ie.w === 1 && ie.h === 1;      // 1x1 = flat colour + texture-gen
         const envStrip = ie && (ie.w === 1 || ie.h === 1
           || /SPECULAR|SHINE|CHROME/i.test(ie.name || ''));   // texture-gen highlight
-        if (envStrip && lit) {        // approximate N64 env-mapped metal
-          const tint = tid === 661 ? 0x7a5c16 : tid === 776 ? 0x8d939c : 0x17171d;
-          nm = new THREE.MeshPhongMaterial({ color: tint, specular: 0xdddddd,
-            shininess: 26, side: THREE.DoubleSide });
+        if (flatCol && lit) {         // 1x1 flat colour + texture-gen = env-mapped metal
+          const c = (ie && (ie.opaque || ie.avg)) || [24, 24, 28];
+          nm = new THREE.MeshPhongMaterial({
+            color: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255),
+            specular: 0xcccccc, shininess: 26, side: THREE.DoubleSide });
+        } else if (envStrip && lit) { // specular strip texture: keep the texture, untinted
+          nm = new THREE.MeshPhongMaterial({ map, specular: 0xbbbbbb,
+            shininess: 22, side: THREE.DoubleSide });
         } else if (lit) {             // vertex-normal lit geometry (gun bodies)
           nm = new THREE.MeshPhongMaterial({ map, specular: 0x8a8a8a, shininess: 30,
             side: THREE.DoubleSide });
@@ -779,9 +784,9 @@ window.__inspect = async (key, view = 'side', w = 560, flat = false) => {
   const { obj } = await loadGunModel(modelName);
   const scn = new THREE.Scene();
   scn.background = new THREE.Color(0x8a93a0);
-  scn.add(new THREE.HemisphereLight(0xffffff, 0x556, 2.0));
-  const dl = new THREE.DirectionalLight(0xffffff, 2.2); dl.position.set(-1, 2, 1.5); scn.add(dl);
-  const dl2 = new THREE.DirectionalLight(0xaabbff, 1.0); dl2.position.set(1.5, -0.5, -1); scn.add(dl2);
+  scn.add(new THREE.HemisphereLight(0xffffff, 0x556677, 0.8));
+  const dl = new THREE.DirectionalLight(0xffffff, 1.0); dl.position.set(-1, 2, 1.5); scn.add(dl);
+  const dl2 = new THREE.DirectionalLight(0xc9d4ff, 0.35); dl2.position.set(1.5, -0.5, -1); scn.add(dl2);
   const clone = obj.clone(true);
   clone.position.set(0, 0, 0); clone.rotation.set(0, 0, 0); clone.scale.setScalar(1);
   // keep the game's visibility rules (flash + non-default switch states stay hidden)
