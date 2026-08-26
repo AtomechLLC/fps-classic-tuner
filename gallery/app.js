@@ -351,6 +351,7 @@ async function loadGunModel(name) {
       const out = [];
       for (let m of mats) {
         const sw = m.name.match(/_sw(\d+)_(\d+)/);
+        const fl = m.name.match(/_fl(\d+)/);
         const lit = /_lit$/.test(m.name);
         const map = m.map || null;
         if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
@@ -370,19 +371,16 @@ async function loadGunModel(name) {
         } else {                      // prelit: baked vertex colours
           nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         }
-        if (map && !(sw && sw[1] === '0')) nm.alphaTest = 0.35;
+        if (map && !fl) nm.alphaTest = 0.35;
         nm.name = m.name;
-        if (sw) {
-          const swi = +sw[1], child = +sw[2];
-          if (swi === 0) {            // muzzle flash switch
-            nm.transparent = true; nm.blending = THREE.AdditiveBlending;
-            nm.depthWrite = false; nm.alphaTest = 0;
-            nm.visible = false;
-            (flashGroups[child] = flashGroups[child] || []).push(nm);
-          } else if (child > 0) {     // non-default switch state
-            nm.visible = false;
-          }
-        }
+        if (fl) {                     // muzzle-flash frames (header Switches[1])
+          nm.transparent = true; nm.blending = THREE.AdditiveBlending;
+          nm.depthWrite = false; nm.alphaTest = 0;
+          nm.visible = false;
+          const frame = +fl[1];
+          (flashGroups[frame] = flashGroups[frame] || []).push(nm);
+        }                             // ordinary switch children are all part of
+                                      // the weapon at rest; only flash is hidden
         out.push(nm);
       }
       o.material = Array.isArray(o.material) ? out : out[0];
@@ -401,14 +399,14 @@ async function loadGunModel(name) {
       const idx = o.geometry.index;
       for (const g of o.geometry.groups || []) {
         const m = mats[g.materialIndex] || mats[0];
-        if (!/_sw0_/.test(m.name)) continue;
+        if (!/_fl\d/.test(m.name)) continue;
         for (let i = g.start; i < g.start + g.count; i++) {
           const vi = idx ? idx.getX(i) : i;
           flash.expandByPoint(v.fromBufferAttribute(pos, vi));
         }
       }
       if ((!o.geometry.groups || !o.geometry.groups.length)
-          && mats.some(m => /_sw0_/.test(m.name))) {
+          && mats.some(m => /_fl\d/.test(m.name))) {
         flash.union(o.geometry.boundingBox);
       }
     });

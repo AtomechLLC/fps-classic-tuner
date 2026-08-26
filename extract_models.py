@@ -90,6 +90,10 @@ class Decoder:
         self.n_switches = 0
         self.mtx = {}            # matrix index -> (tx,ty,tz)  (rotations are identity at rest)
         self.cur_mtx = (0.0, 0.0, 0.0)
+        # header Switches array: gunfire.c uses Switches[1] as the muzzle-flash
+        # switch node and Switches[3] as its placement data
+        self.switches = [self.u32(4*i) & 0xffffff for i in range(ns)]
+        self.flash_node = self.switches[1] if ns > 1 and self.switches[1] else None
 
     def u16(self, o): return struct.unpack(">H", self.d[o:o+2])[0]
     def u32(self, o): return struct.unpack(">I", self.d[o:o+4])[0]
@@ -204,8 +208,8 @@ class Decoder:
         nxt = self.off(self.u32(addr+0x0c))
         t = translate
         if op == 18:              # switch node: one child shown at a time
-            sw = self.n_switches
-            self.n_switches += 1
+            sw = 'fl' if (self.flash_node and addr == self.flash_node) else self.n_switches
+            if sw != 'fl': self.n_switches += 1
             ch = self.off(self.u32(addr+0x14))
             j = 0
             while ch:
@@ -255,7 +259,8 @@ class Decoder:
     def export_obj(self, path, name):
         def mat(tid, sw, lit):
             base = f"tex_{tid}"
-            if isinstance(sw, tuple): base += f"_sw{sw[0]}_{sw[1]}"
+            if isinstance(sw, tuple):
+                base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return base + ("_lit" if lit else "")
         used = sorted(set((f[3], f[4], f[5]) for f in self.faces),
                       key=lambda x: (str(x[0]), str(x[1]), x[2]))
@@ -312,6 +317,7 @@ def main():
         for f in dec.faces:
             if isinstance(f[4], tuple):
                 switches.setdefault(f"{f[4][0]}_{f[4][1]}", set()).add(f[3])
+        has_flash = any(isinstance(f[4], tuple) and f[4][0] == 'fl' for f in dec.faces)
         bbox = None
         if dec.verts:
             xs, ys, zs = zip(*dec.verts)
@@ -321,6 +327,7 @@ def main():
                           "textures": sorted(set(f[3] for f in dec.faces if f[3] is not None)),
                           "switches": {k: sorted(x for x in v if x is not None) for k, v in switches.items()},
                           "bbox": bbox,
+                          "has_flash": has_flash,
                           "source": "decomp" if name in info else "heuristic"}
         if dec.gunfire: manifest[name]["muzzle_flash"] = dec.gunfire
     json.dump(manifest, open(os.path.join(OUT, "MODELS.json"), "w"), indent=1)
