@@ -419,13 +419,15 @@ function shoot(now) {
   // spread: inaccuracy in GE arbitrary units; scale to radians
   const spread = st.inaccuracy * 0.0022;
   const pellets = (state.key === 'shotgun' || state.key === 'autoshot') ? 5 : 1;
+  const aim = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion).normalize();
+  const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
+  const up = new THREE.Vector3(0, 1, 0).applyQuaternion(cam.quaternion);
   const muzzle = cam.position.clone()
-    .add(new THREE.Vector3(0.22, -0.18, -0.6)
-      .applyEuler(new THREE.Euler(look.pitch, look.yaw, 0, 'YX')));
+    .addScaledVector(right, 0.22).addScaledVector(up, -0.18).addScaledVector(aim, 0.6);
   for (let pi = 0; pi < pellets; pi++) {
-    const dir = new THREE.Vector3(0, 0, -1)
-      .applyEuler(new THREE.Euler(look.pitch + (Math.random()-0.5)*spread,
-                                  look.yaw + (Math.random()-0.5)*spread, 0, 'YX'))
+    const dir = aim.clone()
+      .addScaledVector(right, (Math.random()-0.5)*spread)
+      .addScaledVector(up, (Math.random()-0.5)*spread)
       .normalize();
     if (EXPLOSIVE[state.key]) { fireProjectile(state.key, dir); continue; }
     raycaster.set(cam.position, dir);
@@ -471,7 +473,13 @@ function shoot(now) {
 const look = { yaw: 0, pitch: 0 };
 let locked = false;
 canvas.addEventListener('click', () => {
-  if (!locked) { canvas.requestPointerLock(); actx.resume(); }
+  if (!locked) {
+    try {
+      const p = canvas.requestPointerLock();
+      if (p && p.catch) p.catch(() => {});
+    } catch (e) {}
+    actx.resume();
+  }
 });
 document.addEventListener('pointerlockchange', () => {
   locked = document.pointerLockElement === canvas;
@@ -486,6 +494,7 @@ document.addEventListener('mousemove', e => {
 document.addEventListener('mousedown', e => { if (locked && e.button === 0) state.firing = true; });
 document.addEventListener('mouseup', e => { if (e.button === 0) state.firing = false; });
 document.addEventListener('keydown', e => {
+  if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyR') reload();
   if (e.code === 'Minus') master.gain.value = Math.max(0, master.gain.value - 0.05);
   if (e.code === 'Equal') master.gain.value = Math.min(1, master.gain.value + 0.05);
