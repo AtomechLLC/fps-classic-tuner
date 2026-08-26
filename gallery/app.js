@@ -3,7 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { x: 0.20, y: -0.26, z: -0.06, rx: 0.02, ry: -0.30, rz: 0.02, h: 0.24, len: 0.80, near: 0.03 };
+window.__P = { x: 0.03, y: -0.04, z: -0.03, rx: 0.02, ry: -0.30, rz: 0.02, h: 0.28, len: 0.86, near: 0.03 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
@@ -549,14 +549,34 @@ async function selectWeapon(key) {
   obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
   obj.position.copy(centre.clone().applyQuaternion(obj.quaternion).negate());
   holder.add(obj);
+  // Size the view by the WEAPON, not the whole model: several view models carry
+  // Bond's hand and a long sleeve, and letting those drive the scale shrinks the
+  // gun and pushes the arm into the camera.
   const wb = new THREE.Box3().setFromObject(holder);
+  const front = new THREE.Box3();
+  const midZ = (wb.min.z + wb.max.z) / 2;
+  const vtmp = new THREE.Vector3();
+  holder.traverse(o => {
+    if (!o.isMesh) return;
+    const pos = o.geometry.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      vtmp.fromBufferAttribute(pos, i);
+      o.localToWorld(vtmp);
+      if (vtmp.z <= midZ) front.expandByPoint(vtmp);   // muzzle half = the gun
+    }
+  });
+  // Scale from the whole model (keeps long guns sane), but anchor on the gun
+  // half so a long sleeve runs back past the camera instead of shrinking it.
   const wsz = wb.getSize(new THREE.Vector3());
   const sc = Math.min(P.h / Math.max(wsz.y, 1e-3), P.len / Math.max(wsz.z, 1e-3));
   holder.scale.setScalar(sc);
   const wb2 = new THREE.Box3().setFromObject(holder);
-  holder.position.set(P.x - (wb2.min.x + wb2.max.x) / 2,
-                      P.y - wb2.min.y,
-                      P.z - wb2.max.z);
+  const anchorZ = front.isEmpty() ? wb2.max.z : front.max.z * sc;
+  // anchor the gun's top-left corner: it hangs down-right into frame like GE,
+  // with the sleeve running back past the camera
+  holder.position.set(P.x - wb2.min.x,
+                      P.y - wb2.max.y,
+                      P.z - anchorZ);
   holder.rotation.set(P.rx, P.ry, P.rz);
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
