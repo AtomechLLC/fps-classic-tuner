@@ -137,7 +137,7 @@ def decode_setup(path):
         rec = {"type": TYPE_NAMES.get(t, str(t))}
         if t == 9:  # guard
             h = struct.unpack(">HHHHHHHHHh", d[pos+4:pos+0x18])
-            rec.update(chrnum=h[0], pad=s16(h[1]), body=body_name(h[2]),
+            rec.update(chrnum=h[0], pad=s16(h[1]), body_id=h[2], body=body_name(h[2]),
                        ailist=h[3], preset=h[4], chrpreset=h[5],
                        health=h[6], reaction=h[7], flags=f"{h[8]:#06x}", head=h[9])
         elif t in OBJRECORD_TYPES:
