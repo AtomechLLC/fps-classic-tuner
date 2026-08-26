@@ -84,6 +84,8 @@ class Decoder:
         self.cur_tex = None
         self.seen_nodes = set()
         self.gunfire = None
+        self.cur_switch = -1     # -1 = always-visible geometry
+        self.n_switches = 0
 
     def u16(self, o): return struct.unpack(">H", self.d[o:o+2])[0]
     def u32(self, o): return struct.unpack(">I", self.d[o:o+4])[0]
@@ -126,10 +128,10 @@ class Decoder:
                     if x == y == z == 0: continue
                     tris.append((x, y, z))
                 for x, y, z in tris:
-                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex))
+                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
-                self.faces.append((vbuf[a//10], vbuf[b//10], vbuf[c//10], self.cur_tex))
+                self.faces.append((vbuf[a//10], vbuf[b//10], vbuf[c//10], self.cur_tex, self.cur_switch))
             # everything else (rdp state, matrices) ignored
 
     def node(self, addr, translate):
@@ -140,6 +142,11 @@ class Decoder:
         child = self.off(self.u32(addr+0x14))
         nxt = self.off(self.u32(addr+0x0c))
         t = translate
+        entered_switch = False
+        if op == 18:              # switch node: children are toggleable groups
+            self.cur_switch = self.n_switches
+            self.n_switches += 1
+            entered_switch = True
         if op == 1 and data:      # header record (characters): tree at Data->FirstGroup
             grp = self.off(self.u32(data+4))
             if grp: self.node(grp, t)
@@ -163,13 +170,15 @@ class Decoder:
             self.gunfire = {"offset": vals[0:3], "size": vals[3:6],
                             "scale": struct.unpack(">f", self.d[data+0x1c:data+0x20])[0]}
         if child: self.node(child, t)
+        if entered_switch: self.cur_switch = -1
         if nxt: self.node(nxt, translate)
 
     def export_obj(self, path, name):
-        used = sorted(set(f[3] for f in self.faces if f[3] is not None))
+        def mat(tid, sw): return f"tex_{tid}" + (f"_sw{sw}" if sw >= 0 else "")
+        used = sorted(set((f[3], f[4]) for f in self.faces), key=lambda x: (str(x[0]), x[1]))
         with open(path + ".mtl", "w") as m:
-            for tid in used:
-                m.write(f"newmtl tex_{tid}\n")
+            for tid, sw in used:
+                m.write(f"newmtl {mat(tid, sw)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
@@ -178,9 +187,10 @@ class Decoder:
             for v in self.verts: f.write(f"v {v[0]} {v[1]} {v[2]}\n")
             for u in self.uvs: f.write(f"vt {u[0]:.4f} {u[1]:.4f}\n")
             last = object()
-            for a, b, c, tid in self.faces:
-                if tid != last:
-                    f.write(f"usemtl tex_{tid}\n"); last = tid
+            for a, b, c, tid, sw in self.faces:
+                key = (tid, sw)
+                if key != last:
+                    f.write(f"usemtl {mat(tid, sw)}\n"); last = key
                 f.write(f"f {a+1}/{a+1} {b+1}/{b+1} {c+1}/{c+1}\n")
 
 def main():
@@ -206,8 +216,13 @@ def main():
         if not dec.faces:
             failed.append(name); continue
         dec.export_obj(os.path.join(OUT, name), name)
+        switches = {}
+        for f in dec.faces:
+            if f[4] >= 0:
+                switches.setdefault(f[4], set()).add(f[3])
         manifest[name] = {"tris": len(dec.faces), "verts": len(dec.verts),
                           "textures": sorted(set(f[3] for f in dec.faces if f[3] is not None)),
+                          "switches": {str(k): sorted(x for x in v if x is not None) for k, v in switches.items()},
                           "source": "decomp" if name in info else "heuristic"}
         if dec.gunfire: manifest[name]["muzzle_flash"] = dec.gunfire
     json.dump(manifest, open(os.path.join(OUT, "MODELS.json"), "w"), indent=1)
