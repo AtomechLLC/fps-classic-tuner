@@ -13,6 +13,12 @@ and AI-audibility (loudness/noise model).
 """
 import struct, os, re, json
 
+def sfx_names():
+    bc = open(os.path.join(DECOMP, "src", "bondconstants.h"), encoding="utf-8", errors="replace").read()
+    i = bc.find("typedef enum SFX_ID")
+    end = bc.find("}", i)
+    return [m.group(1) for m in re.finditer(r"^\s*(\w+)\s*,", bc[i:end], re.M)]
+
 CODE = "extracted/00021990.bin"
 OUT = "extracted/weapons"
 DECOMP = os.environ.get("GE_DECOMP", r"C:\Users\alexy\AppData\Local\Temp\claude\C--Projects-GameDesignSkills-FPS\84e45f69-1c8d-46db-b624-e37129a216e9\scratchpad\007")
@@ -111,13 +117,19 @@ def main():
         if not (0 <= off + 0x70 <= len(blob)):
             print("  skip", name, "out of range"); continue
         weapons[name] = decode(blob, off)
+    names = sfx_names()
+    for w in weapons.values():
+        sid = int(w["sound_id"], 16)
+        if 0 <= sid < len(names):
+            w["sound_name"] = names[sid]
+            w["sound_file"] = f"../sounds/{sid:03d}_{names[sid]}.wav"
     os.makedirs(OUT, exist_ok=True)
     json.dump(weapons, open(os.path.join(OUT, "WEAPONS.json"), "w"), indent=1)
 
     # summary table
     rows = []
     hdr = ["weapon","ammo","mag","auto rate","single rate","damage","spread",
-           "penetr.","zoom","recoil up","loud min-max","noise/shot","flags"]
+           "penetr.","zoom","recoil up","loud min-max","noise/shot","sound","flags"]
     for name, w in weapons.items():
         if name.startswith(("default","null","joypad")): continue
         fl = ",".join(x for x in w["flags"] if x in
@@ -128,7 +140,8 @@ def main():
                      str(w["damage"]), str(w["inaccuracy"]), str(w["penetration_objects"]),
                      str(w["zoom_fov"]), str(w["vfx"]["recoil_up"]),
                      f"{w['ai_noise']['loudness_min']}-{w['ai_noise']['loudness_max']}",
-                     str(w["ai_noise"]["noise_per_shot"]), fl])
+                     str(w["ai_noise"]["noise_per_shot"]),
+                     w.get("sound_name", w["sound_id"]).replace("_SFX",""), fl])
     widths = [max(len(hdr[i]), max((len(r[i]) for r in rows), default=0)) for i in range(len(hdr))]
     lines = ["# GoldenEye weapon stats (from ROM)", "",
              "Rates are in 60Hz ticks between shots; auto rate `None` = no full-auto mode.",
