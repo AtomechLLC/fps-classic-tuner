@@ -1,0 +1,12 @@
+# ROM images and other large game binaries — keep out of version control
+*.z64
+*.n64
+*.v64
+*.rom
+*.iso
+*.bin
+
+# OS cruft
+Thumbs.db
+desktop.ini
+.DS_Store
