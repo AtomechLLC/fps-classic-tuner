@@ -3,7 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { x: 0.19, y: -0.36, z: -0.06, rx: -0.02, ry: -0.18, rz: 0.02, h: 0.36, len: 1.25, near: 0.03 };
+window.__P = { x: 0.17, y: -0.30, z: -0.02, rx: -0.02, ry: -0.18, rz: 0.02, h: 0.30, len: 0.95, near: 0.03 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {

@@ -88,6 +88,8 @@ class Decoder:
         self.gunfire = None
         self.cur_switch = -1     # -1 = always-visible geometry
         self.n_switches = 0
+        self.mtx = {}            # matrix index -> (tx,ty,tz)  (rotations are identity at rest)
+        self.cur_mtx = (0.0, 0.0, 0.0)
 
     def u16(self, o): return struct.unpack(">H", self.d[o:o+2])[0]
     def u32(self, o): return struct.unpack(">I", self.d[o:o+4])[0]
@@ -95,6 +97,7 @@ class Decoder:
 
     def vertex(self, addr, translate, lit):
         x, y, z, f, s, t = struct.unpack(">6h", self.d[addr:addr+12])
+        translate = self.cur_mtx
         w, h = self.tex.get(self.cur_tex, (32, 32))
         u = s / 32.0 / max(w, 1)
         v = 1.0 - t / 32.0 / max(h, 1)
@@ -120,6 +123,9 @@ class Decoder:
             elif cmd == 0x06:
                 self.run_dl(self.off(w1), vtx_base, translate, depth+1, lit)
                 if (w0 >> 16) & 0xFF == 1: return
+            elif cmd == 0x01:      # G_MTX: load matrix from segment 3 (index = off/64)
+                if (w1 >> 24) == 3:
+                    self.cur_mtx = self.mtx.get((w1 & 0xFFFFFF) // 64, (0.0, 0.0, 0.0))
             elif cmd == 0xC0:
                 self.cur_tex = w1 & 0xFFFF
             elif cmd == 0x04:
@@ -143,10 +149,40 @@ class Decoder:
                 self.faces.append((vbuf[a//10], vbuf[b//10], vbuf[c//10], self.cur_tex, self.cur_switch, lit))
             # everything else (rdp state, matrices) ignored
 
+    def calc_matrices(self, addr, parent, seen=None):
+        """model.c subcalcmatrices: matrix[MatrixID0] = parent * translate(Origin)."""
+        if seen is None: seen = set()
+        if addr == 0 or addr in seen: return
+        seen.add(addr)
+        raw = self.u16(addr)
+        op = raw & 0xFF
+        data = self.off(self.u32(addr+4))
+        here = parent
+        if op in (2, 21) and data:
+            ox, oy, oz = struct.unpack(">3f", self.d[data:data+12])
+            here = (parent[0]+ox, parent[1]+oy, parent[2]+oz)
+            m0 = struct.unpack(">h", self.d[data+0x0e:data+0x10])[0]
+            if m0 >= 0: self.mtx[m0] = here
+            if raw & 0x100:
+                m1 = struct.unpack(">h", self.d[data+0x10:data+0x12])[0]
+                if m1 >= 0: self.mtx[m1] = here
+            if raw & 0x200:
+                m2 = struct.unpack(">h", self.d[data+0x12:data+0x14])[0]
+                if m2 >= 0: self.mtx[m2] = here
+        elif op == 1 and data:
+            mi = struct.unpack(">h", self.d[data+2:data+4])[0]
+            if mi >= 0: self.mtx[mi] = here
+            grp = self.off(self.u32(data+4))
+            if grp: self.calc_matrices(grp, here, seen)
+        child = self.off(self.u32(addr+0x14))
+        nxt = self.off(self.u32(addr+0x0c))
+        if child: self.calc_matrices(child, here, seen)
+        if nxt: self.calc_matrices(nxt, parent, seen)
+
     def node(self, addr, translate):
         if addr == 0 or addr in self.seen_nodes: return
         self.seen_nodes.add(addr)
-        op = self.u16(addr)
+        op = self.u16(addr) & 0xFF
         data = self.off(self.u32(addr+4))
         child = self.off(self.u32(addr+0x14))
         nxt = self.off(self.u32(addr+0x0c))
@@ -169,9 +205,8 @@ class Decoder:
         if op == 1 and data:      # header record (characters): tree at Data->FirstGroup
             grp = self.off(self.u32(data+4))
             if grp: self.node(grp, t)
-        elif op == 2 and data:    # group: origin offset for children
-            ox, oy, oz = struct.unpack(">3f", self.d[data:data+12])
-            t = (translate[0]+ox, translate[1]+oy, translate[2]+oz)
+        elif op in (2, 21) and data:   # group: transform lives in the matrix table
+            pass
         elif op == 4 and data:    # display list (guns)
             pri, sec = self.u32(data), self.u32(data+4)
             lit = self.d[data+18] in (3, 4)     # GunLighting / fog+lighting
@@ -250,6 +285,7 @@ def main():
         root = 4*ns + 12*nt
         dec = Decoder(d, ns, nt, texmap)
         try:
+            dec.calc_matrices(root, (0.0, 0.0, 0.0))
             dec.node(root, (0.0, 0.0, 0.0))
         except (struct.error, IndexError, RecursionError):
             failed.append(name); continue
