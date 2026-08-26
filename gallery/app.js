@@ -47,8 +47,9 @@ async function startMusic() {
   if (music.started) return;
   music.started = true;
   try {
-    // prefer the OC ReMix cover; fall back to the ROM-rendered track
-    let buf = await loadBuf('../extracted/music/facility_hacker_remix.mp3');
+    // GoldenEye title theme cover (Brandon Wiebe OST remake); fallbacks after
+    let buf = await loadBuf('../extracted/music/goldeneye_theme_cover.mp3');
+    if (!buf) buf = await loadBuf('../extracted/music/facility_hacker_remix.mp3');
     if (!buf) buf = await loadBuf('../extracted/music/track02.wav');
     if (!buf) { music.started = false; return; }
     const src = actx.createBufferSource();
