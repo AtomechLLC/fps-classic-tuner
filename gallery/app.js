@@ -3,6 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
+window.__P = { x: 3, y: 10, z: 0, rx: 0.12, ry: -0.38, rz: 0.03, ms: 0.33, k: 0.010, near: 0.05 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
@@ -96,7 +97,7 @@ scene.background = new THREE.Color(0x0a0d12);
 scene.fog = new THREE.Fog(0x0a0d12, 60, 160);
 const cam = new THREE.PerspectiveCamera(60, 1, 0.05, 400);
 cam.position.set(0, 1.6, 0);
-const gunCam = new THREE.PerspectiveCamera(50, 1, 0.01, 50);   // separate pass so gun never clips
+const gunCam = new THREE.PerspectiveCamera(60, 1, 0.02, 60);   // separate pass so gun never clips
 
 scene.add(new THREE.HemisphereLight(0xcfd8e8, 0x30302a, 1.15));
 const sun = new THREE.DirectionalLight(0xfff2d9, 1.3);
@@ -233,6 +234,19 @@ function spawnDecal(p, normal) {
   m.lookAt(p.clone().add(normal));
   addFx(m, 9, 'decal');
 }
+const casingGeo = new THREE.BoxGeometry(0.012, 0.012, 0.03);
+const casingMat = new THREE.MeshLambertMaterial({ color: 0xc8a248 });
+function spawnCasing() {
+  const m = new THREE.Mesh(casingGeo, casingMat);
+  const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion);
+  m.position.copy(cam.position).addScaledVector(right, 0.28).addScaledVector(fwd, 0.35)
+    .add(new THREE.Vector3(0, -0.12, 0));
+  m.userData = { vel: right.clone().multiplyScalar(1.4 + Math.random())
+      .add(new THREE.Vector3(0, 2 + Math.random(), 0)),
+      rot: new THREE.Vector3(Math.random()*20, Math.random()*20, 0) };
+  addFx(m, 0.9, 'casing');
+}
 let shake = 0;
 function explode(p, radius, damage) {
   play(EXPLO_SOUNDS[Math.floor(Math.random()*EXPLO_SOUNDS.length)],
@@ -313,10 +327,13 @@ function fireProjectile(kind, dir) {
 const objLoader = new OBJLoader();
 const mtlLoader = new MTLLoader();
 const gunScene = new THREE.Scene();
-gunScene.add(new THREE.HemisphereLight(0xffffff, 0x404040, 1.6));
-const gl2 = new THREE.DirectionalLight(0xfff5e0, 1.0);
+gunScene.add(new THREE.HemisphereLight(0xffffff, 0x556, 2.3));
+const gl2 = new THREE.DirectionalLight(0xfff5e0, 1.8);
 gl2.position.set(-1, 2, 1);
 gunScene.add(gl2);
+const gl3 = new THREE.DirectionalLight(0xccd5ff, 0.8);
+gl3.position.set(1, -0.5, 1);
+gunScene.add(gl3);
 const gunMount = new THREE.Group();
 gunScene.add(gunMount);
 
@@ -327,35 +344,48 @@ async function loadGunModel(name) {
     const mtl = await mtlLoader.setPath(`${EX}/models/`).loadAsync(`${name}.mtl`);
     mtl.preload();
     const obj = await objLoader.setMaterials(mtl).setPath(`${EX}/models/`).loadAsync(`${name}.obj`);
-    const flashMats = [], flashMeshes = [];
+    const flashGroups = {};          // child index -> [materials]
     obj.traverse(o => {
       if (!o.isMesh) return;
       const mats = Array.isArray(o.material) ? o.material : [o.material];
-      let anySwitch = false;
-      for (const m of mats) {
-        m.side = THREE.DoubleSide;
-        if (m.map) { m.map.magFilter = THREE.NearestFilter; m.map.colorSpace = THREE.SRGBColorSpace; }
-        if (/_sw\d+$/.test(m.name)) {
-          anySwitch = true;
-          if (/_sw0$/.test(m.name)) {           // switch 0 = muzzle flash frames
-            m.transparent = true; m.blending = THREE.AdditiveBlending;
-            m.depthWrite = false;
-            flashMats.push(m);
-          }
-          m.visible = false;
+      const out = [];
+      for (let m of mats) {
+        const sw = m.name.match(/_sw(\d+)_(\d+)/);
+        const lit = /_lit$/.test(m.name);
+        const map = m.map || null;
+        if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
+                   map.wrapS = map.wrapT = THREE.RepeatWrapping; }
+        let nm;
+        const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
+        const ie = IMAGES[tid];
+        const envStrip = ie && (ie.w === 1 || ie.h === 1
+          || /SPECULAR|SHINE|CHROME/i.test(ie.name || ''));   // texture-gen highlight
+        if (envStrip && lit) {        // approximate N64 env-mapped metal
+          nm = new THREE.MeshPhongMaterial({ color: 0xb9bec6, specular: 0xffffff,
+            shininess: 55, side: THREE.DoubleSide });
+        } else if (lit) {             // vertex-normal lit geometry (gun bodies)
+          nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
+        } else {                      // prelit: baked vertex colours
+          nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         }
+        if (map && !(sw && sw[1] === '0')) nm.alphaTest = 0.35;
+        nm.name = m.name;
+        if (sw) {
+          const swi = +sw[1], child = +sw[2];
+          if (swi === 0) {            // muzzle flash switch
+            nm.transparent = true; nm.blending = THREE.AdditiveBlending;
+            nm.depthWrite = false; nm.alphaTest = 0;
+            nm.visible = false;
+            (flashGroups[child] = flashGroups[child] || []).push(nm);
+          } else if (child > 0) {     // non-default switch state
+            nm.visible = false;
+          }
+        }
+        out.push(nm);
       }
-      if (anySwitch) flashMeshes.push(o);
+      o.material = Array.isArray(o.material) ? out : out[0];
     });
-    // normalise: GE guns are modelled in cm-ish units at view offsets
-    const bbox = new THREE.Box3().setFromObject(obj);
-    const size = bbox.getSize(new THREE.Vector3());
-    const s = 0.55 / Math.max(size.x, size.y, size.z);
-    obj.scale.setScalar(s);
-    const bbox2 = new THREE.Box3().setFromObject(obj);
-    const c = bbox2.getCenter(new THREE.Vector3());
-    obj.position.sub(c);
-    return { obj, flashMats };
+    return { obj, flashGroups };
   })();
   gunCache.set(name, p);
   return p;
@@ -363,7 +393,7 @@ async function loadGunModel(name) {
 
 // ---- weapon state ----
 const state = {
-  key: null, stats: null, gun: null, flashMats: [],
+  key: null, stats: null, gun: null, flashGroups: {},
   ammo: 0, reserve: Infinity, firing: false, nextShot: 0, reloading: false,
   recoil: 0, kick: 0, flashT: 0,
   score: 0, shots: 0, hits: 0,
@@ -384,11 +414,20 @@ async function selectWeapon(key) {
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
-  const { obj, flashMats } = await loadGunModel(modelName);
+  const { obj, flashGroups } = await loadGunModel(modelName);
   if (state.key !== key) return;
   gunMount.clear();
+  // GE view frame: model +z into screen; stats give on-screen offset + scale
+  const gp = st.vfx.gun_screen_pos;
+  const P = window.__P;
+  const bb = MODELS[modelName].bbox || [0,0,0,0,0,400];
+  const lenZ = Math.max(bb[5] - bb[2], 100);
+  const norm = Math.pow(407 / lenZ, 0.8);      // soft-normalise long guns
+  obj.rotation.set(P.rx, Math.PI + P.ry, P.rz);
+  obj.scale.setScalar((st.crosshair_speed || 0.8) * P.ms * norm);
+  obj.position.set(gp[0] + P.x, gp[1] + P.y, Math.min(gp[2], -28) + P.z);
   gunMount.add(obj);
-  state.gun = obj; state.flashMats = flashMats;
+  state.gun = obj; state.flashGroups = flashGroups;
   updateHud();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
@@ -398,7 +437,8 @@ function updateHud() {
   if (!st) return;
   document.getElementById('wname').textContent = DISPLAY[state.key] || state.key;
   document.getElementById('ammo').innerHTML = state.reloading ? '<small>RELOADING…</small>'
-    : (state.ammo === Infinity ? '∞' : `${state.ammo} <small>/ ${st.mag_size}</small>`);
+    : (state.ammo === Infinity ? '∞'
+       : `<span class="ge-reserve">∞</span> <span class="ge-bullet">▮</span> ${state.ammo}`);
   const fi = fireInterval(st);
   const rpm = Math.round(60 / fi.t);
   document.getElementById('stats').innerHTML =
@@ -489,7 +529,13 @@ function shoot(now) {
   state.recoil = Math.min(1.5, state.recoil + st.vfx.recoil_up * 0.012 + 0.05);
   state.kick = Math.min(1, state.kick + st.vfx.recoil_back * 0.05 + 0.15);
   state.flashT = 0.055;
-  for (const m of state.flashMats) m.visible = true;
+  const kids = Object.keys(state.flashGroups);
+  if (kids.length) {
+    const j = kids[Math.floor(Math.random() * kids.length)];
+    state.curFlash = state.flashGroups[j];
+    for (const m of state.curFlash) m.visible = true;
+  }
+  if (st.vfx.ejects_cartridges) spawnCasing();
   updateHud();
 }
 
@@ -569,7 +615,8 @@ function tick() {
   state.kick = Math.max(0, state.kick - dt * 8);
   if (state.flashT > 0) {
     state.flashT -= dt;
-    if (state.flashT <= 0) for (const m of state.flashMats) m.visible = false;
+    if (state.flashT <= 0 && state.curFlash)
+      for (const m of state.curFlash) m.visible = false;
   }
   // targets: fall/respawn, wobble, hit flash
   for (const t of targets) {
@@ -597,6 +644,11 @@ function tick() {
     if (u.kind === 'spark' && u.vel) {
       u.vel.y -= 12 * dt;
       m.position.addScaledVector(u.vel, dt);
+    } else if (u.kind === 'casing') {
+      u.vel.y -= 9.8 * dt;
+      m.position.addScaledVector(u.vel, dt);
+      m.rotation.x += u.rot.x * dt; m.rotation.y += u.rot.y * dt;
+      if (m.position.y < 0.02) { m.position.y = 0.02; u.vel.set(0,0,0); u.rot.set(0,0,0); }
     } else if (u.kind === 'explosion') {
       const k = 1 - u.t / u.ttl;
       m.scale.setScalar(0.4 + k * 5.5);
@@ -639,11 +691,12 @@ function tick() {
   cam.rotation.y = look.yaw + shy;
   cam.rotation.x = look.pitch + kickPitch + shx;
 
-  // gun pose (own scene, fixed to camera)
-  gunMount.position.set(0.26, -0.23 + state.recoil * 0.008, -0.55 + state.kick * 0.05);
-  gunMount.rotation.set(state.recoil * 0.10, Math.PI - 0.06, 0);
-  const bob = Math.sin(now * 1.8) * 0.004;
-  gunMount.position.y += bob;
+  // gun pose: GE view units (cm-ish) scaled to metres; recoil pulls back/up
+  const K = window.__P.k;
+  gunMount.scale.setScalar(K);
+  gunMount.position.set(0, Math.sin(now * 1.8) * 0.004 + state.recoil * 0.01,
+                        state.kick * 0.06);
+  gunMount.rotation.set(state.recoil * 0.09, 0, 0);
 
   const w = canvas.clientWidth, h = canvas.clientHeight;
   if (canvas.width !== w * renderer.getPixelRatio() || canvas.height !== h * renderer.getPixelRatio()) {
@@ -660,7 +713,26 @@ function tick() {
 tick();
 
 // ---- debug hooks (harmless in production) ----
-window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer };
+window.__repose = () => {
+  gunCam.near = window.__P.near || 0.02;
+  gunCam.updateProjectionMatrix();
+  return selectWeapon(state.key);
+};
+window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam };
+window.__shot = (w = 480) => {
+  if (canvas.width < 8) {
+    renderer.setSize(960, 540, false);
+    cam.aspect = 16/9; cam.updateProjectionMatrix();
+    gunCam.aspect = 16/9; gunCam.updateProjectionMatrix();
+  }
+  const cw = canvas.width, ch = canvas.height;
+  renderer.autoClear = true; renderer.render(scene, cam);
+  renderer.autoClear = false; renderer.clearDepth(); renderer.render(gunScene, gunCam);
+  const t = document.createElement('canvas');
+  t.width = w; t.height = Math.round(w * ch / cw);
+  t.getContext('2d').drawImage(canvas, 0, 0, t.width, t.height);
+  return t.toDataURL('image/jpeg', 0.7);
+};
 window.__stats = () => {
   const w = canvas.width, h = canvas.height;
   renderer.autoClear = true;

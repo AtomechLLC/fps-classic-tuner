@@ -80,6 +80,8 @@ class Decoder:
             self.tex[tid] = (d[e+4], d[e+5])   # W, H
         self.verts = []      # (x,y,z)
         self.uvs = []        # (u,v)
+        self.attrs = []      # (r,g,b) colour or unit normal, per vertex
+        self.lit = []        # per-vertex: True if attr bytes are a normal
         self.faces = []      # (vi1,vi2,vi3, uv1,uv2,uv3, texid)
         self.cur_tex = None
         self.seen_nodes = set()
@@ -91,16 +93,23 @@ class Decoder:
     def u32(self, o): return struct.unpack(">I", self.d[o:o+4])[0]
     def off(self, v): return v & 0xffffff
 
-    def vertex(self, addr, translate):
+    def vertex(self, addr, translate, lit):
         x, y, z, f, s, t = struct.unpack(">6h", self.d[addr:addr+12])
         w, h = self.tex.get(self.cur_tex, (32, 32))
         u = s / 32.0 / max(w, 1)
         v = 1.0 - t / 32.0 / max(h, 1)
         self.verts.append((x+translate[0], y+translate[1], z+translate[2]))
         self.uvs.append((u, v))
+        if lit:   # colour slots hold a signed vertex normal
+            nx, ny, nz = struct.unpack(">3b", self.d[addr+12:addr+15])
+            ln = max((nx*nx+ny*ny+nz*nz) ** 0.5, 1e-6)
+            self.attrs.append((nx/ln, ny/ln, nz/ln))
+        else:     # prelit vertex colour
+            self.attrs.append((self.d[addr+12]/255, self.d[addr+13]/255, self.d[addr+14]/255))
+        self.lit.append(lit)
         return len(self.verts) - 1
 
-    def run_dl(self, o, vtx_base, translate, depth=0):
+    def run_dl(self, o, vtx_base, translate, depth=0, lit=False):
         vbuf = [0]*32
         if depth > 8: return
         while o + 8 <= len(self.d):
@@ -109,7 +118,7 @@ class Decoder:
             o += 8
             if cmd == 0xB8: return
             elif cmd == 0x06:
-                self.run_dl(self.off(w1), vtx_base, translate, depth+1)
+                self.run_dl(self.off(w1), vtx_base, translate, depth+1, lit)
                 if (w0 >> 16) & 0xFF == 1: return
             elif cmd == 0xC0:
                 self.cur_tex = w1 & 0xFFFF
@@ -118,7 +127,7 @@ class Decoder:
                 v0 = (w0 >> 16) & 0xF
                 addr = self.off(w1)
                 for i in range(n):
-                    vbuf[v0+i] = self.vertex(addr + 16*i, translate)
+                    vbuf[v0+i] = self.vertex(addr + 16*i, translate, lit)
             elif cmd == 0xB1:  # TRI4
                 tris = []
                 for k in range(4):
@@ -128,10 +137,10 @@ class Decoder:
                     if x == y == z == 0: continue
                     tris.append((x, y, z))
                 for x, y, z in tris:
-                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch))
+                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch, lit))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
-                self.faces.append((vbuf[a//10], vbuf[b//10], vbuf[c//10], self.cur_tex, self.cur_switch))
+                self.faces.append((vbuf[a//10], vbuf[b//10], vbuf[c//10], self.cur_tex, self.cur_switch, lit))
             # everything else (rdp state, matrices) ignored
 
     def node(self, addr, translate):
@@ -142,11 +151,21 @@ class Decoder:
         child = self.off(self.u32(addr+0x14))
         nxt = self.off(self.u32(addr+0x0c))
         t = translate
-        entered_switch = False
-        if op == 18:              # switch node: children are toggleable groups
-            self.cur_switch = self.n_switches
+        if op == 18:              # switch node: one child shown at a time
+            sw = self.n_switches
             self.n_switches += 1
-            entered_switch = True
+            ch = self.off(self.u32(addr+0x14))
+            j = 0
+            while ch:
+                self.cur_switch = (sw, j)
+                self.node(ch, t)
+                ch2 = self.off(self.u32(ch+0x0c))
+                # the child list is walked via our normal next-recursion; stop here
+                break
+            self.cur_switch = -1
+            nxt2 = self.off(self.u32(addr+0x0c))
+            if nxt2: self.node(nxt2, translate)
+            return
         if op == 1 and data:      # header record (characters): tree at Data->FirstGroup
             grp = self.off(self.u32(data+4))
             if grp: self.node(grp, t)
@@ -155,12 +174,15 @@ class Decoder:
             t = (translate[0]+ox, translate[1]+oy, translate[2]+oz)
         elif op == 4 and data:    # display list (guns)
             pri, sec = self.u32(data), self.u32(data+4)
+            lit = self.d[data+18] in (3, 4)     # GunLighting / fog+lighting
             for gdl in (pri, sec):
-                if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+12)), translate)
+                if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+12)), translate, lit=lit)
         elif op == 24 and data:   # display list with collision table (props/chars)
             pri, sec = self.u32(data), self.u32(data+4)
+            mtype = struct.unpack(">h", self.d[data+0x18:data+0x1a])[0]
+            lit = mtype in (3, 4)
             for gdl in (pri, sec):
-                if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+8)), translate)
+                if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+8)), translate, lit=lit)
         elif op == 22 and data:   # primary-only display list
             gdl = self.u32(data+8)
             if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+4)), translate)
@@ -170,28 +192,46 @@ class Decoder:
             self.gunfire = {"offset": vals[0:3], "size": vals[3:6],
                             "scale": struct.unpack(">f", self.d[data+0x1c:data+0x20])[0]}
         if child: self.node(child, t)
-        if entered_switch: self.cur_switch = -1
+        if isinstance(self.cur_switch, tuple):
+            sw, j = self.cur_switch
+            if nxt:
+                self.cur_switch = (sw, j + 1)
+                self.node(nxt, translate)
+                self.cur_switch = (sw, j)
+            return
         if nxt: self.node(nxt, translate)
 
     def export_obj(self, path, name):
-        def mat(tid, sw): return f"tex_{tid}" + (f"_sw{sw}" if sw >= 0 else "")
-        used = sorted(set((f[3], f[4]) for f in self.faces), key=lambda x: (str(x[0]), x[1]))
+        def mat(tid, sw, lit):
+            base = f"tex_{tid}"
+            if isinstance(sw, tuple): base += f"_sw{sw[0]}_{sw[1]}"
+            return base + ("_lit" if lit else "")
+        used = sorted(set((f[3], f[4], f[5]) for f in self.faces),
+                      key=lambda x: (str(x[0]), str(x[1]), x[2]))
         with open(path + ".mtl", "w") as m:
-            for tid, sw in used:
-                m.write(f"newmtl {mat(tid, sw)}\n")
+            for tid, sw, lit in used:
+                m.write(f"newmtl {mat(tid, sw, lit)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
         with open(path + ".obj", "w") as f:
             f.write(f"mtllib {name}.mtl\n")
-            for v in self.verts: f.write(f"v {v[0]} {v[1]} {v[2]}\n")
+            for i, v in enumerate(self.verts):
+                r, g, b = (1.0, 1.0, 1.0) if self.lit[i] else self.attrs[i]
+                f.write(f"v {v[0]} {v[1]} {v[2]} {r:.3f} {g:.3f} {b:.3f}\n")
             for u in self.uvs: f.write(f"vt {u[0]:.4f} {u[1]:.4f}\n")
+            for i in range(len(self.verts)):
+                if self.lit[i]:
+                    nx, ny, nz = self.attrs[i]
+                    f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
+                else:
+                    f.write("vn 0 1 0\n")
             last = object()
-            for a, b, c, tid, sw in self.faces:
-                key = (tid, sw)
+            for a, b, c, tid, sw, lit in self.faces:
+                key = (tid, sw, lit)
                 if key != last:
-                    f.write(f"usemtl {mat(tid, sw)}\n"); last = key
-                f.write(f"f {a+1}/{a+1} {b+1}/{b+1} {c+1}/{c+1}\n")
+                    f.write(f"usemtl {mat(tid, sw, lit)}\n"); last = key
+                f.write(f"f {a+1}/{a+1}/{a+1} {b+1}/{b+1}/{b+1} {c+1}/{c+1}/{c+1}\n")
 
 def main():
     only = sys.argv[1:] or None
@@ -218,11 +258,17 @@ def main():
         dec.export_obj(os.path.join(OUT, name), name)
         switches = {}
         for f in dec.faces:
-            if f[4] >= 0:
-                switches.setdefault(f[4], set()).add(f[3])
+            if isinstance(f[4], tuple):
+                switches.setdefault(f"{f[4][0]}_{f[4][1]}", set()).add(f[3])
+        bbox = None
+        if dec.verts:
+            xs, ys, zs = zip(*dec.verts)
+            bbox = [round(min(xs),1), round(min(ys),1), round(min(zs),1),
+                    round(max(xs),1), round(max(ys),1), round(max(zs),1)]
         manifest[name] = {"tris": len(dec.faces), "verts": len(dec.verts),
                           "textures": sorted(set(f[3] for f in dec.faces if f[3] is not None)),
-                          "switches": {str(k): sorted(x for x in v if x is not None) for k, v in switches.items()},
+                          "switches": {k: sorted(x for x in v if x is not None) for k, v in switches.items()},
+                          "bbox": bbox,
                           "source": "decomp" if name in info else "heuristic"}
         if dec.gunfire: manifest[name]["muzzle_flash"] = dec.gunfire
     json.dump(manifest, open(os.path.join(OUT, "MODELS.json"), "w"), indent=1)
