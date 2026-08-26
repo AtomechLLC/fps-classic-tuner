@@ -3,7 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { x: 3, y: 10, z: 0, rx: 0.12, ry: -0.38, rz: 0.03, ms: 0.33, k: 0.010, near: 0.05 };
+window.__P = { x: 0.19, y: -0.36, z: -0.06, rx: -0.02, ry: -0.18, rz: 0.02, h: 0.36, len: 1.25, near: 0.03 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
@@ -361,8 +361,9 @@ async function loadGunModel(name) {
         const envStrip = ie && (ie.w === 1 || ie.h === 1
           || /SPECULAR|SHINE|CHROME/i.test(ie.name || ''));   // texture-gen highlight
         if (envStrip && lit) {        // approximate N64 env-mapped metal
-          nm = new THREE.MeshPhongMaterial({ color: 0xb9bec6, specular: 0xffffff,
-            shininess: 55, side: THREE.DoubleSide });
+          const tint = tid === 661 ? 0x7a5c16 : tid === 776 ? 0x8d939c : 0x17171d;
+          nm = new THREE.MeshPhongMaterial({ color: tint, specular: 0xdddddd,
+            shininess: 26, side: THREE.DoubleSide });
         } else if (lit) {             // vertex-normal lit geometry (gun bodies)
           nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
         } else {                      // prelit: baked vertex colours
@@ -385,7 +386,18 @@ async function loadGunModel(name) {
       }
       o.material = Array.isArray(o.material) ? out : out[0];
     });
-    return { obj, flashGroups };
+    // barrel direction: muzzle flash quads sit at the muzzle in model space
+    const all = new THREE.Box3();
+    const flash = new THREE.Box3();
+    obj.traverse(o => {
+      if (!o.isMesh) return;
+      o.geometry.computeBoundingBox();
+      const bb = o.geometry.boundingBox;
+      all.union(bb);
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      if (mats.some(m => /_sw0_/.test(m.name))) flash.union(bb);
+    });
+    return { obj, flashGroups, all, flash };
   })();
   gunCache.set(name, p);
   return p;
@@ -414,20 +426,39 @@ async function selectWeapon(key) {
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
-  const { obj, flashGroups } = await loadGunModel(modelName);
+  const { obj, flashGroups, all, flash } = await loadGunModel(modelName);
   if (state.key !== key) return;
   gunMount.clear();
-  // GE view frame: model +z into screen; stats give on-screen offset + scale
-  const gp = st.vfx.gun_screen_pos;
   const P = window.__P;
-  const bb = MODELS[modelName].bbox || [0,0,0,0,0,400];
-  const lenZ = Math.max(bb[5] - bb[2], 100);
-  const norm = Math.pow(407 / lenZ, 0.8);      // soft-normalise long guns
-  obj.rotation.set(P.rx, Math.PI + P.ry, P.rz);
-  obj.scale.setScalar((st.crosshair_speed || 0.8) * P.ms * norm);
-  obj.position.set(gp[0] + P.x, gp[1] + P.y, Math.min(gp[2], -28) + P.z);
-  gunMount.add(obj);
-  state.gun = obj; state.flashGroups = flashGroups;
+  const holder = new THREE.Group();
+  // 1. rotate so the muzzle (flash centroid, else +z) points forward (-z)
+  const centre = all.getCenter(new THREE.Vector3());
+  let dir;
+  if (!flash.isEmpty()) {
+    dir = flash.getCenter(new THREE.Vector3()).sub(centre);
+  } else {
+    const size = all.getSize(new THREE.Vector3());
+    dir = new THREE.Vector3(0, 0, size.z >= size.x ? 1 : (0, 1));
+    if (size.x > size.z) dir.set(1, 0, 0);
+  }
+  dir.y = 0; dir.normalize();
+  obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
+  obj.position.copy(centre.clone().applyQuaternion(obj.quaternion).negate());
+  holder.add(obj);
+  // 2. normalise size: cap height and barrel length
+  const wb = new THREE.Box3().setFromObject(holder);
+  const wsz = wb.getSize(new THREE.Vector3());
+  const sc = Math.min(P.h / Math.max(wsz.y, 1e-3), P.len / Math.max(wsz.z, 1e-3));
+  holder.scale.setScalar(sc);
+  // 3. anchor: rear of the gun near the camera, bottom-right
+  const wb2 = new THREE.Box3().setFromObject(holder);
+  holder.position.set(P.x - (wb2.min.x + wb2.max.x) / 2,
+                      P.y - wb2.min.y,
+                      P.z - wb2.max.z);
+  holder.rotation.set(P.rx, P.ry, P.rz);
+  gunMount.add(holder);
+  gunMount.scale.setScalar(1);
+  state.gun = holder; state.flashGroups = flashGroups;
   updateHud();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
@@ -691,18 +722,19 @@ function tick() {
   cam.rotation.y = look.yaw + shy;
   cam.rotation.x = look.pitch + kickPitch + shx;
 
-  // gun pose: GE view units (cm-ish) scaled to metres; recoil pulls back/up
-  const K = window.__P.k;
-  gunMount.scale.setScalar(K);
-  gunMount.position.set(0, Math.sin(now * 1.8) * 0.004 + state.recoil * 0.01,
-                        state.kick * 0.06);
+  // gun mount: metres, fixed to camera; recoil pulls back/up
+  gunMount.position.set(0, Math.sin(now * 1.8) * 0.004 + state.recoil * 0.012,
+                        state.kick * 0.07);
   gunMount.rotation.set(state.recoil * 0.09, 0, 0);
 
   const w = canvas.clientWidth, h = canvas.clientHeight;
   if (canvas.width !== w * renderer.getPixelRatio() || canvas.height !== h * renderer.getPixelRatio()) {
     renderer.setSize(w, h, false);
-    cam.aspect = w / h; cam.updateProjectionMatrix();
-    gunCam.aspect = w / h; gunCam.updateProjectionMatrix();
+    const aspect = w / h;
+    const vfov = a => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(60) / 2) / Math.max(a, 0.4)));
+    cam.aspect = aspect; cam.fov = aspect < 1 ? vfov(aspect) : 60; cam.updateProjectionMatrix();
+    gunCam.aspect = aspect; gunCam.fov = cam.fov; gunCam.near = window.__P.near;
+    gunCam.updateProjectionMatrix();
   }
   renderer.autoClear = true;
   renderer.render(scene, cam);
