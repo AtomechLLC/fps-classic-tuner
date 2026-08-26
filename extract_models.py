@@ -218,18 +218,20 @@ class Decoder:
         child = self.off(self.u32(addr+0x14))
         nxt = self.off(self.u32(addr+0x0c))
         t = translate
-        if op == 18:              # switch node: one child shown at a time
+        if op == 18:
+            # model.c modelApplyToggleRelations(): a switch is a toggle --
+            #   visible -> node->Child = rodata->Controls  (that node and the
+            #              siblings after it in the chain)
+            #   hidden  -> node->Child = NULL
+            # Switches[1] is the muzzle flash, hidden until the weapon fires.
             sw = 'fl' if (self.flash_node and addr == self.flash_node) else self.n_switches
             if sw != 'fl': self.n_switches += 1
-            ch = self.off(self.u32(addr+0x14))
-            j = 0
-            while ch:
-                self.cur_switch = (sw, j)
-                self.node(ch, t)
-                ch2 = self.off(self.u32(ch+0x0c))
-                # the child list is walked via our normal next-recursion; stop here
-                break
-            self.cur_switch = -1
+            controls = self.off(self.u32(data)) if data else 0
+            shown = controls or self.off(self.u32(addr+0x14))
+            if shown:
+                self.cur_switch = (sw, 0)
+                self.node(shown, t)
+                self.cur_switch = -1
             nxt2 = self.off(self.u32(addr+0x0c))
             if nxt2: self.node(nxt2, translate)
             return
@@ -287,12 +289,27 @@ class Decoder:
                 r, g, b = (1.0, 1.0, 1.0) if self.lit[i] else self.attrs[i]
                 f.write(f"v {v[0]} {v[1]} {v[2]} {r:.3f} {g:.3f} {b:.3f}\n")
             for u in self.uvs: f.write(f"vt {u[0]:.4f} {u[1]:.4f}\n")
+            # Some models store degenerate (0,0,0) vertex normals. Those normalize
+            # to NaN in a shader and render pure black, so rebuild them from face
+            # geometry (area-weighted) and fall back to +Y if still undefined.
+            geo = [[0.0, 0.0, 0.0] for _ in self.verts]
+            for a, b, c, *_rest in self.faces:
+                pa, pb, pc = self.verts[a], self.verts[b], self.verts[c]
+                ux, uy, uz = pb[0]-pa[0], pb[1]-pa[1], pb[2]-pa[2]
+                wx, wy, wz = pc[0]-pa[0], pc[1]-pa[1], pc[2]-pa[2]
+                fx, fy, fz = uy*wz - uz*wy, uz*wx - ux*wz, ux*wy - uy*wx
+                for vi in (a, b, c):
+                    geo[vi][0] += fx; geo[vi][1] += fy; geo[vi][2] += fz
             for i in range(len(self.verts)):
-                if self.lit[i]:
-                    nx, ny, nz = self.attrs[i]
-                    f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
-                else:
-                    f.write("vn 0 1 0\n")
+                nx, ny, nz = self.attrs[i] if self.lit[i] else (0.0, 0.0, 0.0)
+                if abs(nx) + abs(ny) + abs(nz) < 1e-6:
+                    nx, ny, nz = geo[i]
+                    ln = (nx*nx + ny*ny + nz*nz) ** 0.5
+                    if ln < 1e-9:
+                        nx, ny, nz = 0.0, 1.0, 0.0
+                    else:
+                        nx, ny, nz = nx/ln, ny/ln, nz/ln
+                f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
             last = object()
             for a, b, c, tid, sw, lit, env in self.faces:
                 key = (tid, sw, lit, env)

@@ -3,7 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { x: 0.17, y: -0.30, z: -0.02, rx: -0.02, ry: -0.18, rz: 0.02, h: 0.30, len: 0.95, near: 0.03 };
+window.__P = { x: 0.20, y: -0.26, z: -0.06, rx: 0.02, ry: -0.30, rz: 0.02, h: 0.24, len: 0.80, near: 0.03 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
@@ -100,6 +100,8 @@ cam.position.set(0, 1.6, 0);
 const gunCam = new THREE.PerspectiveCamera(60, 1, 0.02, 60);   // separate pass so gun never clips
 
 scene.add(new THREE.HemisphereLight(0xcfd8e8, 0x30302a, 1.15));
+// some GE prop faces have inward normals; ambient keeps them from going pure black
+scene.add(new THREE.AmbientLight(0xffffff, 0.45));
 const sun = new THREE.DirectionalLight(0xfff2d9, 1.3);
 sun.position.set(-14, 22, -8);
 scene.add(sun);
@@ -148,6 +150,65 @@ function buildRange() {
   }
 }
 
+
+// ---- GE prop models as range furniture/targets ----
+const propCache = new Map();
+async function loadProp(modelName) {
+  if (propCache.has(modelName)) return propCache.get(modelName);
+  const p = (async () => {
+    const ml = new MTLLoader().setPath(`${EX}/models/`);
+    const mtl = await ml.loadAsync(`${modelName}.mtl`);
+    mtl.preload();
+    const ol = new OBJLoader().setMaterials(mtl).setPath(`${EX}/models/`);
+    const obj = await ol.loadAsync(`${modelName}.obj`);
+    obj.traverse(o => {
+      if (!o.isMesh) return;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const out = mats.map(m => {
+        const map = m.map || null;
+        if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
+                   map.wrapS = map.wrapT = THREE.RepeatWrapping; }
+        const lit = /_lit/.test(m.name);
+        const nm = lit
+          ? new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide })
+          : new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
+        if (map) nm.alphaTest = 0.35;
+        nm.name = m.name;
+        return nm;
+      });
+      o.material = Array.isArray(o.material) ? out : out[0];
+    });
+    return obj;
+  })();
+  propCache.set(modelName, p);
+  return p;
+}
+
+/** Place a prop at (x,z), scaled so it stands `height` metres tall, base on the floor. */
+async function placeProp(modelName, x, z, height, opts = {}) {
+  const src = await loadProp(modelName);
+  const inst = src.clone(true);
+  const bb = new THREE.Box3().setFromObject(inst);
+  const sz = bb.getSize(new THREE.Vector3());
+  const sc = height / Math.max(sz.y, 1e-3);
+  inst.scale.setScalar(sc);
+  const bb2 = new THREE.Box3().setFromObject(inst);
+  const ctr = bb2.getCenter(new THREE.Vector3());
+  const g = new THREE.Group();
+  inst.position.set(-ctr.x, -bb2.min.y, -ctr.z);
+  if (opts.ry) inst.rotation.y = opts.ry;
+  g.add(inst);
+  g.position.set(x, 0, z);
+  g.userData = {
+    hp: opts.hp ?? Infinity, maxhp: opts.hp ?? Infinity,
+    hit: opts.hit || 'metal', downT: 0, wobble: 0, flash: 0,
+    name: opts.name || modelName, prop: true,
+  };
+  scene.add(g);
+  targets.push(g);
+  return g;
+}
+
 // ---- targets ----
 const targets = [];
 const raycaster = new THREE.Raycaster();
@@ -167,6 +228,7 @@ function mkTarget(x, z, opts) {
   targets.push(g);
 }
 function buildTargets() {
+  // knock-down silhouette targets down the lanes (planes: cheap and readable)
   const rows = [
     { z: -14, imgs: [9, 10, 9] },      // STOMEMAN stone-man reliefs
     { z: -32, imgs: [10, 9, 10] },
@@ -176,20 +238,27 @@ function buildTargets() {
   for (const r of rows)
     r.imgs.forEach((img, i) => mkTarget((i - 1) * 6.5, r.z, {
       img, w: 1.35, h: 1.9, hp: 8, hit: 'wood', name: `target @${-r.z}m` }));
-  // material test blocks
-  const blocks = [
-    { img: 8,   hit: 'metal', x: -10, z: -20 },   // yellow stripes
-    { img: 195, hit: 'stone', x: 10, z: -20 },    // BRICK
-    { img: 33,  hit: 'wood',  x: -10, z: -45 },   // AMMOCRATE1
-    { img: 34,  hit: 'wood',  x: 10, z: -45 },    // AMMOCRATE2
+}
+
+/** Real GoldenEye props: material test pieces and range dressing. */
+async function buildProps() {
+  const jobs = [
+    // material test line: metal drums, gas barrels, wooden crates
+    ['Poil_drum1Z',  -10,  -20, 0.95, { hit: 'metal' }],
+    ['Poil_drum6Z',   -8.6,-21.4, 0.95, { hit: 'metal' }],
+    ['PgasbarrelZ',   10,  -20, 1.05, { hit: 'metal' }],
+    ['Pammo_crate5Z',-10,  -45, 0.55, { hit: 'wood' }],
+    ['Pboxes2x4Z',    10,  -45, 1.60, { hit: 'wood' }],
+    ['PgastankZ',    -11,  -70, 1.90, { hit: 'metal' }],
+    ['Poil_drum3Z',   11,  -70, 0.95, { hit: 'metal' }],
+    ['Poil_drum5Z',   12.2,-71.5, 0.95, { hit: 'metal' }],
+    // dressing near the firing line
+    ['Pmetal_chair1Z', -6.5, 2.5, 0.95, { hit: 'metal', ry: 0.6 }],
+    ['Pbookshelf1Z',    9.5, 1.0, 1.85, { hit: 'wood', ry: -0.4 }],
   ];
-  for (const b of blocks) {
-    const m = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.6, 1.6),
-      new THREE.MeshLambertMaterial({ map: geTex(b.img, 1) }));
-    m.position.set(b.x, 0.8, b.z);
-    m.userData = { hp: Infinity, hit: b.hit, block: true };
-    scene.add(m);
-    targets.push(m);
+  for (const [name, x, z, h, opts] of jobs) {
+    try { await placeProp(name, x, z, h, opts); }
+    catch (e) { console.log('prop failed', name, e); }
   }
 }
 
@@ -324,8 +393,6 @@ function fireProjectile(kind, dir) {
 }
 
 // ---- weapon view models ----
-const objLoader = new OBJLoader();
-const mtlLoader = new MTLLoader();
 const gunScene = new THREE.Scene();
 gunScene.add(new THREE.HemisphereLight(0xffffff, 0x556677, 0.75));
 const gl2 = new THREE.DirectionalLight(0xffffff, 0.95);
@@ -341,9 +408,11 @@ const gunCache = new Map();
 async function loadGunModel(name) {
   if (gunCache.has(name)) return gunCache.get(name);
   const p = (async () => {
-    const mtl = await mtlLoader.setPath(`${EX}/models/`).loadAsync(`${name}.mtl`);
+    const ml = new MTLLoader().setPath(`${EX}/models/`);
+    const mtl = await ml.loadAsync(`${name}.mtl`);
     mtl.preload();
-    const obj = await objLoader.setMaterials(mtl).setPath(`${EX}/models/`).loadAsync(`${name}.obj`);
+    const ol = new OBJLoader().setMaterials(mtl).setPath(`${EX}/models/`);
+    const obj = await ol.loadAsync(`${name}.obj`);
     const flashGroups = {};          // child index -> [materials]
     obj.traverse(o => {
       if (!o.isMesh) return;
@@ -658,6 +727,7 @@ for (const k of roster) {
 // ---- main loop ----
 buildRange();
 buildTargets();
+buildProps();
 selectWeapon('wppk');
 
 let last = performance.now() / 1000;
@@ -877,6 +947,7 @@ window.__repose = () => {
   gunCam.updateProjectionMatrix();
   return selectWeapon(state.key);
 };
+window.THREE = THREE;
 window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam };
 window.__shot = (w = 480) => {
   if (canvas.width < 8) {
