@@ -120,20 +120,33 @@ class Decoder:
             cmd = w0 >> 24
             o += 8
             if cmd == 0xB8: return
-            elif cmd == 0x06:
-                self.run_dl(self.off(w1), vtx_base, translate, depth+1, lit)
+            elif cmd == 0x06:      # G_DL
+                if (w1 >> 24) in (5, 6):
+                    self.run_dl(self.off(w1), vtx_base, translate, depth+1, lit)
                 if (w0 >> 16) & 0xFF == 1: return
             elif cmd == 0x01:      # G_MTX: load matrix from segment 3 (index = off/64)
                 if (w1 >> 24) == 3:
                     self.cur_mtx = self.mtx.get((w1 & 0xFFFFFF) // 64, (0.0, 0.0, 0.0))
             elif cmd == 0xC0:
                 self.cur_tex = w1 & 0xFFFF
-            elif cmd == 0x04:
+            elif cmd == 0x04:      # G_VTX
                 n = ((w0 >> 20) & 0xF) + 1
                 v0 = (w0 >> 16) & 0xF
-                addr = self.off(w1)
-                for i in range(n):
-                    vbuf[v0+i] = self.vertex(addr + 16*i, translate, lit)
+                # segment 5 = absolute file offset; segment 4 = offset relative to
+                # this record's Vertices array (set as a segment base at load time)
+                seg = w1 >> 24
+                if seg == 5:
+                    addr = self.off(w1)
+                elif seg == 4 and vtx_base:
+                    addr = vtx_base + self.off(w1)
+                else:
+                    addr = None
+                if addr is None or addr + 16*n > len(self.d):
+                    for i in range(n):
+                        vbuf[v0+i] = -1
+                else:
+                    for i in range(n):
+                        vbuf[v0+i] = self.vertex(addr + 16*i, translate, lit)
             elif cmd == 0xB1:  # TRI4
                 tris = []
                 for k in range(4):
@@ -143,10 +156,13 @@ class Decoder:
                     if x == y == z == 0: continue
                     tris.append((x, y, z))
                 for x, y, z in tris:
+                    if vbuf[x] < 0 or vbuf[y] < 0 or vbuf[z] < 0: continue
                     self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch, lit))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
-                self.faces.append((vbuf[a//10], vbuf[b//10], vbuf[c//10], self.cur_tex, self.cur_switch, lit))
+                ia, ib, ic = vbuf[a//10], vbuf[b//10], vbuf[c//10]
+                if ia >= 0 and ib >= 0 and ic >= 0:
+                    self.faces.append((ia, ib, ic, self.cur_tex, self.cur_switch, lit))
             # everything else (rdp state, matrices) ignored
 
     def calc_matrices(self, addr, parent, seen=None):

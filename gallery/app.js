@@ -775,6 +775,89 @@ function tick() {
 tick();
 
 // ---- debug hooks (harmless in production) ----
+// --- model inspection: render one gun isolated, framed, on a neutral backdrop ---
+window.__inspect = async (key, view = 'side', w = 560, flat = false) => {
+  const modelName = `G${key}Z`;
+  const { obj } = await loadGunModel(modelName);
+  const scn = new THREE.Scene();
+  scn.background = new THREE.Color(0x8a93a0);
+  scn.add(new THREE.HemisphereLight(0xffffff, 0x556, 2.0));
+  const dl = new THREE.DirectionalLight(0xffffff, 2.2); dl.position.set(-1, 2, 1.5); scn.add(dl);
+  const dl2 = new THREE.DirectionalLight(0xaabbff, 1.0); dl2.position.set(1.5, -0.5, -1); scn.add(dl2);
+  const clone = obj.clone(true);
+  clone.position.set(0, 0, 0); clone.rotation.set(0, 0, 0); clone.scale.setScalar(1);
+  // keep the game's visibility rules (flash + non-default switch states stay hidden)
+  if (flat) {                      // neutral material: judge geometry, not shading
+    const nm = new THREE.MeshLambertMaterial({ color: 0xd8d8d8, side: THREE.DoubleSide });
+    clone.traverse(o => {
+      if (!o.isMesh) return;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const rep = mats.map(m => (m.visible === false ? m : nm));
+      o.material = Array.isArray(o.material) ? rep : rep[0];
+    });
+  }
+  scn.add(clone);
+  const bb = new THREE.Box3().setFromObject(clone);
+  const ctr = bb.getCenter(new THREE.Vector3());
+  const sz = bb.getSize(new THREE.Vector3());
+  const radius = Math.max(sz.x, sz.y, sz.z) * 0.5 || 1;
+  const c2 = new THREE.PerspectiveCamera(35, 16/9, radius * 0.01, radius * 40);
+  // barrel runs along the longest axis; view perpendicular to it
+  const long = (sz.z >= sz.x && sz.z >= sz.y) ? 'z' : (sz.x >= sz.y ? 'x' : 'y');
+  const V = (a, b, c) => new THREE.Vector3(a, b, c);
+  const dirs = long === 'z'
+    ? { side: V(1, 0.18, 0.10), top: V(0.06, 1, 0.10), front: V(0.10, 0.18, 1) }
+    : { side: V(0.10, 0.18, 1), top: V(0.10, 1, 0.06), front: V(1, 0.18, 0.10) };
+  const fit = Math.max(sz.x, sz.y, sz.z) * 0.5 || 1;
+  const d = dirs[view].clone().normalize().multiplyScalar(fit * 2.5);
+  c2.position.copy(ctr).add(d);
+  c2.lookAt(ctr);
+  const rt = new THREE.WebGLRenderTarget(w, Math.round(w * 9 / 16));
+  const prevRT = renderer.getRenderTarget();
+  renderer.setRenderTarget(rt);
+  renderer.render(scn, c2);
+  const buf = new Uint8Array(rt.width * rt.height * 4);
+  renderer.readRenderTargetPixels(rt, 0, 0, rt.width, rt.height, buf);
+  renderer.setRenderTarget(prevRT);
+  const cv = document.createElement('canvas');
+  cv.width = rt.width; cv.height = rt.height;
+  const ctx = cv.getContext('2d');
+  const img = ctx.createImageData(rt.width, rt.height);
+  for (let y = 0; y < rt.height; y++) {          // flip vertically
+    const src = (rt.height - 1 - y) * rt.width * 4;
+    img.data.set(buf.subarray(src, src + rt.width * 4), y * rt.width * 4);
+  }
+  ctx.putImageData(img, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 15px sans-serif';
+  ctx.fillText(`${key}  [${view}]  ${sz.x.toFixed(0)}x${sz.y.toFixed(0)}x${sz.z.toFixed(0)}`, 8, 20);
+  rt.dispose();
+  return cv.toDataURL('image/jpeg', 0.82);
+};
+window.__sheet = async (keys, view = 'side', cell = 300, flat = false) => {
+  const cw = cell, ch = Math.round(cell * 9 / 16);
+  const cols = 3, rows = Math.ceil(keys.length / cols);
+  const cv = document.createElement('canvas');
+  cv.width = cols * cw; cv.height = rows * ch;
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#101418'; ctx.fillRect(0, 0, cv.width, cv.height);
+  for (let i = 0; i < keys.length; i++) {
+    const url = await window.__inspect(keys[i], view, cw, flat);
+    const im = new Image();
+    await new Promise(res => { im.onload = res; im.onerror = res; im.src = url; });
+    ctx.drawImage(im, (i % cols) * cw, Math.floor(i / cols) * ch, cw, ch);
+  }
+  return cv.toDataURL('image/jpeg', 0.85);
+};
+window.__inspectAll = async (view = 'side') => {
+  const keys = Array.from(document.querySelectorAll('#picker button')).map(b => b.dataset.key);
+  for (const k of keys) {
+    try {
+      const url = await window.__inspect(k, view);
+      await fetch('http://127.0.0.1:8614/' + view + '_' + k, { method: 'POST', body: url });
+    } catch (e) { console.log('FAIL', k, e); }
+  }
+  return keys.length;
+};
 window.__repose = () => {
   gunCam.near = window.__P.near || 0.02;
   gunCam.updateProjectionMatrix();
