@@ -39,6 +39,27 @@ const master = actx.createGain();
 master.gain.value = 0.30;                 // master volume (- / = keys)
 master.connect(actx.destination);
 const bufCache = new Map();
+// background music (rendered from the ROM's own sequence + instrument bank)
+const music = { gain: actx.createGain(), src: null, on: true, started: false };
+music.gain.gain.value = 0.5;
+music.gain.connect(master);
+async function startMusic() {
+  if (music.started) return;
+  music.started = true;
+  try {
+    const buf = await loadBuf('../extracted/music/track02.wav');
+    if (!buf) { music.started = false; return; }
+    const src = actx.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    src.connect(music.gain);
+    src.start();
+    music.src = src;
+  } catch (e) { music.started = false; }
+}
+function toggleMusic() {
+  music.on = !music.on;
+  music.gain.gain.value = music.on ? 0.5 : 0;
+}
 async function loadBuf(url) {
   if (!url) return null;
   if (!bufCache.has(url)) {
@@ -479,6 +500,7 @@ canvas.addEventListener('click', () => {
       if (p && p.catch) p.catch(() => {});
     } catch (e) {}
     actx.resume();
+    startMusic();
   }
 });
 document.addEventListener('pointerlockchange', () => {
@@ -495,6 +517,7 @@ document.addEventListener('mousedown', e => { if (locked && e.button === 0) stat
 document.addEventListener('mouseup', e => { if (e.button === 0) state.firing = false; });
 document.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
+  if (e.code === 'KeyM') toggleMusic();
   if (e.code === 'KeyR') reload();
   if (e.code === 'Minus') master.gain.value = Math.max(0, master.gain.value - 0.05);
   if (e.code === 'Equal') master.gain.value = Math.min(1, master.gain.value + 0.05);
