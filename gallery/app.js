@@ -31,11 +31,12 @@ const ROSTER = ['wppk','wppksil','tt33','skorpion','ak47','uzi','mp5k','mp5ksil'
   'silverwppk','goldwppk','laser','grenadelaunch','rocketlaunch'];
 
 // ---- data ----
-const [WEAPONS, MODELS, SOUNDS, IMAGES] = await Promise.all([
+const [WEAPONS, MODELS, SOUNDS, IMAGES, CHARS] = await Promise.all([
   fetch(`${EX}/weapons/WEAPONS.json`).then(r => r.json()),
   fetch(`${EX}/models/MODELS.json`).then(r => r.json()),
   fetch(`${EX}/sounds/SOUNDS.json`).then(r => r.json()),
   fetch(`${EX}/images/IMAGES.json`).then(r => r.json()),
+  fetch(`${EX}/characters/CHARACTERS.json`).then(r => r.json()),
 ]);
 const soundById = i => SOUNDS[i] && `${EX}/sounds/${SOUNDS[i].file}`;
 const soundByName = n => { const e = SOUNDS.find(s => s.name === n); return e && `${EX}/sounds/${e.file}`; };
@@ -78,7 +79,7 @@ async function loadBuf(url) {
   }
   return bufCache.get(url);
 }
-function play(url, { vol = 1, pitch = 1, at = null } = {}) {
+function play(url, { vol = 1, pitch = 1, at = null, delay = 0 } = {}) {
   loadBuf(url).then(buf => {
     if (!buf) return;
     const src = actx.createBufferSource();
@@ -91,7 +92,7 @@ function play(url, { vol = 1, pitch = 1, at = null } = {}) {
     }
     const g = actx.createGain(); g.gain.value = v;
     src.connect(g); g.connect(master);
-    src.start();
+    src.start(actx.currentTime + delay);
   });
 }
 
@@ -233,32 +234,133 @@ async function placeProp(modelName, x, z, height, opts = {}) {
 // ---- targets ----
 const targets = [];
 const raycaster = new THREE.Raycaster();
-function mkTarget(x, z, opts) {
+// ---- enemies ----
+// Each lane target is a real GoldenEye guard: the head model the game would
+// give them, wearing the hat their body carries, on a range silhouette.
+//
+// The silhouette is not a shortcut, it is the honest half of the model. GE
+// character *bodies* have no rest pose to export -- chr.c drives every joint
+// from the animation bitstream via process_02_position, and with no rotation
+// applied the limbs splay out to four times the figure's height. Heads and
+// hats are rigid attachments and come out correct, so those are the real
+// models and the body is a board.
+//
+// Identities come from the guard records in the ROM's own stage setups
+// (extracted/characters/CHARACTERS.json), so this is the cast you actually
+// shoot at in GoldenEye, not an invented line-up.
+const ENEMIES = [
+  { body: 'BODY_Russian_Soldier',         head: 'CheadgrantZ',   hat: 'PhatberetZ',      name: 'Russian Soldier',         uniform: 0x4a4a2e },
+  { body: 'BODY_Janus_Special_Forces',    head: 'CheadbalaclavaZ', hat: null,            name: 'Janus Special Forces',    uniform: 0x1c1e22 },
+  { body: 'BODY_Russian_Infantry',        head: 'CheadbZ',       hat: 'PhattbirdZ',      name: 'Russian Infantry',        uniform: 0x3c4630 },
+  { body: 'BODY_Jungle_Commando',         head: 'CheadduncanZ',  hat: 'PhatberetredZ',   name: 'Jungle Commando',         uniform: 0x38452a },
+  { body: 'BODY_Janus_Marine',            head: 'CheadkarlZ',    hat: 'PhathelmetZ',     name: 'Janus Marine',            uniform: 0x24303a },
+  { body: 'BODY_Arctic_Commando',         head: 'CheadmarkZ',    hat: 'PhatfurryZ',      name: 'Arctic Commando',         uniform: 0xb9c2cc },
+  { body: 'BODY_Moonraker_Elite_1_Male',  head: 'CheadneilZ',    hat: 'PhatmoonZ',       name: 'Moonraker Elite',         uniform: 0x8d9198 },
+  { body: 'BODY_Siberian_Special_Forces', head: 'CheadleeZ',     hat: 'PhathelmetgreyZ', name: 'Siberian Special Forces', uniform: 0x2e3238 },
+  { body: 'BODY_Siberian_Guard_2',        head: 'CheadstevehZ',  hat: 'PhatberetblueZ',  name: 'Siberian Guard',          uniform: 0x2b3a52 },
+  { body: 'BODY_Naval_Officer',           head: 'CheadjimZ',     hat: 'PhattbirdbrownZ', name: 'Naval Officer',           uniform: 0x1e2436 },
+  { body: 'BODY_Scientist_1_Male',        head: 'CheadchrisZ',   hat: null,              name: 'Scientist',               uniform: 0xd8d8d2 },
+  { body: 'BODY_Civilian_1_Female',       head: 'CheadsallyZ',   hat: null,              name: 'Civilian', female: true,  uniform: 0x6d5a48 },
+];
+const HEAD_BY_MODEL = Object.fromEntries(CHARS.heads.map(h => [h.model, h]));
+// The colour variants are the same mesh as the entry the table is keyed on.
+const HAT_BASE = { PhatberetblueZ: 'PhatberetZ', PhatberetredZ: 'PhatberetZ',
+                   PhatfurryblackZ: 'PhatfurryZ', PhatfurrybrownZ: 'PhatfurryZ',
+                   PhathelmetgreyZ: 'PhathelmetZ', PhattbirdbrownZ: 'PhattbirdZ' };
+
+const MM = 0.001;                     // character models are in millimetres too
+const NECK_Y = 1.46;                  // where the head sits above the floor
+
+/** Torso board: shoulders and chest, with a neck notch so the real head reads
+ *  as the head. Deliberately flat-topped -- a domed top looks like a second
+ *  head next to the model. */
+function silhouette(colour) {
+  const sh = new THREE.Shape();
+  sh.moveTo(-0.17, 0);
+  sh.lineTo(0.17, 0);
+  sh.lineTo(0.23, 0.58);          // shoulder
+  sh.lineTo(0.09, 0.70);          // neck notch
+  sh.lineTo(-0.09, 0.70);
+  sh.lineTo(-0.23, 0.58);
+  sh.closePath();
+  const g = new THREE.ExtrudeGeometry(sh, { depth: 0.16, bevelEnabled: false });
+  g.translate(0, NECK_Y - 0.70, -0.08);
+  return new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: colour }));
+}
+
+async function mkEnemy(x, z, spec) {
   const g = new THREE.Group();
-  const boardT = geTex(opts.img, 1);
-  const board = new THREE.Mesh(new THREE.PlaneGeometry(opts.w, opts.h),
-    new THREE.MeshLambertMaterial({ map: boardT, side: THREE.DoubleSide, transparent: true }));
-  board.position.y = 1.5;
-  const post = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.0, 0.12),
-    new THREE.MeshLambertMaterial({ color: 0x555 }));
-  post.position.y = 0.5;
-  g.add(board, post);
+  const board = silhouette(spec.uniform);
+  g.add(board);
+  const legs = new THREE.Mesh(new THREE.BoxGeometry(0.26, NECK_Y - 0.70, 0.16),
+    new THREE.MeshLambertMaterial({ color: 0x23262b }));
+  legs.position.y = (NECK_Y - 0.70) / 2;
+  g.add(legs);
+
+  const head = (await loadProp(spec.head)).clone(true);
+  head.scale.setScalar(MM);
+  // Heads are modelled facing +z and the firing line is at +z from the lanes,
+  // so an enemy looks back at the player with no rotation at all. (Weapons
+  // need the half turn because they hang off the camera, which looks down -z.)
+  head.updateMatrixWorld(true);
+  const hb = new THREE.Box3().setFromObject(head);
+  head.position.set(-((hb.min.x + hb.max.x) / 2), NECK_Y - hb.min.y - 0.04,
+                    -((hb.min.z + hb.max.z) / 2) + 0.01);
+  const headGroup = new THREE.Group();          // its own group so a headshot is detectable
+  headGroup.add(head);
+  headGroup.userData.zone = 'head';
+  g.add(headGroup);
+  head.updateMatrixWorld(true);
+  const hb2 = new THREE.Box3().setFromObject(head);
+
+  if (spec.hat) {
+    const hat = (await loadProp(spec.hat)).clone(true);
+    // chr.c seats a hat on its head node and then nudges it with
+    // headHat_array_8003E464: an offset in model units and a per-axis scale.
+    // The attach node itself isn't in the flattened export, so the hat is
+    // sat on the crown of the head's bounds and the ROM's entry applied on
+    // top of that -- the fine adjustment is authentic, the base is inferred.
+    const key = HAT_BASE[spec.hat] || spec.hat;
+    const fit = (HEAD_BY_MODEL[spec.head] || {}).hats?.[key];
+    const sc = fit ? fit.scale : [1, 1, 1];
+    hat.scale.set(MM * sc[0], MM * sc[1], MM * sc[2]);
+    hat.updateMatrixWorld(true);
+    const bb = new THREE.Box3().setFromObject(hat);
+    const off = fit ? fit.offset : [0, 0, 0];
+    // Seat the hat by its underside rather than its origin: the models are
+    // centred on their own middle, so positioning by origin buried every hat
+    // down over the eyes.
+    const brim = hb2.max.y - (bb.max.y - bb.min.y) * 0.52;
+    hat.position.set(-((bb.min.x + bb.max.x) / 2) + off[0] * MM,
+                     brim - bb.min.y + off[1] * MM,
+                     -((bb.min.z + bb.max.z) / 2) + off[2] * MM);
+    headGroup.add(hat);
+  }
+
   g.position.set(x, 0, z);
-  g.userData = { hp: opts.hp, maxhp: opts.hp, board, hit: opts.hit, downT: 0, name: opts.name };
+  g.userData = {
+    // chr.c:1656 -- every guard spawns with maxdamage 4.0, so weapon damage
+    // straight from WeaponStats gives the real number of hits: four PP7 body
+    // shots, one Golden Gun round.
+    hp: CHARS.guard_max_damage, maxhp: CHARS.guard_max_damage,
+    board, hit: 'flesh', downT: 0, wobble: 0, flash: 0,
+    name: spec.name, female: !!spec.female, enemy: true,
+  };
   scene.add(g);
   targets.push(g);
+  return g;
 }
-function buildTargets() {
-  // knock-down silhouette targets down the lanes (planes: cheap and readable)
-  const rows = [
-    { z: -14, imgs: [9, 10, 9] },      // STOMEMAN stone-man reliefs
-    { z: -32, imgs: [10, 9, 10] },
-    { z: -55, imgs: [9, 10, 9] },
-    { z: -85, imgs: [10, 9, 10] },
-  ];
-  for (const r of rows)
-    r.imgs.forEach((img, i) => mkTarget((i - 1) * 6.5, r.z, {
-      img, w: 1.35, h: 1.9, hp: 8, hit: 'wood', name: `target @${-r.z}m` }));
+
+async function buildTargets() {
+  const lanes = [-6.5, 0, 6.5];
+  const rows = [-14, -32, -55, -85];
+  let i = 0;
+  for (const z of rows)
+    for (const x of lanes) {
+      const spec = ENEMIES[i++ % ENEMIES.length];
+      try { await mkEnemy(x + (Math.abs(z) % 7) * 0.1 - 0.3, z, spec); }
+      catch (e) { console.log('enemy failed', spec.head, e); }
+    }
 }
 
 /** Real GoldenEye props: material test pieces and range dressing. */
@@ -286,6 +388,7 @@ async function buildProps() {
 // ---- impact sounds per material (real GE hit SFX + ricochets) ----
 const sfx = n => soundByName(n);
 const HIT_SOUNDS = {
+  flesh: [sfx('HIT_BULLET_FLESH_SFX')],
   wood:  [sfx('HIT_BULLET_WOOD_SFX'), ...RICO.slice(0, 4)],
   metal: [sfx('HIT_BULLET_METAL_A_SFX'), sfx('HIT_BULLET_METAL_B_SFX'), ...RICO.slice(4, 8)],
   stone: RICO.slice(8, 16),
@@ -293,6 +396,10 @@ const HIT_SOUNDS = {
 };
 const EXPLO_SOUNDS = ['EXPLOSION_2A_SFX','EXPLOSION_2B_SFX','EXPLOSION_3_SFX','EXPLOSION_4A_SFX']
   .map(sfx).filter(Boolean);
+// guard reactions: GE grunts on a hit and thumps on the way down
+const HURT_MALE = SOUNDS.filter(s => /^GET_HIT_MALE/.test(s.name)).map(s => `${EX}/sounds/${s.file}`);
+const HURT_GIRL = SOUNDS.filter(s => /^GET_HIT_GIRL/.test(s.name)).map(s => `${EX}/sounds/${s.file}`);
+const BODY_FALL = SOUNDS.filter(s => /^BODY_FALL_/.test(s.name)).map(s => `${EX}/sounds/${s.file}`);
 
 // ---- sparks / tracers / decals / explosions ----
 const fx = [];
@@ -369,10 +476,25 @@ function hitReact(t) {
   const u = t.userData;
   u.wobble = 1;
   if (u.board) {
+    if (!u.baseColor) u.baseColor = u.board.material.color.clone();
     u.board.material.color.setRGB(1.6, 0.6, 0.6);
     u.flash = 0.15;
   }
 }
+/** A guard grunts when hit and thumps when it goes down; a headshot skips the grunt. */
+function reactSound(g, at, head) {
+  if (!g.userData.enemy) return;
+  const dead = g.userData.hp <= 0;
+  if (dead) {
+    if (BODY_FALL.length)
+      play(BODY_FALL[Math.floor(Math.random() * BODY_FALL.length)], { vol: 0.7, at, delay: 0.25 });
+    return;
+  }
+  if (head) return;
+  const set = g.userData.female ? HURT_GIRL : HURT_MALE;
+  if (set.length) play(set[Math.floor(Math.random() * set.length)], { vol: 0.7, at });
+}
+
 function hitMarker() {
   const el = document.getElementById('crosshair');
   el.style.color = '#ff2';
@@ -723,8 +845,14 @@ function shoot(now) {
       if (g.userData.hp !== Infinity && g.userData.downT <= 0) {
         if (pi === 0) state.hits++;
         hitMarker();
-        g.userData.hp -= st.damage;
-        state.score += Math.max(1, Math.round(-g.position.z));
+        // a head hit drops a GE guard outright, whatever the weapon
+        let zone = null;
+        for (let o = h.object; o && o !== g; o = o.parent)
+          if (o.userData && o.userData.zone) { zone = o.userData.zone; break; }
+        const head = zone === 'head';
+        g.userData.hp -= head ? g.userData.maxhp : st.damage;
+        state.score += Math.max(1, Math.round(-g.position.z)) * (head ? 2 : 1);
+        reactSound(g, h.point, head);
         if (g.userData.hp <= 0) {
           g.userData.downT = 2.2;
           state.score += 50;
@@ -808,8 +936,7 @@ for (const k of roster) {
 
 // ---- main loop ----
 buildRange();
-buildTargets();
-buildProps();
+buildTargets().then(buildProps);
 selectWeapon('wppk');
 
 let last = performance.now() / 1000;
@@ -850,7 +977,8 @@ function tick() {
     }
     if (u.flash > 0) {
       u.flash -= dt;
-      if (u.flash <= 0 && u.board) u.board.material.color.setRGB(1, 1, 1);
+      if (u.flash <= 0 && u.board)
+        u.board.material.color.copy(u.baseColor || new THREE.Color(1, 1, 1));
     }
   }
   // transient fx
@@ -1038,7 +1166,7 @@ window.__repose = () => {
   return selectWeapon(state.key);
 };
 window.THREE = THREE;
-window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam };
+window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam, tick };
 window.__shot = (w = 480) => {
   if (canvas.width < 8) {
     renderer.setSize(960, 540, false);

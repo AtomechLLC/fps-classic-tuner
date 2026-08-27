@@ -16,6 +16,7 @@ python extract_models.py    # OBJ+MTL, 510 models       -> extracted/models/
 python extract_sounds.py    # 261 SFX as WAV            -> extracted/sounds/
 python extract_weapons.py   # ballistics/rates/VFX      -> extracted/weapons/
 python decode_setups.py     # stage setups              -> extracted/setups/
+python extract_characters.py # heads, hats, guard roster -> extracted/characters/
 python render_music.py 2    # a music track as WAV      -> extracted/music/
 ```
 
@@ -37,6 +38,13 @@ music, `-` / `=` set volume.
 Fire rates (60Hz ticks), spread, damage, magazine size, recoil and muzzle-flash
 frames all come from ROM data; gunshots, ricochets and reloads are the decoded
 SFX, and impact sounds vary by target material.
+
+Targets are the guards the game actually places: identities come from the guard
+records in the decoded stage setups, each wears the head and hat model GE would
+give it, and each has `chr.c`'s guard `maxdamage` of **4.0** — so the WeaponStats
+damage figures give the real number of hits (four PP7 body shots, one Golden Gun
+round), and a head hit drops a guard outright. They grunt when hit and thump
+when they fall, using GE's own `GET_HIT_*` and `BODY_FALL_*` samples.
 
 ## Format notes (the non-obvious parts)
 
@@ -101,6 +109,24 @@ rediscovered:
   `__repose()` re-applies); `window.__inspect(key, view, size, flat)` and
   `window.__sheet([keys])` render models in isolation.
 
+**Characters** (`extract_characters.py`, `decode_setups.py`)
+- Character **bodies have no rest pose to export.** `process_02_position` in
+  model.c decodes a full 3-axis rotation per joint from the animation bitstream
+  and only then builds the joint matrix; with no rotation applied the limbs
+  splay to roughly four times the figure's height (a guard 681 units tall spans
+  2167 across). Heads and hats are rigid attachments and come out correct, so
+  the range uses those and gives them a silhouette body.
+- `headHat_array_8003E464` (chr.c) seats a hat on a head: an offset in units of
+  21.3 and a per-axis scale, indexed `[head][HATTYPE]`. A peaked cap also sets
+  `headVisible = 0`.
+- The `BODIES`/`HEADS` enums contain three `#ifdef ALL_BONDS` members
+  (Connery/Dalton/Moore tuxedos) that the retail ROM does **not** build — it
+  ships no model for any of them. Parsing the enum without stripping that block
+  shifts every id from 6 upward by three, which labelled Natalya's escort in
+  Archives/Bunker/Train as "Jaws", a character who is not in the game.
+- A setup guard's `health` field is not health: `chraction.c` assigns it to
+  `hearingscale` as `health / 1000`.
+
 **Textures** (`decode_images.py`)
 - `g_Textures` (code segment, RAM `0x80049300`) holds 24-bit compressed sizes;
   offsets are prefix sums from segment base `0x8f7df0`.
@@ -114,9 +140,11 @@ rediscovered:
 
 ## Known gaps
 
-- **Characters don't pose.** Their per-joint matrices come from the skeletal
-  animation system (`ANIM_ENTRY_*` compressed bitstreams), which isn't ported, so
-  character models sit at bind positions. Weapons and props are correct at rest.
+- **Characters don't pose, and there is no usable rest pose either.** Per-joint
+  matrices come from the skeletal animation system (`ANIM_ENTRY_*` compressed
+  bitstreams), which isn't ported. Leaving the rotation out does not give a bind
+  pose — it splays the limbs (see Characters above) — so full bodies are not
+  rendered anywhere. Heads, hats, weapons and props are correct at rest.
 - **Level geometry** (`bg/*.seg`) isn't decoded; those files use a different
   container.
 - Grenades, mines and throwing knives aren't simulated in the range.

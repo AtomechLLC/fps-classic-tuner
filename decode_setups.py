@@ -61,9 +61,21 @@ def parse_enum(header_text, member_prefix, anchor):
         names.append(m.group(1))
     return names
 
+def strip_all_bonds(text):
+    """Drop #ifdef ALL_BONDS blocks.
+
+    The retail ROM has no Connery/Dalton/Moore assets (no body or head models
+    for them in the file table), so those three BODIES/HEADS members are not
+    compiled in and every id above them shifts by three. Keeping them mislabels
+    setup guards: Natalya's escort in Archives/Bunker/Train came out as "Jaws",
+    a character who is not in the game.
+    """
+    return re.sub(r"#ifdef ALL_BONDS.*?#endif", "", text, flags=re.S)
+
 # PROP model enum (obj field of ObjectRecord indexes this)
 try:
-    bc = open(os.path.join(DECOMP, "src", "bondconstants.h"), encoding="utf-8", errors="replace").read()
+    bc = strip_all_bonds(open(os.path.join(DECOMP, "src", "bondconstants.h"),
+                              encoding="utf-8", errors="replace").read())
     PROP_ENUM = parse_enum(bc, "PROP_", "PROP_ALARM1")
     BODY_ENUM = parse_enum(bc, "BODY_", "BODY_Jaws")
 except OSError:
