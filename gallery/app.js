@@ -452,9 +452,17 @@ async function loadGunModel(name) {
           nm = new THREE.MeshPhongMaterial({ map, specular: 0xbbbbbb,
             shininess: 22, side: THREE.DoubleSide });
 
-        } else if (lit) {             // vertex-normal lit geometry (gun bodies)
-          nm = new THREE.MeshPhongMaterial({ map, specular: 0x8a8a8a, shininess: 30,
-            side: THREE.DoubleSide });
+        } else if (lit) {
+          // Records with ModelType 3/4 store NORMALS in the colour slots and were
+          // lit by the N64's own light setup, which we don't reproduce. Relighting
+          // them with scene lights shifted their brightness (the AR33 went grey,
+          // the KF7 lost its wood). The textures already carry the right base
+          // colour, so show them unlit rather than invent lighting.
+          // Approximate the N64's diffuse level with a constant scale: showing
+          // these textures at full value leaves light ones washed out (the AR33's
+          // grey strip) while dark ones already read correctly.
+          nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide });
+          nm.color.setScalar(0.65);
         } else {                      // prelit: baked vertex colours
           nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         }
