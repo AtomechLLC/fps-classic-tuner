@@ -30,6 +30,8 @@ OUT = "extracted/animations"
 # What the range needs: a standing guard, a flinch, and a few ways to fall.
 WANTED = [
     "idle", "idle_unarmed",
+    "fire_standing", "fire_standing_fast", "fire_hip",
+    "fire_standing_one_handed_weapon",
     "hit_left_shoulder", "hit_right_shoulder", "hit_left_arm", "hit_right_arm",
     "death_forward_face_down", "death_backward_fall_face_up1",
     "death_backward_spin_face_down_right", "death_fetal_position_left",

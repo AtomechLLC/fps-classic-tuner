@@ -42,7 +42,13 @@ SFX, and impact sounds vary by target material.
 
 Targets are the guards the game actually places: identities come from the guard
 records in the decoded stage setups, each wears the head and hat model GE would
-give it, and each has `chr.c`'s guard `maxdamage` of **4.0** — so the WeaponStats
+give it, and each holds the `Pchr*` weapon model in its right hand — propobj.c
+attaches that to the body's `Switches[3]` node, the joint-9 wrist, with identity
+rotation. Armed guards periodically play GE's firing animations (`fire_standing`
+/ `fire_hip`, `fire_standing_one_handed_weapon` for the officer's TT-33), light
+the flash quad baked into the held model as a `_sw` switch, and send tracers
+harmlessly past the player; hits play the `hit_*` flinch animations. Each guard
+has `chr.c`'s `maxdamage` of **4.0** — so the WeaponStats
 damage figures give the real number of hits (four PP7 body shots, one Golden Gun
 round), and a head hit drops a guard outright. They grunt when hit and thump
 when they fall, using GE's own `GET_HIT_*` and `BODY_FALL_*` samples.
@@ -143,6 +149,11 @@ rediscovered:
 - `Box3.setFromObject` ignores skinning and returns bind-pose bounds, which
   stands every character waist-deep in the floor; walk the vertices through
   `SkinnedMesh.applyBoneTransform` instead.
+- Raycasting a SkinnedMesh **is** pose-aware in three r160, but its early-out
+  test uses the geometry's bounding sphere, computed from the raw bone-space
+  positions — a small blob near the origin. Rays missing the blob are rejected
+  before the triangle test, making posed guards randomly bulletproof; give the
+  geometry a bounding sphere that covers every reachable pose.
 - `headHat_array_8003E464` (chr.c) seats a hat on a head: an offset in units of
   21.3 and a per-axis scale, indexed `[head][HATTYPE]`. A peaked cap also sets
   `headVisible = 0`.

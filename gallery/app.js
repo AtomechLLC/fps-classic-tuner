@@ -31,13 +31,15 @@ const ROSTER = ['wppk','wppksil','tt33','skorpion','ak47','uzi','mp5k','mp5ksil'
   'silverwppk','goldwppk','laser','grenadelaunch','rocketlaunch'];
 
 // ---- data ----
+// cache: 'no-cache' revalidates against the extractor outputs -- a stale
+// cached index otherwise survives page reloads and 404s new animations.
 const [WEAPONS, MODELS, SOUNDS, IMAGES, CHARS, ANIMS] = await Promise.all([
-  fetch(`${EX}/weapons/WEAPONS.json`).then(r => r.json()),
-  fetch(`${EX}/models/MODELS.json`).then(r => r.json()),
-  fetch(`${EX}/sounds/SOUNDS.json`).then(r => r.json()),
-  fetch(`${EX}/images/IMAGES.json`).then(r => r.json()),
-  fetch(`${EX}/characters/CHARACTERS.json`).then(r => r.json()),
-  fetch(`${EX}/animations/ANIMATIONS.json`).then(r => r.json()),
+  fetch(`${EX}/weapons/WEAPONS.json`, { cache: 'no-cache' }).then(r => r.json()),
+  fetch(`${EX}/models/MODELS.json`, { cache: 'no-cache' }).then(r => r.json()),
+  fetch(`${EX}/sounds/SOUNDS.json`, { cache: 'no-cache' }).then(r => r.json()),
+  fetch(`${EX}/images/IMAGES.json`, { cache: 'no-cache' }).then(r => r.json()),
+  fetch(`${EX}/characters/CHARACTERS.json`, { cache: 'no-cache' }).then(r => r.json()),
+  fetch(`${EX}/animations/ANIMATIONS.json`, { cache: 'no-cache' }).then(r => r.json()),
 ]);
 const soundById = i => SOUNDS[i] && `${EX}/sounds/${SOUNDS[i].file}`;
 const soundByName = n => { const e = SOUNDS.find(s => s.name === n); return e && `${EX}/sounds/${e.file}`; };
@@ -246,7 +248,7 @@ const TAU = Math.PI * 2;
 const animCache = new Map();
 function loadAnim(name) {
   if (!animCache.has(name))
-    animCache.set(name, fetch(`${EX}/animations/${ANIMS.animations[name].file}`).then(r => r.json()));
+    animCache.set(name, fetch(`${EX}/animations/${ANIMS.animations[name].file}`, { cache: 'no-cache' }).then(r => r.json()));
   return animCache.get(name);
 }
 
@@ -346,6 +348,13 @@ async function loadBody(modelName) {
     }
     g.setIndex(index);
     g.computeVertexNormals();
+    // Raycasting a SkinnedMesh is pose-aware (getVertexPosition applies the
+    // bones), but the raycaster's early-out sphere is computed from the raw
+    // bone-space positions -- a small blob near the holder origin. Any shot
+    // whose ray misses that blob is rejected before the per-triangle test,
+    // which made guards randomly bulletproof mid-animation. Swap in a sphere
+    // that bounds every reachable pose.
+    g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 4000);
     const mesh = new THREE.SkinnedMesh(g, mats);
     mesh.frustumCulled = false;
     return { mesh, bones, roots, skeleton: new THREE.Skeleton(bones), skin };
@@ -389,17 +398,20 @@ const raycaster = new THREE.Raycaster();
 // Identities come from the guard records in the ROM's stage setups
 // (extracted/characters/CHARACTERS.json), so this is the cast you actually
 // shoot at in GoldenEye, not an invented line-up.
+// wep: the Pchr* held-weapon model GE renders in a guard's hand; wkey: the
+// weapon whose sound and fire rate it uses. Unarmed characters have neither
+// and stand in idle_unarmed.
 const ENEMIES = [
-  { body: 'CrusguardZ',     head: 'CheadgrantZ',     hat: 'PhatberetZ',      name: 'Russian Soldier' },
-  { body: 'CtrevguardZ',    head: 'CheadbalaclavaZ', hat: null,              name: 'Janus Special Forces' },
-  { body: 'ColiveguardZ',   head: 'CheadbZ',         hat: 'PhattbirdZ',      name: 'Russian Infantry' },
-  { body: 'CcamguardZ',     head: 'CheadduncanZ',    hat: 'PhatberetredZ',   name: 'Jungle Commando' },
-  { body: 'CnavyguardZ',    head: 'CheadkarlZ',      hat: 'PhathelmetZ',     name: 'Janus Marine' },
-  { body: 'CsnowguardZ',    head: 'CheadmarkZ',      hat: 'PhatfurryZ',      name: 'Arctic Commando' },
-  { body: 'CmoonguardZ',    head: 'CheadneilZ',      hat: 'PhatmoonZ',       name: 'Moonraker Elite' },
-  { body: 'CgreatguardZ',   head: 'CheadleeZ',       hat: 'PhathelmetgreyZ', name: 'Siberian Special Forces' },
-  { body: 'CgreyguardZ',    head: 'CheadstevehZ',    hat: 'PhatberetblueZ',  name: 'Siberian Guard' },
-  { body: 'CcommguardZ',    head: 'CheadjimZ',       hat: 'PhattbirdbrownZ', name: 'Naval Officer' },
+  { body: 'CrusguardZ',     head: 'CheadgrantZ',     hat: 'PhatberetZ',      name: 'Russian Soldier',         wep: 'PchrkalashZ',  wkey: 'ak47' },
+  { body: 'CtrevguardZ',    head: 'CheadbalaclavaZ', hat: null,              name: 'Janus Special Forces',    wep: 'PchrkalashZ',  wkey: 'ak47' },
+  { body: 'ColiveguardZ',   head: 'CheadbZ',         hat: 'PhattbirdZ',      name: 'Russian Infantry',        wep: 'PchrkalashZ',  wkey: 'ak47' },
+  { body: 'CcamguardZ',     head: 'CheadduncanZ',    hat: 'PhatberetredZ',   name: 'Jungle Commando',         wep: 'Pchrm16Z',     wkey: 'm16' },
+  { body: 'CnavyguardZ',    head: 'CheadkarlZ',      hat: 'PhathelmetZ',     name: 'Janus Marine',            wep: 'Pchrmp5kZ',    wkey: 'mp5k' },
+  { body: 'CsnowguardZ',    head: 'CheadmarkZ',      hat: 'PhatfurryZ',      name: 'Arctic Commando',         wep: 'PchrkalashZ',  wkey: 'ak47' },
+  { body: 'CmoonguardZ',    head: 'CheadneilZ',      hat: 'PhatmoonZ',       name: 'Moonraker Elite',         wep: 'PchrlaserZ',   wkey: 'laser' },
+  { body: 'CgreatguardZ',   head: 'CheadleeZ',       hat: 'PhathelmetgreyZ', name: 'Siberian Special Forces', wep: 'PchrshotgunZ', wkey: 'shotgun' },
+  { body: 'CgreyguardZ',    head: 'CheadstevehZ',    hat: 'PhatberetblueZ',  name: 'Siberian Guard',          wep: 'PchrkalashZ',  wkey: 'ak47' },
+  { body: 'CcommguardZ',    head: 'CheadjimZ',       hat: 'PhattbirdbrownZ', name: 'Naval Officer',           wep: 'Pchrtt33Z',    wkey: 'tt33', pistol: true },
   { body: 'CtechmanZ',      head: 'CheadchrisZ',     hat: null,              name: 'Scientist' },
   { body: 'CtechwomanZ',    head: 'CheadsallyZ',     hat: null,              name: 'Civilian', female: true },
 ];
@@ -415,7 +427,7 @@ async function mkEnemy(x, z, spec) {
   const g = new THREE.Group();
   const skelName = CHARS.body_skeleton[spec.body] || 'guard';
   const rig = await instanceBody(spec.body, skelName);
-  const idle = await loadAnim('idle');
+  const idle = await loadAnim(spec.wep ? 'idle' : 'idle_unarmed');
   poseSkeleton(rig, idle, 0);
   rig.holder.scale.setScalar(MM);
   g.add(rig.holder);
@@ -425,6 +437,7 @@ async function mkEnemy(x, z, spec) {
   // whichever bone reads that joint and it follows the animation for free.
   const neck = rig.bones.find(b => b.userData.joint === 3) || rig.bones[0];
   const head = (await loadProp(spec.head)).clone(true);
+  head.userData.zone = 'head';        // the hit test walks ancestors for this
   neck.add(head);
 
   if (spec.hat) {
@@ -443,6 +456,7 @@ async function mkEnemy(x, z, spec) {
     hat.position.set(off[0] - (bbb[0] + bbb[3]) / 2 * sc[0],
                      brim - bbb[1] * sc[1] + off[1],
                      off[2] - (bbb[2] + bbb[5]) / 2 * sc[2]);
+    hat.userData.zone = 'head';
     neck.add(hat);
   }
 
@@ -451,6 +465,36 @@ async function mkEnemy(x, z, spec) {
   g.position.set(x, 0, z);
   g.updateWorldMatrix(false, true);
   rig.holder.position.y = -skinnedBounds(rig).min.y;
+
+  let wepObj = null;
+  if (spec.wep) {
+    // propobj.c: the right-hand weapon's basemtx is the chr model's Switches[3]
+    // node -- the joint-9 wrist group on every guard body -- with identity
+    // rotation, so the prop parents straight onto that bone.
+    const wrist = rig.bones.find(b => b.userData.joint === 9)
+               || rig.bones.find(b => b.userData.joint === 8);
+    wepObj = (await loadProp(spec.wep)).clone(true);
+    // muzzle = the -x end of the held model (they run along the wrist's x axis)
+    wepObj.userData.muzzleX = (MODELS[spec.wep].bbox || [-400])[0];
+    // The chr props carry their own muzzle flash as a switch (_sw) group --
+    // GE toggles it while the guard fires. Clone those materials (the prop
+    // cache shares them between instances), hide them, and keep them as this
+    // guard's flash.
+    wepObj.userData.flashMats = [];
+    wepObj.traverse(o => {
+      if (!o.isMesh) return;
+      const mats = (Array.isArray(o.material) ? o.material : [o.material]).map(m => {
+        if (!/_sw/.test(m.name)) return m;
+        const f = m.clone();
+        f.visible = false; f.transparent = true;
+        f.blending = THREE.AdditiveBlending; f.depthWrite = false; f.alphaTest = 0;
+        wepObj.userData.flashMats.push(f);
+        return f;
+      });
+      o.material = Array.isArray(o.material) ? mats : mats[0];
+    });
+    if (wrist) wrist.add(wepObj);
+  }
 
   g.position.set(x, 0, z);
   g.userData = {
@@ -462,6 +506,8 @@ async function mkEnemy(x, z, spec) {
     name: spec.name, female: !!spec.female, enemy: true,
     rig, anim: idle, idleAnim: idle, frame: Math.random() * idle.frames,
     animName: 'idle', flip: Math.random() < 0.5,
+    wepObj, wkey: spec.wkey || null, pistol: !!spec.pistol,
+    nextFire: performance.now() / 1000 + 3 + Math.random() * 6,
   };
   scene.add(g);
   targets.push(g);
@@ -599,6 +645,56 @@ function hitReact(t) {
   u.flashMats = mats;
   u.flash = 0.12;
 }
+// ---- guards fire back (visually -- the range never hurts the player) ----
+const _muz = new THREE.Vector3();
+function guardFire(t, now) {
+  const u = t.userData;
+  const fireAnim = u.pistol ? 'fire_standing_one_handed_weapon'
+                 : (Math.random() < 0.5 ? 'fire_standing' : 'fire_hip');
+  loadAnim(fireAnim).then(a => {
+    if (u.downT > 0 || u.animName !== 'idle') return;
+    u.anim = a; u.animName = fireAnim; u.frame = 0;
+    const st = WEAPONS[u.wkey];
+    // shots land in the middle of the animation, spaced at the weapon's own
+    // auto rate (60 Hz ticks), three rounds for a rifle burst, one for a pistol
+    const rate = (st && st.auto_firing_rate_ticks) ? st.auto_firing_rate_ticks / 60 : 0.5;
+    const nshots = u.pistol ? 1 : 3;
+    for (let i = 0; i < nshots; i++) {
+      setTimeout(() => {
+        if (u.downT > 0 || !u.wepObj) return;
+        // muzzle: the held models run along the wrist's x axis, muzzle at -x
+        _muz.set(u.wepObj.userData.muzzleX || -400, 0, 0);
+        u.wepObj.updateWorldMatrix(true, false);
+        const m = _muz.clone().applyMatrix4(u.wepObj.matrixWorld);
+        if (st) play(soundById(parseInt(st.sound_id, 16)), { vol: 0.5, at: m, pitch: 0.95 + Math.random() * 0.1 });
+        const fm = u.wepObj.userData.flashMats || [];
+        if (fm.length) {
+          fm.forEach(x => { x.visible = true; });
+          setTimeout(() => fm.forEach(x => { x.visible = false; }), 70);
+        } else {
+          spawnSpark(m, true);
+        }
+        // a tracer that always misses: past the player's head, wide
+        const miss = cam.position.clone()
+          .add(new THREE.Vector3((Math.random() - 0.5) * 3, 0.5 + Math.random(), 0));
+        spawnTracer(m, m.clone().lerp(miss, 1.3));   // past the player, not across the sky
+      }, 350 + i * Math.max(rate, 0.09) * 1000);
+    }
+  });
+}
+
+/** Non-fatal hit: play one of GE's flinch animations instead of a wobble. */
+const FLINCHES = ['hit_left_shoulder', 'hit_right_shoulder', 'hit_left_arm', 'hit_right_arm'];
+function playFlinch(t) {
+  const u = t.userData;
+  if (!u.rig || u.downT > 0) return;
+  const name = FLINCHES[Math.floor(Math.random() * FLINCHES.length)];
+  loadAnim(name).then(a => {
+    if (u.downT > 0) return;
+    u.anim = a; u.animName = name; u.frame = 0;
+  });
+}
+
 // GE's own death animations, picked by where the shot landed.
 const DEATHS = ['death_forward_face_down', 'death_backward_fall_face_up1',
                 'death_backward_spin_face_down_right', 'death_fetal_position_left'];
@@ -974,6 +1070,7 @@ function shoot(now) {
                        : dir.clone().negate();
       spawnDecal(h.point, n);
       hitReact(g);
+      if (g.userData.rig) playFlinch(g);
       if (g.userData.hp !== Infinity && g.userData.downT <= 0) {
         if (pi === 0) state.hits++;
         hitMarker();
@@ -1101,10 +1198,19 @@ function tick() {
       // GE animations run at 60 Hz, one bitstream frame per tick.
       u.frame += dt * 60;
       if (u.frame >= u.anim.frames) {
-        if (u.anim.loop || u.animName === 'idle') u.frame %= u.anim.frames;
-        else u.frame = u.anim.frames - 1;         // deaths hold their last pose
+        if (u.anim.loop || u.animName === 'idle') {
+          u.frame %= u.anim.frames;
+        } else if (u.downT > 0) {
+          u.frame = u.anim.frames - 1;            // deaths hold their last pose
+        } else {                                  // fire/flinch: back to idle
+          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
+        }
       }
       poseSkeleton(u.rig, u.anim, u.frame, u.flip);
+      if (u.wkey && u.downT <= 0 && u.animName === 'idle' && now >= u.nextFire) {
+        u.nextFire = now + 4 + Math.random() * 8;
+        guardFire(t, now);
+      }
     }
     if (u.downT > 0) {
       u.downT -= dt;
@@ -1116,7 +1222,7 @@ function tick() {
         t.rotation.x = -Math.min(1, (2.2 - u.downT) * 4) * Math.PI / 2;
       }
     }
-    if (u.wobble > 0) {
+    if (u.wobble > 0 && !u.rig) {
       u.wobble = Math.max(0, u.wobble - dt * 3.5);
       t.rotation.z = Math.sin(performance.now() * 0.045) * u.wobble * 0.12;
       if (u.wobble === 0) t.rotation.z = 0;
