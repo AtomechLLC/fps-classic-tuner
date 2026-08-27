@@ -944,146 +944,144 @@ const gunCache = new Map();
 async function loadGunModel(name) {
   if (gunCache.has(name)) return gunCache.get(name);
   const p = (async () => {
+    // Guns are built from the exporter's skin data rather than the flat OBJ:
+    // one mesh per matrix slot, each at its gunfire.c rest position, so the
+    // slide, bolt, cylinder and hammer are separately movable -- the same
+    // slots gunfire.c drives when the game animates a shot.
     const ml = new MTLLoader().setPath(`${EX}/models/`);
-    const mtl = await ml.loadAsync(`${name}.mtl`);
+    const [mtl, skin] = await Promise.all([
+      ml.loadAsync(`${name}.mtl`),
+      fetch(`${EX}/models/${name}.skin.json`, { cache: 'no-cache' }).then(r => r.json()),
+    ]);
     mtl.preload();
-    const ol = new OBJLoader().setMaterials(mtl).setPath(`${EX}/models/`);
-    const obj = await ol.loadAsync(`${name}.obj`);
-    const flashGroups = {};          // child index -> [materials]
-    obj.traverse(o => {
-      if (!o.isMesh) return;
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      const out = [];
-      for (let m of mats) {
-        const sw = m.name.match(/_sw(\d+)_(\d+)/);
-        const fl = m.name.match(/_fl(\d+)/);
-        const lit = /_lit(_|$)/.test(m.name);
-        // Faces from the record's Secondary display list. model.c draws
-        // Primary opaque and Secondary in XLU mode straight after it; the
-        // struct calls them "secondary surfaces". In practice they are
-        // decals laid exactly on the skin -- 12 of the rocket launcher's 20
-        // secondary triangles are coplanar with a primary face to within
-        // 0.00 model units, which is what made its markings flicker.
-        const sec = /_sec$/.test(m.name);
-        const map = m.map || null;
-        if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
-                   map.wrapS = map.wrapT = THREE.RepeatWrapping; }
-        let nm;
-        const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
-        const ie = IMAGES[tid];
-        const isEnv = /_env(_|$)/.test(m.name);              // G_TEXTURE_GEN geometry
-        const flatCol = ie && ie.w === 1 && ie.h === 1;      // 1x1 = flat colour + texture-gen
-        const envStrip = ie && (ie.w === 1 || ie.h === 1);   // 1xN strip = flat/gradient
-        if (isEnv && map) {
-          // N64 texture generation samples by the VIEW-space normal, so the
-          // highlight sweeps as the weapon moves. Baked object-space UVs pin
-          // each face to one texel and dark-edge faces vanish, which is why the
-          // Golden Gun read as a hollow outline. A matcap does exactly this.
-          nm = new THREE.MeshMatcapMaterial({ matcap: map, side: THREE.DoubleSide });
-        } else if (flatCol && lit) {  // 1x1 flat colour = solid tinted metal
-          const c = (ie && (ie.opaque || ie.avg)) || [24, 24, 28];
-          nm = new THREE.MeshPhongMaterial({
-            color: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255),
-            specular: 0xcccccc, shininess: 26, side: THREE.DoubleSide });
-        } else if (envStrip && lit) { // specular strip texture: keep the texture, untinted
-          nm = new THREE.MeshPhongMaterial({ map, specular: 0xbbbbbb,
-            shininess: 22, side: THREE.DoubleSide });
+    const flashGroups = {};          // flash frame -> [materials]
 
-        } else if (lit) {
-          // ModelType 3 (GunLighting) multiplies TEXEL0 by SHADE from the vertex
-          // normals -- the exported OBJ carries those normals, and the gun scene
-          // now carries GE's own light. This is what makes the barrels gloss:
-          // the AR33's grey gradient (texture 2293) is a specular strip that
-          // only reads correctly once shading modulates it. The previous flat
-          // 0.65 showed it as a painted pale streak.
-          nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
-        } else {                      // prelit: baked vertex colours
-          nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
-        }
-        if (map && !fl) nm.alphaTest = 0.35;
-        if (sec && !fl) {
-          // XLU_SURF does not update Z, so a decal never depth-fights the face
-          // it sits on; the polygon offset keeps it in front of that face.
-          nm.transparent = true;
-          nm.depthWrite = false;
-          nm.polygonOffset = true;
-          nm.polygonOffsetFactor = -2;
-          nm.polygonOffsetUnits = -2;
-        }
-        nm.name = m.name;
-        if (fl) {                     // muzzle-flash frames (header Switches[1])
-          nm.transparent = true; nm.blending = THREE.AdditiveBlending;
-          nm.depthWrite = false; nm.alphaTest = 0;
-          nm.visible = false;
-          const frame = +fl[1];
-          (flashGroups[frame] = flashGroups[frame] || []).push(nm);
-        }                             // ordinary switch children are all part of
-                                      // the weapon at rest; only flash is hidden
-        out.push(nm);
+    function makeGunMat(m) {
+      const fl = m.name.match(/_fl(\d+)/);
+      const lit = /_lit(_|$)/.test(m.name);
+      const sec = /_sec$/.test(m.name);
+      const map = m.map || null;
+      if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
+                 map.wrapS = map.wrapT = THREE.RepeatWrapping; }
+      let nm;
+      const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
+      const ie = IMAGES[tid];
+      const isEnv = /_env(_|$)/.test(m.name);              // G_TEXTURE_GEN geometry
+      const flatCol = ie && ie.w === 1 && ie.h === 1;      // 1x1 = flat colour + texture-gen
+      const envStrip = ie && (ie.w === 1 || ie.h === 1);   // 1xN strip = flat/gradient
+      if (isEnv && map) {
+        // N64 texture generation samples by the VIEW-space normal; a matcap
+        // does the same, where baked UVs pinned faces to one texel.
+        nm = new THREE.MeshMatcapMaterial({ matcap: map, side: THREE.DoubleSide });
+      } else if (flatCol && lit) {  // 1x1 flat colour = solid tinted metal
+        const c = (ie && (ie.opaque || ie.avg)) || [24, 24, 28];
+        nm = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255),
+          specular: 0xcccccc, shininess: 26, side: THREE.DoubleSide });
+      } else if (envStrip && lit) { // specular strip texture: keep the texture, untinted
+        nm = new THREE.MeshPhongMaterial({ map, specular: 0xbbbbbb,
+          shininess: 22, side: THREE.DoubleSide });
+      } else if (lit) {
+        // GunLighting: TEXEL0 * SHADE from vertex normals under GE's gun light.
+        nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
+      } else {                      // prelit: baked vertex colours
+        nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
       }
-      o.material = Array.isArray(o.material) ? out : out[0];
-    });
-    // barrel direction: muzzle flash quads sit at the muzzle in model space.
-    // The OBJ is one mesh with material groups, so gather flash-group vertices.
+      if (map && !fl) nm.alphaTest = 0.35;
+      if (sec && !fl) {             // Secondary display list: decal on the skin
+        nm.transparent = true; nm.depthWrite = false;
+        nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
+      }
+      nm.name = m.name;
+      if (fl) {                     // muzzle-flash frames (header Switches[1])
+        nm.transparent = true; nm.blending = THREE.AdditiveBlending;
+        nm.depthWrite = false; nm.alphaTest = 0;
+        nm.visible = false;
+        (flashGroups[+fl[1]] = flashGroups[+fl[1]] || []).push(nm);
+      }
+      return nm;
+    }
+
+    const posA = new THREE.Float32BufferAttribute(skin.position, 3);
+    const uvA = new THREE.Float32BufferAttribute(skin.uv, 2);
+    const colA = new THREE.Float32BufferAttribute(skin.color, 3);
+    const nrmA = new THREE.Float32BufferAttribute(skin.normal, 3);
+    const vm = skin.vertexMatrix;
+    const rest = k => (skin.rest && skin.rest[String(k)]) || [0, 0, 0];
+
+    const obj = new THREE.Group();
+    const slotMesh = {};             // slot -> Mesh (movable part)
+    const flashMeshes = {};          // flash frame -> [meshes]
     const all = new THREE.Box3();
     const flash = new THREE.Box3();
-    const v = new THREE.Vector3();
-    obj.traverse(o => {
-      if (!o.isMesh) return;
-      o.geometry.computeBoundingBox();
-      all.union(o.geometry.boundingBox);
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      const pos = o.geometry.attributes.position;
-      const idx = o.geometry.index;
-      for (const g of o.geometry.groups || []) {
-        const m = mats[g.materialIndex] || mats[0];
-        if (!/_fl\d/.test(m.name)) continue;
-        for (let i = g.start; i < g.start + g.count; i++) {
-          const vi = idx ? idx.getX(i) : i;
-          flash.expandByPoint(v.fromBufferAttribute(pos, vi));
+    const bv = new THREE.Vector3();
+
+    // bucket each material's triangles by the matrix slot they bind to
+    const slots = {};                // slot -> [{matName, tris:[...]}]
+    for (const [matName, tris] of Object.entries(skin.groups)) {
+      const bySlot = {};
+      for (let i = 0; i < tris.length; i += 3)
+        (bySlot[vm[tris[i]]] = bySlot[vm[tris[i]]] || []).push(tris[i], tris[i+1], tris[i+2]);
+      for (const [sl, list] of Object.entries(bySlot))
+        (slots[sl] = slots[sl] || []).push({ matName, tris: list });
+    }
+    for (const [sl, parts] of Object.entries(slots)) {
+      const r = rest(sl);
+      const isFlashSlot = parts.every(pt => /_fl\d/.test(pt.matName));
+      // 'all'/'flash' boxes in baked model space, for muzzle placement
+      for (const pt of parts)
+        for (const vi of pt.tris) {
+          bv.fromBufferAttribute(posA, vi).add(new THREE.Vector3(r[0], r[1], r[2]));
+          all.expandByPoint(bv);
+          if (/_fl\d/.test(pt.matName)) flash.expandByPoint(bv);
         }
+      const solid = parts.filter(pt => !/_fl\d/.test(pt.matName));
+      if (solid.length) {
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', posA); g.setAttribute('uv', uvA);
+        g.setAttribute('color', colA); g.setAttribute('normal', nrmA);
+        const index = [], mats = [];
+        for (const pt of solid) {
+          g.addGroup(index.length, pt.tris.length, mats.length);
+          index.push(...pt.tris);
+          mats.push(makeGunMat(mtl.create(pt.matName) || new THREE.MeshBasicMaterial()));
+        }
+        g.setIndex(index);
+        const mesh = new THREE.Mesh(g, mats);
+        mesh.position.set(r[0], r[1], r[2]);
+        mesh.userData.base = new THREE.Vector3(r[0], r[1], r[2]);
+        obj.add(mesh);
+        slotMesh[sl] = mesh;
       }
-      if ((!o.geometry.groups || !o.geometry.groups.length)
-          && mats.some(m => /_fl\d/.test(m.name))) {
-        flash.union(o.geometry.boundingBox);
-      }
-    });
-    // GE scales the muzzle flash per shot (random 1.0-1.25, stretched along the
-    // barrel by MuzzleFlashExtension). That needs the flash as its own object,
-    // so lift each flash frame's triangles out of the baked gun mesh.
-    const flashMeshes = {};
-    obj.traverse(o => {
-      if (!o.isMesh) return;
-      const g = o.geometry;
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      const pos = g.attributes.position, uv = g.attributes.uv, idx = g.index;
-      for (const gr of (g.groups || [])) {
-        const m = mats[gr.materialIndex] || mats[0];
-        const fm = m && m.name.match(/_fl(\d+)/);
+      // flash frames become their own centred meshes so gunfire.c's per-shot
+      // random scale and MuzzleFlashExtension stretch can be applied
+      for (const pt of parts) {
+        const fm = pt.matName.match(/_fl(\d+)/);
         if (!fm) continue;
-        const frame = +fm[1];
         const P = [], U = [];
-        for (let i = gr.start; i < gr.start + gr.count; i++) {
-          const vi = idx ? idx.getX(i) : i;
-          P.push(pos.getX(vi), pos.getY(vi), pos.getZ(vi));
-          if (uv) U.push(uv.getX(vi), uv.getY(vi));
+        for (const vi of pt.tris) {
+          P.push(posA.getX(vi) + r[0], posA.getY(vi) + r[1], posA.getZ(vi) + r[2]);
+          U.push(uvA.getX(vi), uvA.getY(vi));
         }
-        if (!P.length) continue;
         const ng = new THREE.BufferGeometry();
         ng.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
-        if (U.length) ng.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+        ng.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
         ng.computeBoundingBox();
         const c = ng.boundingBox.getCenter(new THREE.Vector3());
         ng.translate(-c.x, -c.y, -c.z);        // scale about the flash centre
-        const mesh = new THREE.Mesh(ng, m);
+        const mesh = new THREE.Mesh(ng, makeGunMat(mtl.create(pt.matName)));
         mesh.position.copy(c);
         mesh.visible = false;
         mesh.renderOrder = 10;
-        o.add(mesh);
-        (flashMeshes[frame] = flashMeshes[frame] || []).push(mesh);
+        obj.add(mesh);
+        (flashMeshes[+fm[1]] = flashMeshes[+fm[1]] || []).push(mesh);
       }
-    });
-    return { obj, flashGroups, flashMeshes, all, flash };
+    }
+    // the moving parts gunfire.c drives, by slot from the manifest
+    const movers = {};
+    for (const [label, sl] of Object.entries((MODELS[name] || {}).movers || {}))
+      if (slotMesh[sl]) movers[label] = slotMesh[sl];
+    return { obj, flashGroups, flashMeshes, all, flash, movers };
   })();
   gunCache.set(name, p);
   return p;
@@ -1094,6 +1092,8 @@ const state = {
   key: null, stats: null, gun: null, flashGroups: {},
   ammo: 0, reserve: Infinity, firing: false, nextShot: 0, reloading: false,
   recoil: 0, kick: 0, flashT: 0,
+  movers: {}, slideT: 0, cylFrom: 0, cylTo: 0, cylT: 1, hammerT: 0,
+  reloadStart: 0, reloadDur: 0,
   score: 0, shots: 0, hits: 0,
   hostile: false,               // G: guards return fire (visual only)
   patrol: false,                // P: some guards walk patrol loops
@@ -1114,7 +1114,7 @@ async function selectWeapon(key) {
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
-  const { obj, flashGroups, flashMeshes } = await loadGunModel(modelName);
+  const { obj, flashGroups, flashMeshes, movers } = await loadGunModel(modelName);
   if (state.key !== key) return;
   gunMount.clear();
   const P = window.__P;
@@ -1150,6 +1150,8 @@ async function selectWeapon(key) {
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
   state.gun = holder; state.flashGroups = flashGroups; state.flashMeshes = flashMeshes;
+  state.movers = movers; state.slideT = 0; state.cylFrom = 0; state.cylTo = 0; state.cylT = 1;
+  state.hammerT = 0;
   updateHud();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
@@ -1182,6 +1184,8 @@ function reload() {
   const st = state.stats;
   if (state.reloading || !st || st.mag_size <= 0 || state.ammo === st.mag_size) return;
   state.reloading = true;
+  state.reloadStart = performance.now() / 1000;
+  state.reloadDur = 1.4;
   updateHud();
   if (CLIPOUT) play(CLIPOUT, { vol: 0.45 });
   setTimeout(() => { if (CLIPIN) play(CLIPIN, { vol: 0.45 }); }, 700);
@@ -1265,6 +1269,15 @@ function shoot(now) {
   state.recoil = Math.min(1.5, state.recoil + st.vfx.recoil_up * 0.012 + 0.05);
   state.kick = Math.min(1, state.kick + st.vfx.recoil_back * 0.05 + 0.15);
   state.flashT = 0.055;
+  // gunfire.c cycles the action: the slide/bolt (Switches[6]/[7]) throw back
+  // by BoltRecoilBack model units and return; a revolver advances its cylinder
+  // one chamber and drops the hammer.
+  if ((state.movers.slide || state.movers.bolt) && st.vfx.bolt_recoil_back > 0)
+    state.slideT = 1;
+  if (state.movers.cylinder) {
+    state.cylFrom = state.cylTo; state.cylTo += Math.PI / 3; state.cylT = 0;
+  }
+  if (state.movers.hammer) state.hammerT = 1;
   const kids = Object.keys(state.flashMeshes || {});
   if (kids.length) {
     const j = kids[Math.floor(Math.random() * kids.length)];
@@ -1546,9 +1559,37 @@ function tick() {
   cam.rotation.x = look.pitch + kickPitch + shx;
 
   // gun mount: metres, fixed to camera; recoil pulls back/up
-  gunMount.position.set(0, Math.sin(now * 1.8) * 0.004 + state.recoil * 0.012,
-                        state.kick * 0.07);
-  gunMount.rotation.set(state.recoil * 0.09, 0, 0);
+  // Reload dips the weapon down and tilts it out of view, GE-style: ease in
+  // over the first quarter, hold, ease back over the last quarter.
+  let dip = 0;
+  if (state.reloading && state.reloadDur > 0) {
+    const rp = Math.min(1, (now - state.reloadStart) / state.reloadDur);
+    dip = Math.min(rp / 0.25, 1, (1 - rp) / 0.25);
+    dip = dip * dip * (3 - 2 * dip);                 // smoothstep
+  }
+  gunMount.position.set(dip * 0.03, Math.sin(now * 1.8) * 0.004 + state.recoil * 0.012 - dip * 0.09,
+                        state.kick * 0.07 + dip * 0.04);
+  gunMount.rotation.set(state.recoil * 0.09 - dip * 0.42, 0, dip * 0.18);
+  // action cycling: slide/bolt throw straight back and return
+  if (state.slideT > 0) {
+    state.slideT = Math.max(0, state.slideT - dt / 0.11);
+    const k = state.slideT > 0.72 ? (1 - state.slideT) / 0.28 : state.slideT / 0.72;
+    const back = (state.stats ? state.stats.vfx.bolt_recoil_back : 0) * k;
+    for (const part of ['slide', 'bolt']) {
+      const m2 = state.movers[part];
+      if (m2) m2.position.set(m2.userData.base.x, m2.userData.base.y, m2.userData.base.z - back);
+    }
+  }
+  if (state.cylT < 1 && state.movers.cylinder) {
+    state.cylT = Math.min(1, state.cylT + dt / 0.16);
+    const e = state.cylT * state.cylT * (3 - 2 * state.cylT);
+    state.movers.cylinder.rotation.z = state.cylFrom + (state.cylTo - state.cylFrom) * e;
+  }
+  if (state.hammerT > 0 && state.movers.hammer) {
+    state.hammerT = Math.max(0, state.hammerT - dt / 0.13);
+    const hk = state.hammerT > 0.7 ? (1 - state.hammerT) / 0.3 : state.hammerT / 0.7;
+    state.movers.hammer.rotation.x = -0.5 * hk;
+  }
 
   const w = canvas.clientWidth, h = canvas.clientHeight;
   // A zero-sized canvas (hidden tab, collapsed pane) makes aspect NaN, which

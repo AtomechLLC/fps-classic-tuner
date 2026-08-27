@@ -130,6 +130,13 @@ rediscovered:
   `-33.5` looks small.
 - Weapons point along model **+z**; the flash matrix sits at the model's z
   maximum on every gun (DD44 298/298, PP7 201/201, sniper 804/804).
+- First-person guns are built from the `.skin.json` as one mesh per matrix
+  slot, each at its gunfire.c rest position, so the moving parts are separate
+  objects. The manifest's `movers` records which slot is the cylinder, hammer,
+  slide and bolt (header `Switches[4..7]`); firing throws the slide/bolt back
+  by the WeaponStats `BoltRecoilBack` (PP7 30 units, TT-33 60) and returns it,
+  a revolver advances its cylinder a sixth turn and drops the hammer, and
+  reloading pulls the weapon down out of view and back, GE-style.
 - The weapon pass uses GE's own near plane, `c_perspnear = 10` units = 0.10 m.
   Shoulder-fired weapons are authored with their stock behind the eye (the
   rocket launcher by 39 cm, the M16 by 9 cm) and the game simply clips it.

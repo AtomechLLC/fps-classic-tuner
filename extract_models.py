@@ -387,6 +387,23 @@ class Decoder:
             pos += [round(v[0] - a[0], 2), round(v[1] - a[1], 2), round(v[2] - a[2], 2)]
             r, g, b = (1.0, 1.0, 1.0) if self.lit[i] else self.attrs[i]
             col += [round(r, 3), round(g, 3), round(b, 3)]
+        # normals, same rebuild rules as the OBJ writer (degenerates from faces)
+        geo = [[0.0, 0.0, 0.0] for _ in self.verts]
+        for a2, b2, c2, *_r in self.faces:
+            pa, pb, pc = self.verts[a2], self.verts[b2], self.verts[c2]
+            ux, uy, uz = pb[0]-pa[0], pb[1]-pa[1], pb[2]-pa[2]
+            wx, wy, wz = pc[0]-pa[0], pc[1]-pa[1], pc[2]-pa[2]
+            fx, fy, fz = uy*wz - uz*wy, uz*wx - ux*wz, ux*wy - uy*wx
+            for vi in (a2, b2, c2):
+                geo[vi][0] += fx; geo[vi][1] += fy; geo[vi][2] += fz
+        nrm = []
+        for i in range(len(self.verts)):
+            nx, ny, nz = self.attrs[i] if self.lit[i] else (0.0, 0.0, 0.0)
+            if abs(nx) + abs(ny) + abs(nz) < 1e-6:
+                nx, ny, nz = geo[i]
+                ln = (nx*nx + ny*ny + nz*nz) ** 0.5
+                nx, ny, nz = (0.0, 1.0, 0.0) if ln < 1e-9 else (nx/ln, ny/ln, nz/ln)
+            nrm += [round(nx, 3), round(ny, 3), round(nz, 3)]
         uv = []
         for u in self.uvs: uv += [round(u[0], 4), round(u[1], 4)]
 
@@ -410,8 +427,13 @@ class Decoder:
                 hitparts[k] = by_joint[v["joint"]]
         json.dump({"matrices": {str(k): v for k, v in sorted(tree.items())},
                    "vertexMatrix": self.vmtx,
-                   "position": pos, "uv": uv, "color": col,
+                   "position": pos, "uv": uv, "color": col, "normal": nrm,
                    "groups": groups,
+                   # rest = the slot's translation with the gunfire.c runtime
+                   # overrides applied -- group at rest + bone-space vertices
+                   # reproduces the baked OBJ exactly
+                   "rest": {str(k): [round(c, 2) for c in self.mtx.get(k, (0, 0, 0))]
+                            for k in sorted(tree)},
                    "hitpart": {str(k): v for k, v in sorted(hitparts.items())}},
                   open(path + ".skin.json", "w"), separators=(",", ":"))
 
@@ -496,6 +518,15 @@ def main():
             if isinstance(f[4], tuple):
                 switches.setdefault(f"{f[4][0]}_{f[4][1]}", set()).add(f[3])
         has_flash = any(isinstance(f[4], tuple) and f[4][0] == 'fl' for f in dec.faces)
+        movers = {}
+        for idx, label in ((4, "cylinder"), (5, "hammer"), (6, "slide"), (7, "bolt")):
+            if idx >= len(dec.switches): break
+            node = dec.switches[idx]
+            if not node or node + 8 > len(dec.d): continue
+            ndata = dec.off(dec.u32(node + 4))
+            if not ndata or ndata + 0x10 > len(dec.d): continue
+            m0 = struct.unpack(">h", dec.d[ndata+0x0e:ndata+0x10])[0]
+            if m0 >= 0: movers[label] = m0
         bbox = None
         if dec.verts:
             xs, ys, zs = zip(*dec.verts)
@@ -506,6 +537,7 @@ def main():
                           "switches": {k: sorted(x for x in v if x is not None) for k, v in switches.items()},
                           "bbox": bbox,
                           "has_flash": has_flash,
+                          "movers": movers,
                           "source": "decomp" if name in info else "heuristic"}
         if dec.gunfire: manifest[name]["muzzle_flash"] = dec.gunfire
     json.dump(manifest, open(os.path.join(OUT, "MODELS.json"), "w"), indent=1)

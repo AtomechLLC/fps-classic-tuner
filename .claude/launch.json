@@ -1,6 +1,16 @@
 {
   "version": "0.0.1",
   "configurations": [
-    { "name": "gallery", "runtimeExecutable": "python", "runtimeArgs": ["-m", "http.server", "8613"], "port": 8613 }
+    {
+      "name": "gallery",
+      "runtimeExecutable": "python",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8613"
+      ],
+      "port": 8613,
+      "autoPort": false
+    }
   ]
 }
