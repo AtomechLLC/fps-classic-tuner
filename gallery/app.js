@@ -933,6 +933,7 @@ const state = {
   ammo: 0, reserve: Infinity, firing: false, nextShot: 0, reloading: false,
   recoil: 0, kick: 0, flashT: 0,
   score: 0, shots: 0, hits: 0,
+  hostile: false,               // G: guards return fire (visual only)
 };
 
 function fireInterval(st) {
@@ -1137,9 +1138,21 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mousedown', e => { if (locked && e.button === 0) state.firing = true; });
 document.addEventListener('mouseup', e => { if (e.button === 0) state.firing = false; });
+function toggleHostile() {
+  state.hostile = !state.hostile;
+  if (state.hostile) {
+    // stagger the first volleys so the whole range doesn't open up at once
+    const now = performance.now() / 1000;
+    for (const t of targets)
+      if (t.userData.enemy) t.userData.nextFire = now + 1 + Math.random() * 6;
+  }
+  const el = document.getElementById('hostile');
+  if (el) el.textContent = state.hostile ? 'RANGE IS HOT' : '';
+}
 document.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
+  if (e.code === 'KeyG') toggleHostile();
   if (e.code === 'KeyR') reload();
   if (e.code === 'Minus') master.gain.value = Math.max(0, master.gain.value - 0.05);
   if (e.code === 'Equal') master.gain.value = Math.min(1, master.gain.value + 0.05);
@@ -1207,7 +1220,7 @@ function tick() {
         }
       }
       poseSkeleton(u.rig, u.anim, u.frame, u.flip);
-      if (u.wkey && u.downT <= 0 && u.animName === 'idle' && now >= u.nextFire) {
+      if (state.hostile && u.wkey && u.downT <= 0 && u.animName === 'idle' && now >= u.nextFire) {
         u.nextFire = now + 4 + Math.random() * 8;
         guardFire(t, now);
       }
