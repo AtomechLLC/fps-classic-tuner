@@ -190,6 +190,10 @@ async function loadProp(modelName) {
           ? new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide })
           : new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         if (map) nm.alphaTest = 0.35;
+        if (/_sec$/.test(m.name)) {   // Secondary display list: decals on the skin
+          nm.transparent = true; nm.depthWrite = false;
+          nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
+        }
         nm.name = m.name;
         return nm;
       });
@@ -438,14 +442,21 @@ async function loadGunModel(name) {
       for (let m of mats) {
         const sw = m.name.match(/_sw(\d+)_(\d+)/);
         const fl = m.name.match(/_fl(\d+)/);
-        const lit = /_lit$/.test(m.name);
+        const lit = /_lit(_|$)/.test(m.name);
+        // Faces from the record's Secondary display list. model.c draws
+        // Primary opaque and Secondary in XLU mode straight after it; the
+        // struct calls them "secondary surfaces". In practice they are
+        // decals laid exactly on the skin -- 12 of the rocket launcher's 20
+        // secondary triangles are coplanar with a primary face to within
+        // 0.00 model units, which is what made its markings flicker.
+        const sec = /_sec$/.test(m.name);
         const map = m.map || null;
         if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
                    map.wrapS = map.wrapT = THREE.RepeatWrapping; }
         let nm;
         const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
         const ie = IMAGES[tid];
-        const isEnv = /_env$/.test(m.name);                  // G_TEXTURE_GEN geometry
+        const isEnv = /_env(_|$)/.test(m.name);              // G_TEXTURE_GEN geometry
         const flatCol = ie && ie.w === 1 && ie.h === 1;      // 1x1 = flat colour + texture-gen
         const envStrip = ie && (ie.w === 1 || ie.h === 1);   // 1xN strip = flat/gradient
         if (isEnv && map) {
@@ -478,6 +489,15 @@ async function loadGunModel(name) {
           nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         }
         if (map && !fl) nm.alphaTest = 0.35;
+        if (sec && !fl) {
+          // XLU_SURF does not update Z, so a decal never depth-fights the face
+          // it sits on; the polygon offset keeps it in front of that face.
+          nm.transparent = true;
+          nm.depthWrite = false;
+          nm.polygonOffset = true;
+          nm.polygonOffsetFactor = -2;
+          nm.polygonOffsetUnits = -2;
+        }
         nm.name = m.name;
         if (fl) {                     // muzzle-flash frames (header Switches[1])
           nm.transparent = true; nm.blending = THREE.AdditiveBlending;

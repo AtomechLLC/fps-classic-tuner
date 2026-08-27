@@ -66,6 +66,12 @@ rediscovered:
   render pure black; the exporter rebuilds those from face geometry.
 - Vertex colour slots hold a *normal* when the record's ModelType is 3 or 4
   (GunLighting / fog+lighting), and a prelit colour otherwise.
+- A display-list record has **two** lists. `model.c` draws `Primary` opaque
+  (`OPA_SURF`) and then `Secondary` translucent (`XLU_SURF`) — the struct calls
+  these "secondary surfaces". They are decals lying exactly on the skin: 12 of
+  the rocket launcher's 20 secondary triangles are coplanar with a primary
+  face to within 0.00 units. Drawing them opaque z-fights, which is what made
+  the launcher's lettering flicker. The exporter tags them `_sec`.
 
 **First-person view** (`gallery/app.js`)
 - FOV is **60°** vertical (`fr.h: FOV_Y_F`). `player.c` initialises

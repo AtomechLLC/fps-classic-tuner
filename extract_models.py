@@ -87,6 +87,11 @@ class Decoder:
         self.seen_nodes = set()
         self.gunfire = None
         self.cur_switch = -1     # -1 = always-visible geometry
+        # model.c renders a record's Primary list opaque and its Secondary
+        # list translucent (OPA_SURF vs XLU_SURF); the struct comment calls
+        # them "secondary surfaces" driven by vertex alpha. Tag them so the
+        # renderer can blend rather than depth-fight with the primary skin.
+        self.cur_sec = False
         self.n_switches = 0
         self.vbuf = [-1] * 32    # RSP vertex buffer: persists across nested DLs
         self.geomode = 0         # RSP geometry mode (G_TEXTURE_GEN etc.)
@@ -172,13 +177,14 @@ class Decoder:
                 env = bool(self.geomode & 0x40000)
                 for x, y, z in tris:
                     if vbuf[x] < 0 or vbuf[y] < 0 or vbuf[z] < 0: continue
-                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex, self.cur_switch, lit, env))
+                    self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex,
+                                       self.cur_switch, lit, env, self.cur_sec))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
                 ia, ib, ic = vbuf[a//10], vbuf[b//10], vbuf[c//10]
                 if ia >= 0 and ib >= 0 and ic >= 0:
                     self.faces.append((ia, ib, ic, self.cur_tex, self.cur_switch, lit,
-                                       bool(self.geomode & 0x40000)))
+                                       bool(self.geomode & 0x40000), self.cur_sec))
             # everything else (rdp state, matrices) ignored
 
     def calc_matrices(self, addr, parent, seen=None):
@@ -282,14 +288,20 @@ class Decoder:
             # Records of both kinds appear in one model (the sniper's wood is lit,
             # its body prelit), so this must be per-record, not per-model.
             lit = self.d[data+18] in (3, 4)
-            for gdl in (pri, sec):
-                if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+12)), translate, lit=lit)
+            for is_sec, gdl in enumerate((pri, sec)):
+                if not gdl: continue
+                self.cur_sec = bool(is_sec)
+                self.run_dl(self.off(gdl), self.off(self.u32(data+12)), translate, lit=lit)
+            self.cur_sec = False
         elif op == 24 and data:   # display list with collision table (props/chars)
             pri, sec = self.u32(data), self.u32(data+4)
             mtype = struct.unpack(">h", self.d[data+0x18:data+0x1a])[0]
             lit = mtype in (3, 4)
-            for gdl in (pri, sec):
-                if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+8)), translate, lit=lit)
+            for is_sec, gdl in enumerate((pri, sec)):
+                if not gdl: continue
+                self.cur_sec = bool(is_sec)
+                self.run_dl(self.off(gdl), self.off(self.u32(data+8)), translate, lit=lit)
+            self.cur_sec = False
         elif op == 22 and data:   # primary-only display list
             gdl = self.u32(data+8)
             if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+4)), translate)
@@ -309,16 +321,17 @@ class Decoder:
         if nxt: self.node(nxt, translate)
 
     def export_obj(self, path, name):
-        def mat(tid, sw, lit, env):
+        def mat(tid, sw, lit, env, sec):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
-            return base + ("_lit" if lit else "") + ("_env" if env else "")
-        used = sorted(set((f[3], f[4], f[5], f[6]) for f in self.faces),
-                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3]))
+            return (base + ("_lit" if lit else "") + ("_env" if env else "")
+                    + ("_sec" if sec else ""))
+        used = sorted(set((f[3], f[4], f[5], f[6], f[7]) for f in self.faces),
+                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4]))
         with open(path + ".mtl", "w") as m:
-            for tid, sw, lit, env in used:
-                m.write(f"newmtl {mat(tid, sw, lit, env)}\n")
+            for tid, sw, lit, env, sec in used:
+                m.write(f"newmtl {mat(tid, sw, lit, env, sec)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
@@ -350,10 +363,10 @@ class Decoder:
                         nx, ny, nz = nx/ln, ny/ln, nz/ln
                 f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
             last = object()
-            for a, b, c, tid, sw, lit, env in self.faces:
-                key = (tid, sw, lit, env)
+            for a, b, c, tid, sw, lit, env, sec in self.faces:
+                key = (tid, sw, lit, env, sec)
                 if key != last:
-                    f.write(f"usemtl {mat(tid, sw, lit, env)}\n"); last = key
+                    f.write(f"usemtl {mat(tid, sw, lit, env, sec)}\n"); last = key
                 f.write(f"f {a+1}/{a+1}/{a+1} {b+1}/{b+1}/{b+1} {c+1}/{c+1}/{c+1}\n")
 
 def main():
