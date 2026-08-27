@@ -429,10 +429,16 @@ async function loadGunModel(name) {
         let nm;
         const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
         const ie = IMAGES[tid];
+        const isEnv = /_env$/.test(m.name);                  // G_TEXTURE_GEN geometry
         const flatCol = ie && ie.w === 1 && ie.h === 1;      // 1x1 = flat colour + texture-gen
-        const envStrip = ie && (ie.w === 1 || ie.h === 1
-          || /SPECULAR|SHINE|CHROME/i.test(ie.name || ''));   // texture-gen highlight
-        if (flatCol && lit) {         // 1x1 flat colour + texture-gen = env-mapped metal
+        const envStrip = ie && (ie.w === 1 || ie.h === 1);   // 1xN strip = flat/gradient
+        if (isEnv && map) {
+          // N64 texture generation samples by the VIEW-space normal, so the
+          // highlight sweeps as the weapon moves. Baked object-space UVs pin
+          // each face to one texel and dark-edge faces vanish, which is why the
+          // Golden Gun read as a hollow outline. A matcap does exactly this.
+          nm = new THREE.MeshMatcapMaterial({ matcap: map, side: THREE.DoubleSide });
+        } else if (flatCol && lit) {  // 1x1 flat colour = solid tinted metal
           const c = (ie && (ie.opaque || ie.avg)) || [24, 24, 28];
           nm = new THREE.MeshPhongMaterial({
             color: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255),
@@ -440,6 +446,7 @@ async function loadGunModel(name) {
         } else if (envStrip && lit) { // specular strip texture: keep the texture, untinted
           nm = new THREE.MeshPhongMaterial({ map, specular: 0xbbbbbb,
             shininess: 22, side: THREE.DoubleSide });
+
         } else if (lit) {             // vertex-normal lit geometry (gun bodies)
           nm = new THREE.MeshPhongMaterial({ map, specular: 0x8a8a8a, shininess: 30,
             side: THREE.DoubleSide });
@@ -585,7 +592,15 @@ async function selectWeapon(key) {
   // Point the barrel down -z, centre the model, normalise its longest axis to
   // one unit, then place it with explicit numbers. No solving, no fitting:
   // scale and position are literal and directly observable.
+  // Detach and reset before measuring: Box3.setFromObject uses WORLD bounds, so
+  // a model still parented to the previous holder would be measured through that
+  // holder's scale -- giving a tiny size and, in turn, an enormous new scale.
+  // That was the burst of distorted geometry when cycling weapons quickly.
+  obj.removeFromParent();
+  obj.position.set(0, 0, 0);
+  obj.scale.set(1, 1, 1);
   obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
+  obj.updateWorldMatrix(false, true);
   const raw = new THREE.Box3().setFromObject(obj);
   obj.position.sub(raw.getCenter(new THREE.Vector3()));
   holder.add(obj);
