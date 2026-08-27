@@ -3,7 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, gain: 1, near: 0.02 };
+window.__P = { scale: 0.55, px: 0.16, py: -0.17, pz: -0.62, rx: 0.05, ry: -0.50, rz: 0.04, near: 0.01 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
@@ -485,7 +485,42 @@ async function loadGunModel(name) {
         flash.union(o.geometry.boundingBox);
       }
     });
-    return { obj, flashGroups, all, flash };
+    // GE scales the muzzle flash per shot (random 1.0-1.25, stretched along the
+    // barrel by MuzzleFlashExtension). That needs the flash as its own object,
+    // so lift each flash frame's triangles out of the baked gun mesh.
+    const flashMeshes = {};
+    obj.traverse(o => {
+      if (!o.isMesh) return;
+      const g = o.geometry;
+      const mats = Array.isArray(o.material) ? o.material : [o.material];
+      const pos = g.attributes.position, uv = g.attributes.uv, idx = g.index;
+      for (const gr of (g.groups || [])) {
+        const m = mats[gr.materialIndex] || mats[0];
+        const fm = m && m.name.match(/_fl(\d+)/);
+        if (!fm) continue;
+        const frame = +fm[1];
+        const P = [], U = [];
+        for (let i = gr.start; i < gr.start + gr.count; i++) {
+          const vi = idx ? idx.getX(i) : i;
+          P.push(pos.getX(vi), pos.getY(vi), pos.getZ(vi));
+          if (uv) U.push(uv.getX(vi), uv.getY(vi));
+        }
+        if (!P.length) continue;
+        const ng = new THREE.BufferGeometry();
+        ng.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+        if (U.length) ng.setAttribute('uv', new THREE.Float32BufferAttribute(U, 2));
+        ng.computeBoundingBox();
+        const c = ng.boundingBox.getCenter(new THREE.Vector3());
+        ng.translate(-c.x, -c.y, -c.z);        // scale about the flash centre
+        const mesh = new THREE.Mesh(ng, m);
+        mesh.position.copy(c);
+        mesh.visible = false;
+        mesh.renderOrder = 10;
+        o.add(mesh);
+        (flashMeshes[frame] = flashMeshes[frame] || []).push(mesh);
+      }
+    });
+    return { obj, flashGroups, flashMeshes, all, flash };
   })();
   gunCache.set(name, p);
   return p;
@@ -514,7 +549,7 @@ async function selectWeapon(key) {
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
-  const { obj, flashGroups, all, flash } = await loadGunModel(modelName);
+  const { obj, flashGroups, flashMeshes, all, flash } = await loadGunModel(modelName);
   if (state.key !== key) return;
   gunMount.clear();
   const P = window.__P;
@@ -546,23 +581,22 @@ async function selectWeapon(key) {
   if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
   dir.normalize();
 
-  // GE's own first-person transform (gunfire.c): the weapon matrix is the
-  // camera-space matrix scaled by 0.1 and translated to WeaponStats
-  // PosX/PosY/PosZ, with identity rotation. Model units are ~cm, so metres
-  // need a further 0.01. Part matrices descend from this, which the exporter
-  // has already baked into vertex positions.
-  const GE_SCALE = 0.1, CM = 0.01;
-  const gp = st.vfx.gun_screen_pos;
-  // models are authored barrel-forward in the camera frame, but a few are
-  // mirrored; the flash-derived direction tells us which way the muzzle faces
-  if (dir.z > 0) obj.rotation.y = Math.PI;
+  // --- Simplest possible framing -----------------------------------------
+  // Point the barrel down -z, centre the model, normalise its longest axis to
+  // one unit, then place it with explicit numbers. No solving, no fitting:
+  // scale and position are literal and directly observable.
+  obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
+  const raw = new THREE.Box3().setFromObject(obj);
+  obj.position.sub(raw.getCenter(new THREE.Vector3()));
   holder.add(obj);
-  holder.scale.setScalar(GE_SCALE * CM * P.gain);
-  holder.position.set(gp[0] * CM + P.x, gp[1] * CM + P.y, gp[2] * CM + P.z);
+  const size = raw.getSize(new THREE.Vector3());
+  const unit = Math.max(size.x, size.y, size.z) || 1;
+  holder.scale.setScalar(P.scale / unit);
+  holder.position.set(P.px, P.py, P.pz);
   holder.rotation.set(P.rx, P.ry, P.rz);
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
-  state.gun = holder; state.flashGroups = flashGroups;
+  state.gun = holder; state.flashGroups = flashGroups; state.flashMeshes = flashMeshes;
   updateHud();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
@@ -664,11 +698,18 @@ function shoot(now) {
   state.recoil = Math.min(1.5, state.recoil + st.vfx.recoil_up * 0.012 + 0.05);
   state.kick = Math.min(1, state.kick + st.vfx.recoil_back * 0.05 + 0.15);
   state.flashT = 0.055;
-  const kids = Object.keys(state.flashGroups);
+  const kids = Object.keys(state.flashMeshes || {});
   if (kids.length) {
     const j = kids[Math.floor(Math.random() * kids.length)];
-    state.curFlash = state.flashGroups[j];
-    for (const m of state.curFlash) m.visible = true;
+    state.curFlash = state.flashMeshes[j];
+    const s = 1 + Math.random() * 0.25;              // gunfire.c flashscale
+    const ext = st.vfx.muzzle_flash_extension || 1;  // stretch along the barrel
+    const spin = Math.random() * Math.PI * 2;
+    for (const m of state.curFlash) {
+      m.visible = true;
+      m.scale.set(s, s, s * ext);
+      m.rotation.z = spin;
+    }
   }
   if (st.vfx.ejects_cartridges) spawnCasing();
   updateHud();
