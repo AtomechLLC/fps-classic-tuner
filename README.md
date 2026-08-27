@@ -50,10 +50,17 @@ rotation. Armed guards periodically play GE's firing animations (`fire_standing`
 / `fire_hip`, `fire_standing_one_handed_weapon` for the officer's TT-33), light
 the flash quad baked into the held model as a `_sw` switch, and send tracers
 harmlessly past the player; hits play the `hit_*` flinch animations. Each guard
-has `chr.c`'s `maxdamage` of **4.0** — so the WeaponStats
-damage figures give the real number of hits (four PP7 body shots, one Golden Gun
-round), and a head hit drops a guard outright. They grunt when hit and thump
-when they fall, using GE's own `GET_HIT_*` and `BODY_FALL_*` samples.
+has `chr.c`'s `maxdamage` of **4.0** with
+`handles_shot_actors`' body-part multipliers: head ×4, chest ×2, limbs ×1 — so a
+PP7 kills in one head shot, two chest shots or four limb shots, and a Klobb head
+shot (0.6 × 4 = 2.4) is *not* lethal. Which part a bullet struck comes from the
+ROM itself: every body-part group in a character model carries an op-10 bounding
+box whose first word is the `HITTARGET` part id, exported per matrix slot in
+`.skin.json`. Hits on the held gun do nothing (a metal ping); a soft hat is
+knocked flying and lies where it lands, a steel helmet ricochets, and the
+moonraker helmet counts as the head — all per `handles_shot_actors`. Flinches
+pick the animation for the side and limb that was struck. They grunt when hit
+and thump when they fall, using GE's own `GET_HIT_*` and `BODY_FALL_*` samples.
 
 ## Format notes (the non-obvious parts)
 
@@ -166,6 +173,12 @@ rediscovered:
   Archives/Bunker/Train as "Jaws", a character who is not in the game.
 - A setup guard's `health` field is not health: `chraction.c` assigns it to
   `hearingscale` as `health / 1000`.
+- Hit locations are data, not code: each body-part group carries an op-10
+  bounding-box node whose **first word is the `HITTARGET` part id** —
+  `chrTestHit` returns it when a ray crosses the box. A group's own bbox is a
+  *sibling* of its child groups in the node chain, so when walking, siblings
+  inherit the slot the node was entered with (attributing them to the child
+  group shifts every part one joint down the limb).
 
 **Textures** (`decode_images.py`)
 - `g_Textures` (code segment, RAM `0x80049300`) holds 24-bit compressed sizes;

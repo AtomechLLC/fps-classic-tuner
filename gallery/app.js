@@ -315,7 +315,7 @@ async function loadBody(modelName) {
   if (bodyCache.has(modelName)) return bodyCache.get(modelName);
   const p = (async () => {
     const [skin, mtl] = await Promise.all([
-      fetch(`${EX}/models/${modelName}.skin.json`).then(r => r.json()),
+      fetch(`${EX}/models/${modelName}.skin.json`, { cache: 'no-cache' }).then(r => r.json()),
       new MTLLoader().setPath(`${EX}/models/`).loadAsync(`${modelName}.mtl`),
     ]);
     mtl.preload();
@@ -360,7 +360,8 @@ async function loadBody(modelName) {
     g.boundingSphere = new THREE.Sphere(new THREE.Vector3(0, 0, 0), 4000);
     const mesh = new THREE.SkinnedMesh(g, mats);
     mesh.frustumCulled = false;
-    return { mesh, bones, roots, skeleton: new THREE.Skeleton(bones), skin };
+    return { mesh, bones, roots, skeleton: new THREE.Skeleton(bones), skin,
+             vertexMatrix: skin.vertexMatrix, hitpart: skin.hitpart || {} };
   })();
   bodyCache.set(modelName, p);
   return p;
@@ -388,7 +389,8 @@ async function instanceBody(modelName, skelName) {
   holder.add(mesh);
   mesh.bind(skeleton);
   const joints = (CHARS.skeletons[skelName] || CHARS.skeletons.guard).joints;
-  return { holder, mesh, bones, skeleton, joints };
+  return { holder, mesh, bones, skeleton, joints,
+           vertexMatrix: src.vertexMatrix, hitpart: src.hitpart };
 }
 
 // ---- targets ----
@@ -459,7 +461,8 @@ async function mkEnemy(x, z, spec) {
     hat.position.set(off[0] - (bbb[0] + bbb[3]) / 2 * sc[0],
                      brim - bbb[1] * sc[1] + off[1],
                      off[2] - (bbb[2] + bbb[5]) / 2 * sc[2]);
-    hat.userData.zone = 'head';
+    hat.userData.zone = 'hat';
+    hat.userData.hatKey = HAT_BASE[spec.hat] || spec.hat;
     neck.add(hat);
   }
 
@@ -483,6 +486,7 @@ async function mkEnemy(x, z, spec) {
     // GE toggles it while the guard fires. Clone those materials (the prop
     // cache shares them between instances), hide them, and keep them as this
     // guard's flash.
+    wepObj.userData.zone = 'gun';
     wepObj.userData.flashMats = [];
     wepObj.traverse(o => {
       if (!o.isMesh) return;
@@ -648,6 +652,60 @@ function hitReact(t) {
   u.flashMats = mats;
   u.flash = 0.12;
 }
+// ---- body-part damage (chraction.c handles_shot_actors) ----
+// HITTARGET part numbers, from the op-10 bbox nodes in each body model.
+const PART_HEAD = 8, PART_CHEST = 15;
+const PART_LEFT = new Set([1, 2, 3, 9, 10, 11]);    // left limbs
+const PART_ARM = new Set([9, 10, 11, 12, 13, 14]);  // arms/shoulders/hands
+/**
+ * Work out what a ray hit on an enemy actually struck and what GE does about
+ * it: head x4, chest x2, limbs x1; the held gun soaks the shot for nothing;
+ * a soft hat is knocked off, a steel helmet ricochets, and the moonraker
+ * helmet counts as the head (all per handles_shot_actors).
+ */
+function resolveBodyPart(g, h) {
+  let zone = null, zobj = null;
+  for (let o = h.object; o && o !== g; o = o.parent)
+    if (o.userData && o.userData.zone) { zone = o.userData.zone; zobj = o; break; }
+  if (zone === 'gun')
+    return { part: 100, mult: 0, head: false, sound: 'metal', object: zobj };
+  if (zone === 'hat') {
+    const key = zobj.userData.hatKey;
+    if (key === 'PhatmoonZ')                        // moon helmet: head hit
+      return { part: PART_HEAD, mult: 4, head: true, sound: 'flesh', object: zobj };
+    if (key === 'PhathelmetZ')                      // steel helmet: ricochet
+      return { part: 110, mult: 0, head: false, sound: 'metal', object: zobj };
+    return { part: 110, mult: 0, head: false, sound: 'other', dropHat: true, object: zobj };
+  }
+  if (zone === 'head')
+    return { part: PART_HEAD, mult: 4, head: true, sound: 'flesh', object: zobj };
+  let part = PART_CHEST;
+  const rig = g.userData.rig;
+  if (rig && h.object === rig.mesh && h.face) {
+    const slot = rig.vertexMatrix[h.face.a];
+    part = rig.hitpart[String(slot)] ?? PART_CHEST;
+  }
+  const mult = part === PART_HEAD ? 4 : part === PART_CHEST ? 2 : 1;
+  return { part, mult, head: part === PART_HEAD, sound: 'flesh', object: null };
+}
+
+/** Knock a soft hat off (propobjSetDropped): reparent to the world and let it
+ *  tumble to the floor, where it stays. */
+function dropHat(g, hat) {
+  if (!hat || hat.userData.dropped) return;
+  hat.userData.dropped = true;
+  hat.updateWorldMatrix(true, false);
+  const pos = new THREE.Vector3(), q = new THREE.Quaternion(), sc = new THREE.Vector3();
+  hat.matrixWorld.decompose(pos, q, sc);
+  hat.removeFromParent();
+  hat.position.copy(pos); hat.quaternion.copy(q); hat.scale.copy(sc);
+  scene.add(hat);
+  hat.userData.fall = { vel: new THREE.Vector3((Math.random() - 0.5) * 0.8, 1.4, (Math.random() - 0.5) * 0.8),
+                        rot: new THREE.Vector3(Math.random() * 5, Math.random() * 5, 0) };
+  droppedHats.push(hat);
+}
+const droppedHats = [];
+
 // ---- guards fire back (visually -- the range never hurts the player) ----
 const _muz = new THREE.Vector3();
 function guardFire(t, now) {
@@ -686,12 +744,13 @@ function guardFire(t, now) {
   });
 }
 
-/** Non-fatal hit: play one of GE's flinch animations instead of a wobble. */
-const FLINCHES = ['hit_left_shoulder', 'hit_right_shoulder', 'hit_left_arm', 'hit_right_arm'];
-function playFlinch(t) {
+/** Non-fatal hit: play GE's flinch for the side and limb that was struck. */
+function playFlinch(t, bp) {
   const u = t.userData;
   if (!u.rig || u.downT > 0) return;
-  const name = FLINCHES[Math.floor(Math.random() * FLINCHES.length)];
+  const left = bp ? PART_LEFT.has(bp.part) : Math.random() < 0.5;
+  const arm = bp ? PART_ARM.has(bp.part) : Math.random() < 0.5;
+  const name = `hit_${left ? 'left' : 'right'}_${arm ? 'arm' : 'shoulder'}`;
   loadAnim(name).then(a => {
     if (u.downT > 0) return;
     u.anim = a; u.animName = name; u.frame = 0;
@@ -1066,7 +1125,9 @@ function shoot(now) {
       const h = hits[0];
       let g = h.object;
       while (g.parent && !g.userData.hit) g = g.parent;
-      const mat = g.userData.hit || 'other';
+      // chraction.c handles_shot_actors: the part decides everything below
+      const bp = g.userData.enemy ? resolveBodyPart(g, h) : null;
+      const mat = bp ? bp.sound : (g.userData.hit || 'other');
       const set = HIT_SOUNDS[mat];
       play(set[Math.floor(Math.random() * set.length)], { vol: 0.8, at: h.point, pitch: 0.9 + Math.random()*0.2 });
       spawnSpark(h.point);
@@ -1074,18 +1135,16 @@ function shoot(now) {
                        : dir.clone().negate();
       spawnDecal(h.point, n);
       hitReact(g);
-      if (g.userData.rig) playFlinch(g);
+      if (g.userData.rig && (!bp || bp.mult > 0)) playFlinch(g, bp);
       if (g.userData.hp !== Infinity && g.userData.downT <= 0) {
         if (pi === 0) state.hits++;
         hitMarker();
-        // a head hit drops a GE guard outright, whatever the weapon
-        let zone = null;
-        for (let o = h.object; o && o !== g; o = o.parent)
-          if (o.userData && o.userData.zone) { zone = o.userData.zone; break; }
-        const head = zone === 'head';
-        g.userData.hp -= head ? g.userData.maxhp : st.damage;
+        const mult = bp ? bp.mult : 1;
+        const head = bp ? bp.head : false;
+        if (bp && bp.dropHat) dropHat(g, bp.object);
+        g.userData.hp -= st.damage * mult;
         state.score += Math.max(1, Math.round(-g.position.z)) * (head ? 2 : 1);
-        reactSound(g, h.point, head);
+        if (mult > 0) reactSound(g, h.point, head);
         if (g.userData.hp <= 0) {
           g.userData.downT = 3.4;
           state.score += 50;
@@ -1247,6 +1306,17 @@ function tick() {
       u.flash -= dt;
       if (u.flash <= 0 && u.flashMats)
         u.flashMats.forEach((m, i) => m.color.copy(u.baseColor[i]));
+    }
+  }
+  // dropped hats tumble to the floor and stay there
+  for (let i = droppedHats.length - 1; i >= 0; i--) {
+    const hb = droppedHats[i], f = hb.userData.fall;
+    f.vel.y -= 9.8 * dt;
+    hb.position.addScaledVector(f.vel, dt);
+    hb.rotation.x += f.rot.x * dt; hb.rotation.y += f.rot.y * dt;
+    if (hb.position.y <= 0.02) {
+      hb.position.y = 0.02;
+      droppedHats.splice(i, 1);                    // lies where it fell
     }
   }
   // transient fx

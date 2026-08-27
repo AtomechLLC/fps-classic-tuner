@@ -95,6 +95,7 @@ class Decoder:
         self.cur_mtx_id = 0           # matrix slot the current vertices bind to
         self.vmtx = []                # per-vertex matrix slot, parallel to verts
         self.tree = {}                # matrix slot -> {origin, parent, joint, half}
+        self.hitparts = {}            # matrix slot -> HITTARGET part number (op-10 bbox)
         self.n_switches = 0
         self.vbuf = [-1] * 32    # RSP vertex buffer: persists across nested DLs
         self.geomode = 0         # RSP geometry mode (G_TEXTURE_GEN etc.)
@@ -274,14 +275,26 @@ class Decoder:
             if m0 >= 0:
                 self.mtx[m0] = (ox, oy, oz)
 
-    def node(self, addr, translate):
+    def node(self, addr, translate, slot=-1):
         if addr == 0 or addr in self.seen_nodes: return
         self.seen_nodes.add(addr)
-        op = self.u16(addr) & 0xFF
+        raw = self.u16(addr)
+        op = raw & 0xFF
         data = self.off(self.u32(addr+4))
         child = self.off(self.u32(addr+0x14))
         nxt = self.off(self.u32(addr+0x0c))
         t = translate
+        # A group's own bbox node is a *sibling* of its child groups, so
+        # siblings keep the slot this node was entered with; only children see
+        # the group's slot.
+        slot_in = slot
+        if op in (2, 21) and data:
+            slot = struct.unpack(">h", self.d[data+0x0e:data+0x10])[0]
+        elif op == 10 and data:
+            # ModelRoData_BoundingBoxRecord: the first word is the HITTARGET
+            # part number chrTestHit returns when a ray crosses this box --
+            # this is how GE knows a hit was the head and not the chest.
+            self.hitparts[slot] = struct.unpack(">i", self.d[data:data+4])[0]
         if op == 18:
             # model.c modelApplyToggleRelations(): a switch is a toggle --
             #   visible -> node->Child = rodata->Controls  (that node and the
@@ -294,14 +307,14 @@ class Decoder:
             shown = controls or self.off(self.u32(addr+0x14))
             if shown:
                 self.cur_switch = (sw, 0)
-                self.node(shown, t)
+                self.node(shown, t, slot)
                 self.cur_switch = -1
             nxt2 = self.off(self.u32(addr+0x0c))
-            if nxt2: self.node(nxt2, translate)
+            if nxt2: self.node(nxt2, translate, slot_in)
             return
         if op == 1 and data:      # header record (characters): tree at Data->FirstGroup
             grp = self.off(self.u32(data+4))
-            if grp: self.node(grp, t)
+            if grp: self.node(grp, t, slot)
         elif op in (2, 21) and data:   # group: transform lives in the matrix table
             pass
         elif op == 4 and data:    # display list (guns)
@@ -334,15 +347,15 @@ class Decoder:
             img = self.u32(data+24)
             self.gunfire = {"offset": vals[0:3], "size": vals[3:6],
                             "scale": struct.unpack(">f", self.d[data+0x1c:data+0x20])[0]}
-        if child: self.node(child, t)
+        if child: self.node(child, t, slot)
         if isinstance(self.cur_switch, tuple):
             sw, j = self.cur_switch
             if nxt:
                 self.cur_switch = (sw, j + 1)
-                self.node(nxt, translate)
+                self.node(nxt, translate, slot_in)
                 self.cur_switch = (sw, j)
             return
-        if nxt: self.node(nxt, translate)
+        if nxt: self.node(nxt, translate, slot_in)
 
     def export_skin(self, path):
         """A poseable copy of the mesh: geometry in bone space, plus the tree.
@@ -387,10 +400,19 @@ class Decoder:
         for a, b, c, tid, sw, lit, env, sec in self.faces:
             groups.setdefault(mat(tid, sw, lit, env, sec), []).extend((a, b, c))
 
+        # Half-turn slots carry no bbox of their own; they take the part of
+        # the full slot that reads the same joint (they are the same limb).
+        hitparts = dict(self.hitparts)
+        by_joint = {v["joint"]: hitparts[k] for k, v in tree.items()
+                    if k in hitparts and not v["half"]}
+        for k, v in tree.items():
+            if k not in hitparts and v["joint"] in by_joint:
+                hitparts[k] = by_joint[v["joint"]]
         json.dump({"matrices": {str(k): v for k, v in sorted(tree.items())},
                    "vertexMatrix": self.vmtx,
                    "position": pos, "uv": uv, "color": col,
-                   "groups": groups},
+                   "groups": groups,
+                   "hitpart": {str(k): v for k, v in sorted(hitparts.items())}},
                   open(path + ".skin.json", "w"), separators=(",", ":"))
 
     def export_obj(self, path, name):
