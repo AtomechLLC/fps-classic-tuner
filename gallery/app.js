@@ -31,12 +31,13 @@ const ROSTER = ['wppk','wppksil','tt33','skorpion','ak47','uzi','mp5k','mp5ksil'
   'silverwppk','goldwppk','laser','grenadelaunch','rocketlaunch'];
 
 // ---- data ----
-const [WEAPONS, MODELS, SOUNDS, IMAGES, CHARS] = await Promise.all([
+const [WEAPONS, MODELS, SOUNDS, IMAGES, CHARS, ANIMS] = await Promise.all([
   fetch(`${EX}/weapons/WEAPONS.json`).then(r => r.json()),
   fetch(`${EX}/models/MODELS.json`).then(r => r.json()),
   fetch(`${EX}/sounds/SOUNDS.json`).then(r => r.json()),
   fetch(`${EX}/images/IMAGES.json`).then(r => r.json()),
   fetch(`${EX}/characters/CHARACTERS.json`).then(r => r.json()),
+  fetch(`${EX}/animations/ANIMATIONS.json`).then(r => r.json()),
 ]);
 const soundById = i => SOUNDS[i] && `${EX}/sounds/${SOUNDS[i].file}`;
 const soundByName = n => { const e = SOUNDS.find(s => s.name === n); return e && `${EX}/sounds/${e.file}`; };
@@ -169,6 +170,26 @@ function buildRange() {
 }
 
 
+/** The material rules for GE props and characters, shared so a skinned body
+ *  and a static prop are shaded identically. `skinning` needs no flag in three
+ *  r150+; the SkinnedMesh drives it. */
+function geMaterial(m, name = m.name) {
+  const map = m.map || null;
+  if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
+             map.wrapS = map.wrapT = THREE.RepeatWrapping; }
+  const lit = /_lit(_|$)/.test(name);
+  const nm = lit
+    ? new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide })
+    : new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
+  if (map) nm.alphaTest = 0.35;
+  if (/_sec$/.test(name)) {        // Secondary display list: decals on the skin
+    nm.transparent = true; nm.depthWrite = false;
+    nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
+  }
+  nm.name = name;
+  return nm;
+}
+
 // ---- GE prop models as range furniture/targets ----
 const propCache = new Map();
 async function loadProp(modelName) {
@@ -182,22 +203,7 @@ async function loadProp(modelName) {
     obj.traverse(o => {
       if (!o.isMesh) return;
       const mats = Array.isArray(o.material) ? o.material : [o.material];
-      const out = mats.map(m => {
-        const map = m.map || null;
-        if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
-                   map.wrapS = map.wrapT = THREE.RepeatWrapping; }
-        const lit = /_lit/.test(m.name);
-        const nm = lit
-          ? new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide })
-          : new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
-        if (map) nm.alphaTest = 0.35;
-        if (/_sec$/.test(m.name)) {   // Secondary display list: decals on the skin
-          nm.transparent = true; nm.depthWrite = false;
-          nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
-        }
-        nm.name = m.name;
-        return nm;
-      });
+      const out = mats.map(m => geMaterial(m));
       o.material = Array.isArray(o.material) ? out : out[0];
     });
     return obj;
@@ -231,36 +237,155 @@ async function placeProp(modelName, x, z, height, opts = {}) {
   return g;
 }
 
+// ---- skeletal characters ----
+// model.c builds a joint as `parent * translate(Origin) * rotate(anim)`, and
+// matrix_4x4_set_rotation_around_xyz composes it Rz*Ry*Rx -- three.js 'ZYX'.
+// The rotation only ever comes from the animation, which is why an unposed body
+// splays: every bone sits on its own +x axis until a frame turns it.
+const TAU = Math.PI * 2;
+const animCache = new Map();
+function loadAnim(name) {
+  if (!animCache.has(name))
+    animCache.set(name, fetch(`${EX}/animations/${ANIMS.animations[name].file}`).then(r => r.json()));
+  return animCache.get(name);
+}
+
+/** Pose one skeleton from one animation frame (sub_GAME_7F06DEC0). */
+const _e = new THREE.Euler(), _q = new THREE.Quaternion(), _qi = new THREE.Quaternion();
+function poseSkeleton(rig, anim, frame, flip = false) {
+  const f = anim.data[((frame % anim.frames) + anim.frames) % anim.frames];
+  for (const b of rig.bones) {
+    if (!b.userData.joint) continue;              // joint 0 is the model root
+    const j = rig.joints[b.userData.joint];
+    if (!j) continue;
+    const i = flip ? j.mtxB : j.mtxA;
+    let x = f[i] * TAU / 65535, y = f[i+1] * TAU / 65535, z = f[i+2] * TAU / 65535;
+    if (flip) { y = y ? TAU - y : 0; z = z ? TAU - z : 0; }
+    _e.set(x, y, z, 'ZYX');
+    _q.setFromEuler(_e);
+    // MatrixID1 bones are the same joint at half the turn (GE's bend/stretch);
+    // modelBuildGroupMatrices halves the quaternion rather than the angles.
+    if (b.userData.half) _q.slerpQuaternions(_qi.identity(), _q, 0.5);
+    b.quaternion.copy(_q);
+  }
+}
+
+/** World bounds of a posed skeleton. Box3.setFromObject reads the bind-pose
+ *  geometry and ignores skinning, which put every guard waist-deep in the
+ *  floor; this walks the vertices through their bone transforms instead. */
+const _bv = new THREE.Vector3();
+function skinnedBounds(rig) {
+  rig.mesh.updateMatrixWorld(true);
+  rig.skeleton.update();
+  const pos = rig.mesh.geometry.attributes.position;
+  const box = new THREE.Box3();
+  for (let i = 0; i < pos.count; i++) {
+    _bv.fromBufferAttribute(pos, i);
+    rig.mesh.applyBoneTransform(i, _bv);
+    box.expandByPoint(_bv.applyMatrix4(rig.mesh.matrixWorld));
+  }
+  return box;
+}
+
+const bodyCache = new Map();
+/** Build a SkinnedMesh from a model's .skin.json: geometry in bone space plus
+ *  the matrix-slot tree the exporter recorded. */
+async function loadBody(modelName) {
+  if (bodyCache.has(modelName)) return bodyCache.get(modelName);
+  const p = (async () => {
+    const [skin, mtl] = await Promise.all([
+      fetch(`${EX}/models/${modelName}.skin.json`).then(r => r.json()),
+      new MTLLoader().setPath(`${EX}/models/`).loadAsync(`${modelName}.mtl`),
+    ]);
+    mtl.preload();
+    const slots = Object.keys(skin.matrices).map(Number).sort((a, b) => a - b);
+    const slotIndex = new Map(slots.map((s, i) => [s, i]));
+    const bones = slots.map(sl => {
+      const m = skin.matrices[String(sl)];
+      const b = new THREE.Bone();
+      b.position.set(m.origin[0], m.origin[1], m.origin[2]);
+      b.userData = { slot: sl, joint: m.joint, half: m.half };
+      return b;
+    });
+    slots.forEach((sl, i) => {
+      const par = skin.matrices[String(sl)].parent;
+      if (slotIndex.has(par)) bones[slotIndex.get(par)].add(bones[i]);
+    });
+    const roots = bones.filter(b => !b.parent);
+
+    const n = skin.position.length / 3;
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(skin.position, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(skin.uv, 2));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(skin.color, 3));
+    const si = new Uint16Array(n * 4), sw = new Float32Array(n * 4);
+    for (let i = 0; i < n; i++) { si[i*4] = slotIndex.get(skin.vertexMatrix[i]) ?? 0; sw[i*4] = 1; }
+    g.setAttribute('skinIndex', new THREE.Uint16BufferAttribute(si, 4));
+    g.setAttribute('skinWeight', new THREE.Float32BufferAttribute(sw, 4));
+    const index = [], mats = [];
+    for (const [name, tri] of Object.entries(skin.groups)) {
+      g.addGroup(index.length, tri.length, mats.length);
+      index.push(...tri);
+      mats.push(geMaterial(mtl.create(name) || new THREE.MeshBasicMaterial(), name));
+    }
+    g.setIndex(index);
+    g.computeVertexNormals();
+    const mesh = new THREE.SkinnedMesh(g, mats);
+    mesh.frustumCulled = false;
+    return { mesh, bones, roots, skeleton: new THREE.Skeleton(bones), skin };
+  })();
+  bodyCache.set(modelName, p);
+  return p;
+}
+
+/** A fresh, independently poseable instance of a body. */
+async function instanceBody(modelName, skelName) {
+  const src = await loadBody(modelName);
+  const bones = src.bones.map(b => {
+    const c = new THREE.Bone();
+    c.position.copy(b.position);
+    c.userData = { ...b.userData };
+    return c;
+  });
+  src.bones.forEach((b, i) => {
+    const pi = src.bones.indexOf(b.parent);
+    if (pi >= 0) bones[pi].add(bones[i]);
+  });
+  const roots = bones.filter(b => !b.parent);
+  const skeleton = new THREE.Skeleton(bones);
+  const mesh = new THREE.SkinnedMesh(src.mesh.geometry, src.mesh.material);
+  mesh.frustumCulled = false;
+  const holder = new THREE.Group();
+  roots.forEach(r => holder.add(r));
+  holder.add(mesh);
+  mesh.bind(skeleton);
+  const joints = (CHARS.skeletons[skelName] || CHARS.skeletons.guard).joints;
+  return { holder, mesh, bones, skeleton, joints };
+}
+
 // ---- targets ----
 const targets = [];
 const raycaster = new THREE.Raycaster();
 // ---- enemies ----
-// Each lane target is a real GoldenEye guard: the head model the game would
-// give them, wearing the hat their body carries, on a range silhouette.
+// Each lane target is a real GoldenEye guard: the game's body model, posed by
+// the game's own animation, wearing the head and hat GE would give it.
 //
-// The silhouette is not a shortcut, it is the honest half of the model. GE
-// character *bodies* have no rest pose to export -- chr.c drives every joint
-// from the animation bitstream via process_02_position, and with no rotation
-// applied the limbs splay out to four times the figure's height. Heads and
-// hats are rigid attachments and come out correct, so those are the real
-// models and the body is a board.
-//
-// Identities come from the guard records in the ROM's own stage setups
+// Identities come from the guard records in the ROM's stage setups
 // (extracted/characters/CHARACTERS.json), so this is the cast you actually
 // shoot at in GoldenEye, not an invented line-up.
 const ENEMIES = [
-  { body: 'BODY_Russian_Soldier',         head: 'CheadgrantZ',   hat: 'PhatberetZ',      name: 'Russian Soldier',         uniform: 0x4a4a2e },
-  { body: 'BODY_Janus_Special_Forces',    head: 'CheadbalaclavaZ', hat: null,            name: 'Janus Special Forces',    uniform: 0x1c1e22 },
-  { body: 'BODY_Russian_Infantry',        head: 'CheadbZ',       hat: 'PhattbirdZ',      name: 'Russian Infantry',        uniform: 0x3c4630 },
-  { body: 'BODY_Jungle_Commando',         head: 'CheadduncanZ',  hat: 'PhatberetredZ',   name: 'Jungle Commando',         uniform: 0x38452a },
-  { body: 'BODY_Janus_Marine',            head: 'CheadkarlZ',    hat: 'PhathelmetZ',     name: 'Janus Marine',            uniform: 0x24303a },
-  { body: 'BODY_Arctic_Commando',         head: 'CheadmarkZ',    hat: 'PhatfurryZ',      name: 'Arctic Commando',         uniform: 0xb9c2cc },
-  { body: 'BODY_Moonraker_Elite_1_Male',  head: 'CheadneilZ',    hat: 'PhatmoonZ',       name: 'Moonraker Elite',         uniform: 0x8d9198 },
-  { body: 'BODY_Siberian_Special_Forces', head: 'CheadleeZ',     hat: 'PhathelmetgreyZ', name: 'Siberian Special Forces', uniform: 0x2e3238 },
-  { body: 'BODY_Siberian_Guard_2',        head: 'CheadstevehZ',  hat: 'PhatberetblueZ',  name: 'Siberian Guard',          uniform: 0x2b3a52 },
-  { body: 'BODY_Naval_Officer',           head: 'CheadjimZ',     hat: 'PhattbirdbrownZ', name: 'Naval Officer',           uniform: 0x1e2436 },
-  { body: 'BODY_Scientist_1_Male',        head: 'CheadchrisZ',   hat: null,              name: 'Scientist',               uniform: 0xd8d8d2 },
-  { body: 'BODY_Civilian_1_Female',       head: 'CheadsallyZ',   hat: null,              name: 'Civilian', female: true,  uniform: 0x6d5a48 },
+  { body: 'CrusguardZ',     head: 'CheadgrantZ',     hat: 'PhatberetZ',      name: 'Russian Soldier' },
+  { body: 'CtrevguardZ',    head: 'CheadbalaclavaZ', hat: null,              name: 'Janus Special Forces' },
+  { body: 'ColiveguardZ',   head: 'CheadbZ',         hat: 'PhattbirdZ',      name: 'Russian Infantry' },
+  { body: 'CcamguardZ',     head: 'CheadduncanZ',    hat: 'PhatberetredZ',   name: 'Jungle Commando' },
+  { body: 'CnavyguardZ',    head: 'CheadkarlZ',      hat: 'PhathelmetZ',     name: 'Janus Marine' },
+  { body: 'CsnowguardZ',    head: 'CheadmarkZ',      hat: 'PhatfurryZ',      name: 'Arctic Commando' },
+  { body: 'CmoonguardZ',    head: 'CheadneilZ',      hat: 'PhatmoonZ',       name: 'Moonraker Elite' },
+  { body: 'CgreatguardZ',   head: 'CheadleeZ',       hat: 'PhathelmetgreyZ', name: 'Siberian Special Forces' },
+  { body: 'CgreyguardZ',    head: 'CheadstevehZ',    hat: 'PhatberetblueZ',  name: 'Siberian Guard' },
+  { body: 'CcommguardZ',    head: 'CheadjimZ',       hat: 'PhattbirdbrownZ', name: 'Naval Officer' },
+  { body: 'CtechmanZ',      head: 'CheadchrisZ',     hat: null,              name: 'Scientist' },
+  { body: 'CtechwomanZ',    head: 'CheadsallyZ',     hat: null,              name: 'Civilian', female: true },
 ];
 const HEAD_BY_MODEL = Object.fromEntries(CHARS.heads.map(h => [h.model, h]));
 // The colour variants are the same mesh as the entry the table is keyed on.
@@ -269,73 +394,47 @@ const HAT_BASE = { PhatberetblueZ: 'PhatberetZ', PhatberetredZ: 'PhatberetZ',
                    PhathelmetgreyZ: 'PhathelmetZ', PhattbirdbrownZ: 'PhattbirdZ' };
 
 const MM = 0.001;                     // character models are in millimetres too
-const NECK_Y = 1.46;                  // where the head sits above the floor
-
-/** Torso board: shoulders and chest, with a neck notch so the real head reads
- *  as the head. Deliberately flat-topped -- a domed top looks like a second
- *  head next to the model. */
-function silhouette(colour) {
-  const sh = new THREE.Shape();
-  sh.moveTo(-0.17, 0);
-  sh.lineTo(0.17, 0);
-  sh.lineTo(0.23, 0.58);          // shoulder
-  sh.lineTo(0.09, 0.70);          // neck notch
-  sh.lineTo(-0.09, 0.70);
-  sh.lineTo(-0.23, 0.58);
-  sh.closePath();
-  const g = new THREE.ExtrudeGeometry(sh, { depth: 0.16, bevelEnabled: false });
-  g.translate(0, NECK_Y - 0.70, -0.08);
-  return new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: colour }));
-}
 
 async function mkEnemy(x, z, spec) {
   const g = new THREE.Group();
-  const board = silhouette(spec.uniform);
-  g.add(board);
-  const legs = new THREE.Mesh(new THREE.BoxGeometry(0.26, NECK_Y - 0.70, 0.16),
-    new THREE.MeshLambertMaterial({ color: 0x23262b }));
-  legs.position.y = (NECK_Y - 0.70) / 2;
-  g.add(legs);
+  const skelName = CHARS.body_skeleton[spec.body] || 'guard';
+  const rig = await instanceBody(spec.body, skelName);
+  const idle = await loadAnim('idle');
+  poseSkeleton(rig, idle, 0);
+  rig.holder.scale.setScalar(MM);
+  g.add(rig.holder);
 
+  // The head is its own model in GE, attached at the neck joint; chr.c renders
+  // it with the neck's matrix. SKEL_NECK is joint 3, so parent the head to
+  // whichever bone reads that joint and it follows the animation for free.
+  const neck = rig.bones.find(b => b.userData.joint === 3) || rig.bones[0];
   const head = (await loadProp(spec.head)).clone(true);
-  head.scale.setScalar(MM);
-  // Heads are modelled facing +z and the firing line is at +z from the lanes,
-  // so an enemy looks back at the player with no rotation at all. (Weapons
-  // need the half turn because they hang off the camera, which looks down -z.)
-  head.updateMatrixWorld(true);
-  const hb = new THREE.Box3().setFromObject(head);
-  head.position.set(-((hb.min.x + hb.max.x) / 2), NECK_Y - hb.min.y - 0.04,
-                    -((hb.min.z + hb.max.z) / 2) + 0.01);
-  const headGroup = new THREE.Group();          // its own group so a headshot is detectable
-  headGroup.add(head);
-  headGroup.userData.zone = 'head';
-  g.add(headGroup);
-  head.updateMatrixWorld(true);
-  const hb2 = new THREE.Box3().setFromObject(head);
+  neck.add(head);
 
   if (spec.hat) {
-    const hat = (await loadProp(spec.hat)).clone(true);
-    // chr.c seats a hat on its head node and then nudges it with
-    // headHat_array_8003E464: an offset in model units and a per-axis scale.
-    // The attach node itself isn't in the flattened export, so the hat is
-    // sat on the crown of the head's bounds and the ROM's entry applied on
-    // top of that -- the fine adjustment is authentic, the base is inferred.
     const key = HAT_BASE[spec.hat] || spec.hat;
     const fit = (HEAD_BY_MODEL[spec.head] || {}).hats?.[key];
+    const hat = (await loadProp(spec.hat)).clone(true);
     const sc = fit ? fit.scale : [1, 1, 1];
-    hat.scale.set(MM * sc[0], MM * sc[1], MM * sc[2]);
-    hat.updateMatrixWorld(true);
-    const bb = new THREE.Box3().setFromObject(hat);
+    hat.scale.set(sc[0], sc[1], sc[2]);
     const off = fit ? fit.offset : [0, 0, 0];
-    // Seat the hat by its underside rather than its origin: the models are
-    // centred on their own middle, so positioning by origin buried every hat
-    // down over the eyes.
-    const brim = hb2.max.y - (bb.max.y - bb.min.y) * 0.52;
-    hat.position.set(-((bb.min.x + bb.max.x) / 2) + off[0] * MM,
-                     brim - bb.min.y + off[1] * MM,
-                     -((bb.min.z + bb.max.z) / 2) + off[2] * MM);
-    headGroup.add(hat);
+    // chr.c seats the hat on the head's own matrix and nudges it with
+    // headHat_array_8003E464. Work in model units off the manifest's bounds:
+    // measuring the live objects returns world metres, because everything here
+    // hangs off a bone under a millimetre-scaled holder.
+    const hbb = MODELS[spec.head].bbox, bbb = MODELS[spec.hat].bbox;
+    const brim = hbb[4] - (bbb[4] - bbb[1]) * sc[1] * 0.72;
+    hat.position.set(off[0] - (bbb[0] + bbb[3]) / 2 * sc[0],
+                     brim - bbb[1] * sc[1] + off[1],
+                     off[2] - (bbb[2] + bbb[5]) / 2 * sc[2]);
+    neck.add(hat);
   }
+
+  // Stand the figure on the floor: its root joint sits at hip height, so the
+  // drop is wherever the posed feet land.
+  g.position.set(x, 0, z);
+  g.updateWorldMatrix(false, true);
+  rig.holder.position.y = -skinnedBounds(rig).min.y;
 
   g.position.set(x, 0, z);
   g.userData = {
@@ -343,8 +442,10 @@ async function mkEnemy(x, z, spec) {
     // straight from WeaponStats gives the real number of hits: four PP7 body
     // shots, one Golden Gun round.
     hp: CHARS.guard_max_damage, maxhp: CHARS.guard_max_damage,
-    board, hit: 'flesh', downT: 0, wobble: 0, flash: 0,
+    hit: 'flesh', downT: 0, wobble: 0, flash: 0,
     name: spec.name, female: !!spec.female, enemy: true,
+    rig, anim: idle, idleAnim: idle, frame: Math.random() * idle.frames,
+    animName: 'idle', flip: Math.random() < 0.5,
   };
   scene.add(g);
   targets.push(g);
@@ -359,7 +460,7 @@ async function buildTargets() {
     for (const x of lanes) {
       const spec = ENEMIES[i++ % ENEMIES.length];
       try { await mkEnemy(x + (Math.abs(z) % 7) * 0.1 - 0.3, z, spec); }
-      catch (e) { console.log('enemy failed', spec.head, e); }
+      catch (e) { console.log('enemy failed', spec.body, e); }
     }
 }
 
@@ -475,12 +576,29 @@ function explode(p, radius, damage) {
 function hitReact(t) {
   const u = t.userData;
   u.wobble = 1;
-  if (u.board) {
-    if (!u.baseColor) u.baseColor = u.board.material.color.clone();
-    u.board.material.color.setRGB(1.6, 0.6, 0.6);
-    u.flash = 0.15;
-  }
+  const mats = u.rig ? [].concat(u.rig.mesh.material) : (u.board ? [u.board.material] : []);
+  if (!mats.length) return;
+  if (!u.baseColor) u.baseColor = mats.map(m => m.color.clone());
+  mats.forEach(m => m.color.setRGB(1.6, 0.6, 0.6));
+  u.flashMats = mats;
+  u.flash = 0.12;
 }
+// GE's own death animations, picked by where the shot landed.
+const DEATHS = ['death_forward_face_down', 'death_backward_fall_face_up1',
+                'death_backward_spin_face_down_right', 'death_fetal_position_left'];
+const HEAD_DEATHS = ['death_head', 'death_neck'];
+function playDeath(g, head) {
+  const u = g.userData;
+  if (!u.rig) return;
+  const pool = head ? HEAD_DEATHS : DEATHS;
+  const name = pool[Math.floor(Math.random() * pool.length)];
+  loadAnim(name).then(a => {
+    if (u.downT <= 0) return;
+    u.anim = a; u.animName = name; u.frame = 0;
+    u.downT = Math.max(u.downT, a.frames / 60);
+  });
+}
+
 /** A guard grunts when hit and thumps when it goes down; a headshot skips the grunt. */
 function reactSound(g, at, head) {
   if (!g.userData.enemy) return;
@@ -854,8 +972,9 @@ function shoot(now) {
         state.score += Math.max(1, Math.round(-g.position.z)) * (head ? 2 : 1);
         reactSound(g, h.point, head);
         if (g.userData.hp <= 0) {
-          g.userData.downT = 2.2;
+          g.userData.downT = 3.4;
           state.score += 50;
+          playDeath(g, head);
         }
       }
     }
@@ -961,14 +1080,27 @@ function tick() {
     if (state.flashT <= 0 && state.curFlash)
       for (const m of state.curFlash) m.visible = false;
   }
-  // targets: fall/respawn, wobble, hit flash
+  // targets: animation, fall/respawn, wobble, hit flash
   for (const t of targets) {
     const u = t.userData;
+    if (u.rig && u.anim) {
+      // GE animations run at 60 Hz, one bitstream frame per tick.
+      u.frame += dt * 60;
+      if (u.frame >= u.anim.frames) {
+        if (u.anim.loop || u.animName === 'idle') u.frame %= u.anim.frames;
+        else u.frame = u.anim.frames - 1;         // deaths hold their last pose
+      }
+      poseSkeleton(u.rig, u.anim, Math.floor(u.frame), u.flip);
+    }
     if (u.downT > 0) {
       u.downT -= dt;
-      const fall = Math.min(1, (2.2 - u.downT) * 4);
-      t.rotation.x = -fall * Math.PI / 2;
-      if (u.downT <= 0) { u.hp = u.maxhp; t.rotation.x = 0; }
+      if (u.downT <= 0) {
+        u.hp = u.maxhp;
+        if (u.rig) { u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0; }
+        else t.rotation.x = 0;
+      } else if (!u.rig) {
+        t.rotation.x = -Math.min(1, (2.2 - u.downT) * 4) * Math.PI / 2;
+      }
     }
     if (u.wobble > 0) {
       u.wobble = Math.max(0, u.wobble - dt * 3.5);
@@ -977,8 +1109,8 @@ function tick() {
     }
     if (u.flash > 0) {
       u.flash -= dt;
-      if (u.flash <= 0 && u.board)
-        u.board.material.color.copy(u.baseColor || new THREE.Color(1, 1, 1));
+      if (u.flash <= 0 && u.flashMats)
+        u.flashMats.forEach((m, i) => m.color.copy(u.baseColor[i]));
     }
   }
   // transient fx

@@ -16,7 +16,8 @@ python extract_models.py    # OBJ+MTL, 510 models       -> extracted/models/
 python extract_sounds.py    # 261 SFX as WAV            -> extracted/sounds/
 python extract_weapons.py   # ballistics/rates/VFX      -> extracted/weapons/
 python decode_setups.py     # stage setups              -> extracted/setups/
-python extract_characters.py # heads, hats, guard roster -> extracted/characters/
+python extract_characters.py # heads, hats, skeletons, roster -> extracted/characters/
+python extract_animations.py # skeletal animations      -> extracted/animations/
 python render_music.py 2    # a music track as WAV      -> extracted/music/
 ```
 
@@ -109,13 +110,32 @@ rediscovered:
   `__repose()` re-applies); `window.__inspect(key, view, size, flat)` and
   `window.__sheet([keys])` render models in isolation.
 
-**Characters** (`extract_characters.py`, `decode_setups.py`)
-- Character **bodies have no rest pose to export.** `process_02_position` in
-  model.c decodes a full 3-axis rotation per joint from the animation bitstream
-  and only then builds the joint matrix; with no rotation applied the limbs
-  splay to roughly four times the figure's height (a guard 681 units tall spans
-  2167 across). Heads and hats are rigid attachments and come out correct, so
-  the range uses those and gives them a silhouette body.
+**Characters and animation** (`extract_characters.py`, `extract_animations.py`)
+- Character **bodies have no rest pose**: `process_02_position` in model.c
+  decodes a 3-axis rotation per joint from the animation bitstream and only then
+  builds the matrix, so with no rotation the limbs stay on their local +x and
+  splay to four times the figure's height (a guard 681 units tall spans 2167
+  across). The animation is not optional decoration; it *is* the pose.
+- The joint matrix is `parent * translate(Origin) * rotate(anim)`, and
+  `matrix_4x4_set_rotation_around_xyz` composes Rz*Ry*Rx — three.js Euler
+  order `'ZYX'`. `extract_models.py` writes a `.skin.json` beside each model
+  giving the matrix-slot tree and each vertex's slot, with positions already in
+  bone space.
+- A group's `0x100`/`0x200` opcode flags give it extra matrix slots at the same
+  origin; `modelBuildGroupMatrices` drives those with the **quaternion** halved,
+  not the angles.
+- **Animation layout**: ge007.ld places `animation_data` immediately after
+  `animation_entries`, so the data blob's start is the entries segment's end,
+  and the segment's own start falls out of the furthest frame any animation
+  reads. A ModelAnimation gives frame count, a bit width and bits-per-frame;
+  `loadAnimationFrame` reads frame N at `address + N * (bits >> 3)`. Within a
+  frame, joint J reads three consecutive values at index `Joints[J].mtxA`
+  (`mtxB` for the mirrored copy, where y and z are negated).
+- Guard idle is nearly static by design — about 4° of sway at the neck and
+  ankles over 163 frames — so "the bones aren't moving" is not a symptom.
+- `Box3.setFromObject` ignores skinning and returns bind-pose bounds, which
+  stands every character waist-deep in the floor; walk the vertices through
+  `SkinnedMesh.applyBoneTransform` instead.
 - `headHat_array_8003E464` (chr.c) seats a hat on a head: an offset in units of
   21.3 and a per-axis scale, indexed `[head][HATTYPE]`. A peaked cap also sets
   `headVisible = 0`.
@@ -140,11 +160,12 @@ rediscovered:
 
 ## Known gaps
 
-- **Characters don't pose, and there is no usable rest pose either.** Per-joint
-  matrices come from the skeletal animation system (`ANIM_ENTRY_*` compressed
-  bitstreams), which isn't ported. Leaving the rotation out does not give a bind
-  pose — it splays the limbs (see Characters above) — so full bodies are not
-  rendered anywhere. Heads, hats, weapons and props are correct at rest.
+- **Animation blending isn't implemented.** GE cross-fades between two frames
+  and two animations (`model->unk2c`, `anim2` and a quaternion slerp); the range
+  samples a single frame, so motion is stepped at 60 Hz rather than interpolated.
+  The `MatrixID2` bend/stretch (a y-only half turn with a scale from
+  `modelGetBendStretchScale`) is also skipped — no character model in the range
+  uses it.
 - **Level geometry** (`bg/*.seg`) isn't decoded; those files use a different
   container.
 - Grenades, mines and throwing knives aren't simulated in the range.

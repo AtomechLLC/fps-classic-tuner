@@ -59,6 +59,37 @@ def enum_members(text, name):
         if m: out.append(m.group(1))
     return out
 
+def skeletons():
+    """JOINTLIST/MODELSKELETON from assets/embedded/skeletons.
+
+    Each joint's mtxA is the index of its first animation value; a joint reads
+    three consecutive values (x, y, z) from there. mtxB is the mirrored variant
+    the game uses to flip a character left-for-right.
+    """
+    out = {}
+    for path in glob.glob(os.path.join(DECOMP, "assets", "embedded", "skeletons", "*.inc.c")):
+        src = open(path, encoding="utf-8", errors="replace").read()
+        src = re.sub(r"#ifdef DEBUG.*?#endif", "", src, flags=re.S)
+        for m in re.finditer(r"ModelJoint JOINTLIST\((\w+)\)\s*(?:\[\d*\])?\s*=\s*\{(.*?)\}\s*;", src, re.S):
+            joints = [[int(x, 0) for x in row]
+                      for row in re.findall(r"\{\s*(0x[0-9a-fA-F]+|\d+)\s*,\s*(0x[0-9a-fA-F]+|\d+)\s*,\s*(0x[0-9a-fA-F]+|\d+)\s*\}", m.group(2))]
+            out[m.group(1)] = {"joints": [{"type": j[0], "mtxA": j[1], "mtxB": j[2]}
+                                          for j in joints]}
+        for m in re.finditer(r"MODELSKELETON\((\w+),\s*([^,]+),\s*([^)]+)\)", src):
+            e = out.setdefault(m.group(1), {"joints": []})
+            e["numjoints"] = int(m.group(2), 0)
+            e["size"] = int(m.group(3), 0)
+    return out
+
+def body_skeletons():
+    """Which skeleton each character body model uses (its MODELFILEHEADER)."""
+    out = {}
+    for path in glob.glob(os.path.join(DECOMP, "assets", "obseg", "chr", "*", "[Mm]odelFileHeader.inc.c")):
+        src = open(path, encoding="utf-8", errors="replace").read()
+        m = re.search(r"MODELFILEHEADER\((\w+),[^,]*,\s*&SKELETON\((\w+)\)", src)
+        if m: out["C%sZ" % m.group(1)] = m.group(2)
+    return out
+
 def head_hat_table():
     """headHat_array_8003E464: 28 heads x 6 hat types, six floats each."""
     src = open(os.path.join(DECOMP, "assets", "obseg", "chr", "chrHeadHats.inc.c"),
@@ -108,20 +139,25 @@ def main():
     roster = sorted(roster.values(), key=lambda e: -e["count"])
 
     os.makedirs(OUT, exist_ok=True)
+    skels = skeletons()
+    bodies_map = {k: v for k, v in body_skeletons().items() if k in have}
     data = {
         # chr.c:1656 -- every guard spawns with maxdamage 4.0, so the WeaponStats
         # damage values (PP7 1.0, shotgun 0.4/pellet, Golden Gun 100) are the
         # authentic number of hits.
         "guard_max_damage": 4.0,
+        "skeletons": skels,
+        "body_skeleton": bodies_map,
         "hat_models": HAT_MODELS,
         "bodies": bodies,
         "heads": head_entries,
         "roster": roster,
     }
     json.dump(data, open(os.path.join(OUT, "CHARACTERS.json"), "w"), indent=1)
-    print("%d heads (%d with hat placements), %d bodies, %d guard identities -> %s/CHARACTERS.json"
+    print("%d heads (%d with hat placements), %d bodies, %d guard identities, "
+          "%d skeletons, %d body models mapped -> %s/CHARACTERS.json"
           % (len(head_entries), sum(1 for h in head_entries if h["hats"]),
-             len(bodies), len(roster), OUT))
+             len(bodies), len(roster), len(skels), len(bodies_map), OUT))
 
 if __name__ == "__main__":
     main()

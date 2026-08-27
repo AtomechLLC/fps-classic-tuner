@@ -92,6 +92,9 @@ class Decoder:
         # them "secondary surfaces" driven by vertex alpha. Tag them so the
         # renderer can blend rather than depth-fight with the primary skin.
         self.cur_sec = False
+        self.cur_mtx_id = 0           # matrix slot the current vertices bind to
+        self.vmtx = []                # per-vertex matrix slot, parallel to verts
+        self.tree = {}                # matrix slot -> {origin, parent, joint, half}
         self.n_switches = 0
         self.vbuf = [-1] * 32    # RSP vertex buffer: persists across nested DLs
         self.geomode = 0         # RSP geometry mode (G_TEXTURE_GEN etc.)
@@ -113,6 +116,7 @@ class Decoder:
         u = s / 32.0 / max(w, 1)
         v = 1.0 - t / 32.0 / max(h, 1)
         self.verts.append((x+translate[0], y+translate[1], z+translate[2]))
+        self.vmtx.append(self.cur_mtx_id)
         if lit:   # colour slots hold a signed vertex normal
             nx, ny, nz = struct.unpack(">3b", self.d[addr+12:addr+15])
             ln = max((nx*nx+ny*ny+nz*nz) ** 0.5, 1e-6)
@@ -141,7 +145,8 @@ class Decoder:
                 if (w0 >> 16) & 0xFF == 1: return
             elif cmd == 0x01:      # G_MTX: load matrix from segment 3 (index = off/64)
                 if (w1 >> 24) == 3:
-                    self.cur_mtx = self.mtx.get((w1 & 0xFFFFFF) // 64, (0.0, 0.0, 0.0))
+                    self.cur_mtx_id = (w1 & 0xFFFFFF) // 64
+                    self.cur_mtx = self.mtx.get(self.cur_mtx_id, (0.0, 0.0, 0.0))
             elif cmd == 0xB7:      # G_SETGEOMETRYMODE
                 self.geomode |= w1
             elif cmd == 0xB6:      # G_CLEARGEOMETRYMODE
@@ -187,8 +192,15 @@ class Decoder:
                                        bool(self.geomode & 0x40000), self.cur_sec))
             # everything else (rdp state, matrices) ignored
 
-    def calc_matrices(self, addr, parent, seen=None):
-        """model.c subcalcmatrices: matrix[MatrixID0] = parent * translate(Origin)."""
+    def calc_matrices(self, addr, parent, seen=None, parent_id=-1):
+        """model.c subcalcmatrices: matrix[MatrixID0] = parent * translate(Origin).
+
+        Also records the joint tree (`self.tree`): each matrix slot's own
+        Group.Origin, its parent slot and the skeleton JointID it takes its
+        rotation from. The accumulated translate alone is only a rest layout --
+        model.c actually builds `parent * rotate(anim) * translate(Origin)`, so
+        the tree is what a poseable export needs.
+        """
         if seen is None: seen = set()
         if addr == 0 or addr in seen: return
         seen.add(addr)
@@ -196,26 +208,38 @@ class Decoder:
         op = raw & 0xFF
         data = self.off(self.u32(addr+4))
         here = parent
+        here_id = parent_id
         if op in (2, 21) and data:
             ox, oy, oz = struct.unpack(">3f", self.d[data:data+12])
             here = (parent[0]+ox, parent[1]+oy, parent[2]+oz)
-            m0 = struct.unpack(">h", self.d[data+0x0e:data+0x10])[0]
-            if m0 >= 0: self.mtx[m0] = here
-            if raw & 0x100:
-                m1 = struct.unpack(">h", self.d[data+0x10:data+0x12])[0]
-                if m1 >= 0: self.mtx[m1] = here
-            if raw & 0x200:
-                m2 = struct.unpack(">h", self.d[data+0x12:data+0x14])[0]
-                if m2 >= 0: self.mtx[m2] = here
+            joint = self.u16(data+0x0c)
+            m0, m1, m2 = struct.unpack(">3h", self.d[data+0x0e:data+0x14])
+            if m0 >= 0:
+                self.mtx[m0] = here
+                self.tree[m0] = {"origin": [ox, oy, oz], "parent": parent_id,
+                                 "joint": joint, "half": 0}
+                here_id = m0
+            # The 0x100/0x200 flags give the group a second and third matrix at
+            # the same place; sub_GAME_7F06E2B8 drives those with half the
+            # joint's angle (GE's bend/stretch), so they are separate bones.
+            for flag, mi, half in ((0x100, m1, 1), (0x200, m2, 2)):
+                if (raw & flag) and mi >= 0:
+                    self.mtx[mi] = here
+                    self.tree[mi] = {"origin": [ox, oy, oz], "parent": parent_id,
+                                     "joint": joint, "half": half}
         elif op == 1 and data:
             mi = struct.unpack(">h", self.d[data+2:data+4])[0]
-            if mi >= 0: self.mtx[mi] = here
+            if mi >= 0:
+                self.mtx[mi] = here
+                self.tree.setdefault(mi, {"origin": [0.0, 0.0, 0.0],
+                                          "parent": parent_id, "joint": 0, "half": 0})
+                here_id = mi
             grp = self.off(self.u32(data+4))
-            if grp: self.calc_matrices(grp, here, seen)
+            if grp: self.calc_matrices(grp, here, seen, here_id)
         child = self.off(self.u32(addr+0x14))
         nxt = self.off(self.u32(addr+0x0c))
-        if child: self.calc_matrices(child, here, seen)
-        if nxt: self.calc_matrices(nxt, parent, seen)
+        if child: self.calc_matrices(child, here, seen, here_id)
+        if nxt: self.calc_matrices(nxt, parent, seen, parent_id)
 
     def override_runtime_matrices(self):
         """gunfire.c replaces specific matrix slots at render time.
@@ -320,6 +344,55 @@ class Decoder:
             return
         if nxt: self.node(nxt, translate)
 
+    def export_skin(self, path):
+        """A poseable copy of the mesh: geometry in bone space, plus the tree.
+
+        The OBJ keeps its baked rest positions for the existing consumers, but a
+        skinned renderer needs three things the OBJ cannot carry -- which matrix
+        slot each vertex belongs to, how the slots nest, and the vertex position
+        in that slot's own frame. Bone-local position is the baked position
+        minus the slot's accumulated origin, which is exactly what the rest
+        layout adds, so it is computed here rather than at load time.
+        """
+        used = sorted(set(self.vmtx))
+        tree = {}
+        for m in used:
+            tree[m] = self.tree.get(m, {"origin": [0.0, 0.0, 0.0], "parent": -1,
+                                        "joint": 0, "half": 0})
+        pending = [tree[m]["parent"] for m in used]
+        while pending:                      # keep the chain complete to the root
+            m = pending.pop()
+            if m < 0 or m in tree: continue
+            e = self.tree.get(m, {"origin": [0.0, 0.0, 0.0], "parent": -1,
+                                  "joint": 0, "half": 0})
+            tree[m] = e
+            pending.append(e["parent"])
+
+        pos, col = [], []
+        for i, v in enumerate(self.verts):
+            a = self.mtx.get(self.vmtx[i], (0.0, 0.0, 0.0))
+            pos += [round(v[0] - a[0], 2), round(v[1] - a[1], 2), round(v[2] - a[2], 2)]
+            r, g, b = (1.0, 1.0, 1.0) if self.lit[i] else self.attrs[i]
+            col += [round(r, 3), round(g, 3), round(b, 3)]
+        uv = []
+        for u in self.uvs: uv += [round(u[0], 4), round(u[1], 4)]
+
+        def mat(tid, sw, lit, env, sec):
+            base = f"tex_{tid}"
+            if isinstance(sw, tuple):
+                base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
+            return (base + ("_lit" if lit else "") + ("_env" if env else "")
+                    + ("_sec" if sec else ""))
+        groups = {}
+        for a, b, c, tid, sw, lit, env, sec in self.faces:
+            groups.setdefault(mat(tid, sw, lit, env, sec), []).extend((a, b, c))
+
+        json.dump({"matrices": {str(k): v for k, v in sorted(tree.items())},
+                   "vertexMatrix": self.vmtx,
+                   "position": pos, "uv": uv, "color": col,
+                   "groups": groups},
+                  open(path + ".skin.json", "w"), separators=(",", ":"))
+
     def export_obj(self, path, name):
         def mat(tid, sw, lit, env, sec):
             base = f"tex_{tid}"
@@ -394,6 +467,8 @@ def main():
         if not dec.faces:
             failed.append(name); continue
         dec.export_obj(os.path.join(OUT, name), name)
+        if len(set(dec.vmtx)) > 1:
+            dec.export_skin(os.path.join(OUT, name))
         switches = {}
         for f in dec.faces:
             if isinstance(f[4], tuple):
