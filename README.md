@@ -75,6 +75,13 @@ rediscovered:
   render pure black; the exporter rebuilds those from face geometry.
 - Vertex colour slots hold a *normal* when the record's ModelType is 3 or 4
   (GunLighting / fog+lighting), and a prelit colour otherwise.
+- GunLighting is a real diffuse pass, not decoration: the combiner multiplies
+  TEXEL0 by SHADE from those normals, lit by `g_WeaponEnvmapLight` (gun.c) —
+  ambient `0x96` grey, white diffuse from signed direction `(-78, 77, 46)`,
+  over the player's left shoulder. The AR33's grey gradient (texture 2293) is a
+  specular strip that only reads correctly under that light; shown flat it is a
+  painted pale streak, and the barrel gloss in reference footage is this
+  shading, not a texture effect.
 - A display-list record has **two** lists. `model.c` draws `Primary` opaque
   (`OPA_SURF`) and then `Secondary` translucent (`XLU_SURF`) — the struct calls
   these "secondary surfaces". They are decals lying exactly on the skin: 12 of

@@ -654,14 +654,15 @@ function fireProjectile(kind, dir) {
 }
 
 // ---- weapon view models ----
+// The weapon pass is lit with GE's own gun light, g_WeaponEnvmapLight (gun.c):
+// ambient 0x96 grey, white diffuse from direction (0xb2, 0x4d, 0x2e) -- signed
+// (-78, 77, 46), i.e. over the player's left shoulder. The gun matrix is
+// camera-space, so a fixed light in this scene is exactly what the game does.
 const gunScene = new THREE.Scene();
-gunScene.add(new THREE.HemisphereLight(0xffffff, 0x556677, 0.75));
-const gl2 = new THREE.DirectionalLight(0xffffff, 0.95);
-gl2.position.set(-0.6, 1.4, 0.8);
-gunScene.add(gl2);
-const gl3 = new THREE.DirectionalLight(0xc9d4ff, 0.35);
-gl3.position.set(1, -0.3, 0.5);
-gunScene.add(gl3);
+gunScene.add(new THREE.AmbientLight(0xffffff, 0x96 / 255));
+const gunLight = new THREE.DirectionalLight(0xffffff, 1.0);
+gunLight.position.set(-78, 77, 46);   // direction TO the light, N64 convention
+gunScene.add(gunLight, gunLight.target);
 const gunMount = new THREE.Group();
 gunScene.add(gunMount);
 
@@ -715,16 +716,13 @@ async function loadGunModel(name) {
             shininess: 22, side: THREE.DoubleSide });
 
         } else if (lit) {
-          // Records with ModelType 3/4 store NORMALS in the colour slots and were
-          // lit by the N64's own light setup, which we don't reproduce. Relighting
-          // them with scene lights shifted their brightness (the AR33 went grey,
-          // the KF7 lost its wood). The textures already carry the right base
-          // colour, so show them unlit rather than invent lighting.
-          // Approximate the N64's diffuse level with a constant scale: showing
-          // these textures at full value leaves light ones washed out (the AR33's
-          // grey strip) while dark ones already read correctly.
-          nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide });
-          nm.color.setScalar(0.65);
+          // ModelType 3 (GunLighting) multiplies TEXEL0 by SHADE from the vertex
+          // normals -- the exported OBJ carries those normals, and the gun scene
+          // now carries GE's own light. This is what makes the barrels gloss:
+          // the AR33's grey gradient (texture 2293) is a specular strip that
+          // only reads correctly once shading modulates it. The previous flat
+          // 0.65 showed it as a painted pale streak.
+          nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
         } else {                      // prelit: baked vertex colours
           nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
         }
