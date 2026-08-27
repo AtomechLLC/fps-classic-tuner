@@ -516,7 +516,7 @@ async function mkEnemy(x, z, spec) {
     hit: 'flesh', downT: 0, wobble: 0, flash: 0,
     name: spec.name, female: !!spec.female, enemy: true,
     rig, anim: idle, idleAnim: idle, frame: Math.random() * idle.frames,
-    animName: 'idle', flip: Math.random() < 0.5,
+    animName: 'idle', flip: Math.random() < 0.5, animRate: 1,
     wepObj, wkey: spec.wkey || null, pistol: !!spec.pistol,
     walkAnim: spec.female ? 'walking_female' : (spec.wep ? 'walking' : 'walking_unarmed'),
     hpBar, lastDmg: 0,
@@ -679,6 +679,18 @@ function hitReact(t) {
   u.flashMats = mats;
   u.flash = 0.12;
 }
+// ---- walk gaits ----
+// GE's walk cycles animate in place (their root-motion channel holds the hip's
+// absolute position; x/z barely move), so ground speed comes from the gait:
+// how fast the planted foot travels backward relative to the root, measured
+// per animation from the posed skeleton (units/frame at 1.0x playback).
+// chraction.c plays guard walks at 0.5x speed, so both the playback rate and
+// the movement speed halve together and the feet never slide.
+const WALK_RATE = 0.5;                     // modelSetAnimation(..., 0.5f, ...)
+const WALK_SPEED = {                       // m/s at 1.0x playback
+  walking: 2.19, walking_unarmed: 3.15, walking_female: 3.84,
+};
+
 // ---- range UI: floating damage numbers and HP bars ----
 // Not from the original game -- range instrumentation. The HP bar divides
 // itself into segments the size of the last hit taken, so the number of full
@@ -802,7 +814,7 @@ function guardFire(t, now) {
                  : (Math.random() < 0.5 ? 'fire_standing' : 'fire_hip');
   loadAnim(fireAnim).then(a => {
     if (u.downT > 0 || (u.animName !== 'idle' && !u.animName.startsWith('walking'))) return;
-    u.anim = a; u.animName = fireAnim; u.frame = 0;
+    u.anim = a; u.animName = fireAnim; u.frame = 0; u.animRate = 1;
     const st = WEAPONS[u.wkey];
     // shots land in the middle of the animation, spaced at the weapon's own
     // auto rate (60 Hz ticks), three rounds for a rifle burst, one for a pistol
@@ -841,7 +853,7 @@ function playFlinch(t, bp) {
   const name = `hit_${left ? 'left' : 'right'}_${arm ? 'arm' : 'shoulder'}`;
   loadAnim(name).then(a => {
     if (u.downT > 0) return;
-    u.anim = a; u.animName = name; u.frame = 0;
+    u.anim = a; u.animName = name; u.frame = 0; u.animRate = 1;
   });
 }
 
@@ -856,7 +868,7 @@ function playDeath(g, head) {
   const name = pool[Math.floor(Math.random() * pool.length)];
   loadAnim(name).then(a => {
     if (u.downT <= 0) return;
-    u.anim = a; u.animName = name; u.frame = 0;
+    u.anim = a; u.animName = name; u.frame = 0; u.animRate = 1;
     u.downT = Math.max(u.downT, a.frames / 60);
   });
 }
@@ -1370,8 +1382,9 @@ function tick() {
   for (const t of targets) {
     const u = t.userData;
     if (u.rig && u.anim) {
-      // GE animations run at 60 Hz, one bitstream frame per tick.
-      u.frame += dt * 60;
+      // GE animations run at 60 Hz, one bitstream frame per tick; walks play
+      // at chraction.c's half rate.
+      u.frame += dt * 60 * (u.animRate || 1);
       let animEnded = false;
       if (u.frame >= u.anim.frames) {
         if (u.anim.loop || u.animName === 'idle') {
@@ -1380,7 +1393,7 @@ function tick() {
           u.frame = u.anim.frames - 1;            // deaths hold their last pose
           animEnded = true;
         } else {                                  // fire/flinch: back to idle
-          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
+          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0; u.animRate = 1;
         }
       }
       poseSkeleton(u.rig, u.anim, u.frame, u.flip);
@@ -1392,7 +1405,9 @@ function tick() {
         if (u.animName === 'idle') {
           loadAnim(u.walkAnim).then(a => {
             if (u.downT <= 0 && u.animName === 'idle') {
-              u.anim = a; u.animName = u.walkAnim; u.frame = Math.random() * a.frames;
+              u.anim = a; u.animName = u.walkAnim;
+              u.frame = Math.random() * a.frames;
+              u.animRate = WALK_RATE;
             }
           });
         } else {
@@ -1402,7 +1417,7 @@ function tick() {
           if (dist < 0.15) {
             u.patrol.next = (u.patrol.next + 1) % u.patrol.points.length;
           } else {
-            const speed = 0.85;                  // m/s, matched to the stride
+            const speed = (WALK_SPEED[u.walkAnim] || 2.19) * (u.animRate || 1);
             t.position.x += dx / dist * speed * dt;
             t.position.z += dz / dist * speed * dt;
             // face the walk direction (enemies are authored facing +z)
@@ -1414,7 +1429,7 @@ function tick() {
         }
       } else if (canWalk) {
         if (u.animName !== 'idle' && u.downT <= 0) {
-          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
+          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0; u.animRate = 1;
         }
         // off duty: turn back to the firing line
         if (Math.abs(t.rotation.y) > 0.01 && u.downT <= 0)

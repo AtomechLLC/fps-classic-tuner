@@ -50,9 +50,12 @@ def anim_offsets():
 def header(rom, off):
     address, = struct.unpack(">I", rom[off:off+4])
     frames, width, flags = struct.unpack(">HBB", rom[off+4:off+8])
-    framebits, = struct.unpack(">H", rom[off+14:off+16])
+    descoff, = struct.unpack(">I", rom[off+8:off+12])
+    rootbits, framebits = struct.unpack(">2H", rom[off+12:off+16])
+    streamoff, = struct.unpack(">I", rom[off+16:off+20])
     return {"address": address, "frames": frames, "width": width, "flags": flags,
-            "framebits": framebits, "framebytes": framebits >> 3}
+            "framebits": framebits, "framebytes": framebits >> 3,
+            "descoff": descoff, "rootbits": rootbits, "streamoff": streamoff}
 
 def plausible(h):
     if not (0 < h["frames"] < 20000): return False
@@ -90,6 +93,44 @@ def read_bits(buf, width, bitoff):
         value &= 0xFFFF
     return (value << (16 - width)) & 0xFFFF
 
+def root_motion(rom, blob, h):
+    """Per-frame root position and yaw (sub_GAME_7F06D2E4).
+
+    The header's unk08/unk10 are blob-relative offsets to a table of
+    ModelAnimBitField {bitOffset u16, bitCount u8, pad, valueOffset u16} and a
+    second bit stream; unk0C is that stream's bits-per-frame. The root joint
+    reads four fields -- x, y, z, then a 16th-turn yaw -- each sign-extended
+    from bitCount bits and added to valueOffset. Idle-style animations point
+    at the shared all-zero descriptor block and so have no root motion.
+    """
+    descs = []
+    for i in range(4):
+        o = blob + h["descoff"] + 6 * i
+        bo, bc, _, vo = struct.unpack(">HBBH", rom[o:o+6])
+        descs.append((bo, bc, vo))
+    if not any(d[1] for d in descs):
+        return None
+    stream = blob + h["streamoff"]
+    frames = []
+    for f in range(h["frames"]):
+        base = h["rootbits"] * f
+        vals = []
+        for bo, bc, vo in descs:
+            if bc == 0:
+                vals.append(vo if vo < 0x8000 else vo - 0x10000)
+                continue
+            raw = 0
+            pos = base + bo
+            for _ in range(bc):
+                raw = (raw << 1) | ((rom[stream + (pos >> 3)] >> (7 - (pos & 7))) & 1)
+                pos += 1
+            if raw & (1 << (bc - 1)):               # sign-extend
+                raw |= ((1 << (16 - bc)) - 1) << bc
+            v = (vo + raw) & 0xFFFF
+            vals.append(v if v < 0x8000 else v - 0x10000)
+        frames.append(vals)
+    return frames
+
 def main():
     if not ROM: sys.exit("ROM not found")
     rom = open(ROM[0], "rb").read()
@@ -119,13 +160,20 @@ def main():
             o = base + f * h["framebytes"]
             buf = rom[o:o + h["framebytes"] + 4]
             frames.append([read_bits(buf, h["width"], i * h["width"]) for i in range(nvals)])
+        root = root_motion(rom, blob, h)
         json.dump({"name": name, "frames": h["frames"], "width": h["width"],
-                   "values": nvals, "loop": bool(h["flags"] & 1), "data": frames},
+                   "values": nvals, "loop": bool(h["flags"] & 1), "data": frames,
+                   "root": root},
                   open(os.path.join(OUT, name + ".json"), "w"), separators=(",", ":"))
         index["animations"][name] = {"frames": h["frames"], "values": nvals,
                                      "loop": bool(h["flags"] & 1),
                                      "file": name + ".json"}
-        print(f"  {name:38s} {h['frames']:4d} frames x {nvals} values @ {h['width']} bits")
+        rinfo = "no root motion"
+        if root:
+            import math
+            dist = sum(math.dist(root[i][:3:2], root[i+1][:3:2]) for i in range(len(root)-1))
+            rinfo = f"root motion {dist:6.0f} units over {h['frames']/60:.2f} s"
+        print(f"  {name:38s} {h['frames']:4d} frames x {nvals} values @ {h['width']} bits  {rinfo}")
     json.dump(index, open(os.path.join(OUT, "ANIMATIONS.json"), "w"), indent=1)
     print(f"-> {OUT}/")
 

@@ -35,7 +35,9 @@ python -m http.server 8613
 Open `http://localhost:8613/gallery/`. Mouse aims (pointer lock), click/hold
 fires, **R** reloads, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
 music, **G** toggles the targets returning fire (visual only — off by default),
-**P** sends half the guards walking patrol loops (GE's own `walking` gaits),
+**P** sends half the guards walking patrol loops (GE's own `walking` gaits, at
+`chraction.c`'s 0.5× playback with movement matched to each gait's measured
+planted-foot speed, so feet don't slide),
 `-` / `=` set volume. Launching with `?mute` starts silent (used by automated
 sessions); `=` brings the volume back.
 
@@ -162,6 +164,14 @@ rediscovered:
   (`mtxB` for the mirrored copy, where y and z are negated).
 - Guard idle is nearly static by design — about 4° of sway at the neck and
   ankles over 163 frames — so "the bones aren't moving" is not a symptom.
+- Animations carry a second bit-packed stream (header `unk08`/`unk10` →
+  descriptor table + stream, `unk0C` bits per frame): the root joint's
+  **absolute hip position** and yaw. Idle-style animations point at a shared
+  all-zero descriptor block. The walk cycles animate **in place** — their root
+  x/z barely move — so ground speed is not in the animation; it belongs to the
+  actor code. `chraction.c` plays guard walks at 0.5×, and the ground speed
+  that keeps the planted foot pinned is measured from the posed skeleton:
+  2.19 m/s at 1.0× for `walking` (1.10 at GE's rate).
 - `Box3.setFromObject` ignores skinning and returns bind-pose bounds, which
   stands every character waist-deep in the floor; walk the vertices through
   `SkinnedMesh.applyBoneTransform` instead.
