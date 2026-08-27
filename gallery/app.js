@@ -556,42 +556,16 @@ async function selectWeapon(key) {
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
-  const { obj, flashGroups, flashMeshes, all, flash } = await loadGunModel(modelName);
+  const { obj, flashGroups, flashMeshes } = await loadGunModel(modelName);
   if (state.key !== key) return;
   gunMount.clear();
   const P = window.__P;
   const holder = new THREE.Group();
-  // 1. rotate so the muzzle (flash centroid, else +z) points forward (-z)
-  const centre = all.getCenter(new THREE.Vector3());
-  let dir;
-  if (!flash.isEmpty()) {
-    dir = flash.getCenter(new THREE.Vector3()).sub(centre);
-  } else {
-    const size = all.getSize(new THREE.Vector3());
-    const axis = size.z >= size.x ? 'z' : 'x';
-    // muzzle end is the thinner half: compare vertical extent of each half
-    let hiY = -1e9, loY = 1e9, hiN = 0, loN = 0;
-    obj.traverse(o => {
-      if (!o.isMesh) return;
-      const pos = o.geometry.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const a = axis === 'z' ? pos.getZ(i) : pos.getX(i);
-        const y = pos.getY(i);
-        if (a > centre[axis]) { hiY = Math.max(hiY, Math.abs(y - centre.y)); hiN++; }
-        else { loY = Math.min(loY, 0); loN++; }
-      }
-    });
-    dir = new THREE.Vector3();
-    dir[axis] = 1;                        // default: positive end is muzzle
-  }
-  dir.y = 0;
-  if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
-  dir.normalize();
-
-  // --- Simplest possible framing -----------------------------------------
-  // Point the barrel down -z, centre the model, normalise its longest axis to
-  // one unit, then place it with explicit numbers. No solving, no fitting:
-  // scale and position are literal and directly observable.
+  // Weapon models are authored with the muzzle at +z: across every gun the
+  // flash matrix sits at the model's z maximum (DD44 298/298, PP7 201/201,
+  // sniper 804/804, shotgun 678/678). So the barrel direction is a fixed
+  // convention, not something to infer per-model -- deriving it from flash
+  // mesh bounds was fragile and had the DD44 pointing sideways.
   // Detach and reset before measuring: Box3.setFromObject uses WORLD bounds, so
   // a model still parented to the previous holder would be measured through that
   // holder's scale -- giving a tiny size and, in turn, an enormous new scale.
@@ -599,7 +573,7 @@ async function selectWeapon(key) {
   obj.removeFromParent();
   obj.position.set(0, 0, 0);
   obj.scale.set(1, 1, 1);
-  obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
+  obj.rotation.set(0, Math.PI, 0);        // muzzle +z -> camera forward -z
   obj.updateWorldMatrix(false, true);
   const raw = new THREE.Box3().setFromObject(obj);
   obj.position.sub(raw.getCenter(new THREE.Vector3()));
