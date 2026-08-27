@@ -276,13 +276,12 @@ class Decoder:
             pass
         elif op == 4 and data:    # display list (guns)
             pri, sec = self.u32(data), self.u32(data+4)
-            lit = self.d[data+18] in (3, 4)     # GunLighting / fog+lighting
+            lit = bool(self.geomode & 0x20000)  # G_LIGHTING: colours are normals
             for gdl in (pri, sec):
                 if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+12)), translate, lit=lit)
         elif op == 24 and data:   # display list with collision table (props/chars)
             pri, sec = self.u32(data), self.u32(data+4)
-            mtype = struct.unpack(">h", self.d[data+0x18:data+0x1a])[0]
-            lit = mtype in (3, 4)
+            lit = bool(self.geomode & 0x20000)  # G_LIGHTING: colours are normals
             for gdl in (pri, sec):
                 if gdl: self.run_dl(self.off(gdl), self.off(self.u32(data+8)), translate, lit=lit)
         elif op == 22 and data:   # primary-only display list
