@@ -518,6 +518,7 @@ async function mkEnemy(x, z, spec) {
     rig, anim: idle, idleAnim: idle, frame: Math.random() * idle.frames,
     animName: 'idle', flip: Math.random() < 0.5,
     wepObj, wkey: spec.wkey || null, pistol: !!spec.pistol,
+    walkAnim: spec.female ? 'walking_female' : (spec.wep ? 'walking' : 'walking_unarmed'),
     hpBar, lastDmg: 0,
     nextFire: performance.now() / 1000 + 3 + Math.random() * 6,
   };
@@ -532,8 +533,20 @@ async function buildTargets() {
   let i = 0;
   for (const z of rows)
     for (const x of lanes) {
-      const spec = ENEMIES[i++ % ENEMIES.length];
-      try { await mkEnemy(x + (Math.abs(z) % 7) * 0.1 - 0.3, z, spec); }
+      const spec = ENEMIES[i % ENEMIES.length];
+      const patrols = (i % 2) === 1;            // every other guard walks a beat
+      i++;
+      try {
+        const g = await mkEnemy(x + (Math.abs(z) % 7) * 0.1 - 0.3, z, spec);
+        if (patrols) {
+          const hx = g.position.x, hz = g.position.z;
+          const rx = 2.2, rz = Math.min(1.8, Math.abs(hz) - 6 > 0 ? 1.8 : 0.8);
+          g.userData.patrol = {
+            points: [[hx - rx, hz], [hx, hz - rz], [hx + rx, hz], [hx, hz + rz]],
+            next: Math.floor(Math.random() * 4),
+          };
+        }
+      }
       catch (e) { console.log('enemy failed', spec.body, e); }
     }
 }
@@ -788,7 +801,7 @@ function guardFire(t, now) {
   const fireAnim = u.pistol ? 'fire_standing_one_handed_weapon'
                  : (Math.random() < 0.5 ? 'fire_standing' : 'fire_hip');
   loadAnim(fireAnim).then(a => {
-    if (u.downT > 0 || u.animName !== 'idle') return;
+    if (u.downT > 0 || (u.animName !== 'idle' && !u.animName.startsWith('walking'))) return;
     u.anim = a; u.animName = fireAnim; u.frame = 0;
     const st = WEAPONS[u.wkey];
     // shots land in the middle of the animation, spaced at the weapon's own
@@ -1071,6 +1084,7 @@ const state = {
   recoil: 0, kick: 0, flashT: 0,
   score: 0, shots: 0, hits: 0,
   hostile: false,               // G: guards return fire (visual only)
+  patrol: false,                // P: some guards walk patrol loops
 };
 
 function fireInterval(st) {
@@ -1296,6 +1310,11 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
   if (e.code === 'KeyG') toggleHostile();
+  if (e.code === 'KeyP') {
+    state.patrol = !state.patrol;
+    const el = document.getElementById('patrol');
+    if (el) el.textContent = state.patrol ? 'PATROLS OUT' : '';
+  }
   if (e.code === 'KeyR') reload();
   if (e.code === 'Minus') master.gain.value = Math.max(0, master.gain.value - 0.05);
   if (e.code === 'Equal') master.gain.value = Math.min(1, master.gain.value + 0.05);
@@ -1365,6 +1384,42 @@ function tick() {
         }
       }
       poseSkeleton(u.rig, u.anim, u.frame, u.flip);
+      // Patrol: walk the beat between waypoints. Movement only runs while the
+      // walk (or idle) animation owns the body, so firing and flinching stop
+      // the guard in place and the walk resumes after.
+      const canWalk = u.animName === 'idle' || u.animName.startsWith('walking');
+      if (state.patrol && u.patrol && u.downT <= 0 && canWalk) {
+        if (u.animName === 'idle') {
+          loadAnim(u.walkAnim).then(a => {
+            if (u.downT <= 0 && u.animName === 'idle') {
+              u.anim = a; u.animName = u.walkAnim; u.frame = Math.random() * a.frames;
+            }
+          });
+        } else {
+          const wp = u.patrol.points[u.patrol.next];
+          const dx = wp[0] - t.position.x, dz = wp[1] - t.position.z;
+          const dist = Math.hypot(dx, dz);
+          if (dist < 0.15) {
+            u.patrol.next = (u.patrol.next + 1) % u.patrol.points.length;
+          } else {
+            const speed = 0.85;                  // m/s, matched to the stride
+            t.position.x += dx / dist * speed * dt;
+            t.position.z += dz / dist * speed * dt;
+            // face the walk direction (enemies are authored facing +z)
+            const want = Math.atan2(dx, dz);
+            let dy = want - t.rotation.y;
+            while (dy > Math.PI) dy -= TAU; while (dy < -Math.PI) dy += TAU;
+            t.rotation.y += dy * Math.min(1, dt * 6);
+          }
+        }
+      } else if (canWalk) {
+        if (u.animName !== 'idle' && u.downT <= 0) {
+          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
+        }
+        // off duty: turn back to the firing line
+        if (Math.abs(t.rotation.y) > 0.01 && u.downT <= 0)
+          t.rotation.y *= Math.max(0, 1 - dt * 5);
+      }
       // The death animations pivot the body around the hip joint, but the
       // animation's root translation isn't decoded, so without help the corpse
       // ends horizontal a metre off the floor. Re-ground from the posed
@@ -1373,7 +1428,8 @@ function tick() {
         t.updateWorldMatrix(true, true);
         u.rig.holder.position.y -= skinnedBounds(u.rig).min.y;
       }
-      if (state.hostile && u.wkey && u.downT <= 0 && u.animName === 'idle' && now >= u.nextFire) {
+      if (state.hostile && u.wkey && u.downT <= 0 &&
+          (u.animName === 'idle' || u.animName.startsWith('walking')) && now >= u.nextFire) {
         u.nextFire = now + 4 + Math.random() * 8;
         guardFire(t, now);
       }

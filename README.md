@@ -35,6 +35,7 @@ python -m http.server 8613
 Open `http://localhost:8613/gallery/`. Mouse aims (pointer lock), click/hold
 fires, **R** reloads, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
 music, **G** toggles the targets returning fire (visual only — off by default),
+**P** sends half the guards walking patrol loops (GE's own `walking` gaits),
 `-` / `=` set volume. Launching with `?mute` starts silent (used by automated
 sessions); `=` brings the volume back.
 
