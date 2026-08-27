@@ -1353,16 +1353,26 @@ function tick() {
     if (u.rig && u.anim) {
       // GE animations run at 60 Hz, one bitstream frame per tick.
       u.frame += dt * 60;
+      let animEnded = false;
       if (u.frame >= u.anim.frames) {
         if (u.anim.loop || u.animName === 'idle') {
           u.frame %= u.anim.frames;
         } else if (u.downT > 0) {
           u.frame = u.anim.frames - 1;            // deaths hold their last pose
+          animEnded = true;
         } else {                                  // fire/flinch: back to idle
           u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
         }
       }
       poseSkeleton(u.rig, u.anim, u.frame, u.flip);
+      // The death animations pivot the body around the hip joint, but the
+      // animation's root translation isn't decoded, so without help the corpse
+      // ends horizontal a metre off the floor. Re-ground from the posed
+      // vertices while falling; once the pose holds, stop paying for it.
+      if (u.downT > 0 && !animEnded) {
+        t.updateWorldMatrix(true, true);
+        u.rig.holder.position.y -= skinnedBounds(u.rig).min.y;
+      }
       if (state.hostile && u.wkey && u.downT <= 0 && u.animName === 'idle' && now >= u.nextFire) {
         u.nextFire = now + 4 + Math.random() * 8;
         guardFire(t, now);
@@ -1374,7 +1384,12 @@ function tick() {
         u.hp = u.maxhp;
         u.lastDmg = 0;
         updateHpBar(t);
-        if (u.rig) { u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0; }
+        if (u.rig) {
+          u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
+          poseSkeleton(u.rig, u.anim, 0, u.flip);
+          t.updateWorldMatrix(true, true);
+          u.rig.holder.position.y -= skinnedBounds(u.rig).min.y;
+        }
         else t.rotation.x = 0;
       } else if (!u.rig) {
         t.rotation.x = -Math.min(1, (2.2 - u.downT) * 4) * Math.PI / 2;
@@ -1471,12 +1486,14 @@ function tick() {
   if (canvas.width !== w * renderer.getPixelRatio() || canvas.height !== h * renderer.getPixelRatio()) {
     renderer.setSize(w, h, false);
     const aspect = w / h;
-    // GE renders 4:3; on wider/narrower windows keep the horizontal field the
-    // game had rather than letting the vertical FOV stretch the view
+    // GE renders 4:3 at 60 degrees vertical, i.e. a ~75 degree horizontal
+    // field. Hold THAT constant: on wide windows the vertical FOV shrinks
+    // (vert-) instead of the horizontal blowing out to ~91 degrees at 16:9,
+    // which stretched everything near the screen edges.
     const hFromGE = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(GE_FOVY) / 2) * (4 / 3));
     const vfov = a => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(hFromGE / 2) / Math.max(a, 0.4)));
     cam.aspect = aspect;
-    cam.fov = aspect > (4 / 3) ? GE_FOVY : vfov(aspect);
+    cam.fov = aspect > (4 / 3) ? vfov(aspect) : GE_FOVY;
     cam.updateProjectionMatrix();
     gunCam.aspect = aspect; gunCam.fov = cam.fov; gunCam.near = window.__P.near;
     gunCam.updateProjectionMatrix();
