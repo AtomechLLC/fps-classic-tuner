@@ -48,7 +48,10 @@ const RICO = SOUNDS.filter(s => /^RICO_/.test(s.name)).map(s => `${EX}/sounds/${
 // ---- audio ----
 const actx = new (window.AudioContext || window.webkitAudioContext)();
 const master = actx.createGain();
-master.gain.value = 0.30;                 // master volume (- / = keys)
+// ?mute silences everything from launch -- used by automated/Claude sessions so
+// test volleys don't play out loud. = raises the volume again if wanted.
+const MUTED = new URLSearchParams(location.search).has('mute');
+master.gain.value = MUTED ? 0 : 0.30;     // master volume (- / = keys)
 master.connect(actx.destination);
 const bufCache = new Map();
 // background music (rendered from the ROM's own sequence + instrument bank)

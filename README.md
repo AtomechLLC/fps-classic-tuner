@@ -35,7 +35,8 @@ python -m http.server 8613
 Open `http://localhost:8613/gallery/`. Mouse aims (pointer lock), click/hold
 fires, **R** reloads, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
 music, **G** toggles the targets returning fire (visual only — off by default),
-`-` / `=` set volume.
+`-` / `=` set volume. Launching with `?mute` starts silent (used by automated
+sessions); `=` brings the volume back.
 
 Fire rates (60Hz ticks), spread, damage, magazine size, recoil and muzzle-flash
 frames all come from ROM data; gunshots, ricochets and reloads are the decoded
