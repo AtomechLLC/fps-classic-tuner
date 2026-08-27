@@ -211,6 +211,29 @@ class Decoder:
         if child: self.calc_matrices(child, here, seen)
         if nxt: self.calc_matrices(nxt, parent, seen)
 
+    def override_runtime_matrices(self):
+        """gunfire.c replaces specific matrix slots at render time.
+
+        subcalcmatrices() accumulates group origins down the parent chain, but
+        for the weapon's moving parts the game instead builds
+        `gunmtx * translate(node->Data->Origin)` -- i.e. the origin is relative
+        to the weapon root, not to the parent chain. Slots come from the header
+        Switches array: [4] revolver cylinder, [5] hammer, [6] slide/hinge,
+        [7] bolt. Using the accumulated value displaces those parts (on the PP7
+        by 58 units down and 73 back), which reads as a hollow gun with a
+        detached barrel. Rifles have no Switches[6]/[7] and were unaffected.
+        """
+        for idx in (4, 5, 6, 7):
+            if idx >= len(self.switches): break
+            node = self.switches[idx]
+            if not node or node + 8 > len(self.d): continue
+            data = self.off(self.u32(node + 4))
+            if not data or data + 0x10 > len(self.d): continue
+            ox, oy, oz = struct.unpack(">3f", self.d[data:data+12])
+            m0 = struct.unpack(">h", self.d[data+0x0e:data+0x10])[0]
+            if m0 >= 0:
+                self.mtx[m0] = (ox, oy, oz)
+
     def node(self, addr, translate):
         if addr == 0 or addr in self.seen_nodes: return
         self.seen_nodes.add(addr)
@@ -336,6 +359,7 @@ def main():
         dec = Decoder(d, ns, nt, texmap)
         try:
             dec.calc_matrices(root, (0.0, 0.0, 0.0))
+            dec.override_runtime_matrices()
             dec.node(root, (0.0, 0.0, 0.0))
         except (struct.error, IndexError, RecursionError):
             failed.append(name); continue
