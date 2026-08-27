@@ -223,6 +223,16 @@ class Decoder:
         by 58 units down and 73 back), which reads as a hollow gun with a
         detached barrel. Rifles have no Switches[6]/[7] and were unaffected.
         """
+        # rwmtx[0] is the weapon root itself: gunfire.c does
+        # matrix_4x4_copy(&gunmtx, rwmtx), so slot 0 carries no group origin.
+        # Leaving the root group's own origin in it shifts every part bound to
+        # slot 0 (the DD44's body by 192 units, stretching it into the hand).
+        self.mtx[0] = (0.0, 0.0, 0.0)
+        # Switches[3] holds the muzzle-flash placement, written to rwmtx[1].
+        if len(self.switches) > 3 and self.switches[3]:
+            fd = self.off(self.u32(self.switches[3] + 4))
+            if fd and fd + 12 <= len(self.d):
+                self.mtx[1] = struct.unpack(">3f", self.d[fd:fd+12])
         for idx in (4, 5, 6, 7):
             if idx >= len(self.switches): break
             node = self.switches[idx]
