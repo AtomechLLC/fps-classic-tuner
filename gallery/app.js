@@ -3,7 +3,12 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { scale: 0.55, px: 0.16, py: -0.17, pz: -0.62, rx: 0.05, ry: -0.50, rz: 0.04, near: 0.01 };
+window.__P = { scale: 0.55, px: 0.16, py: -0.17, pz: -0.62, rx: 0.01, ry: 0.01, rz: 0.03, near: 0.01 };
+// Aim solved geometrically: the barrel axis is set nearly parallel to the
+// view axis with a slight inward convergence, so perspective carries it
+// onto the crosshair. A weapon aimed at a distant point is almost parallel
+// to your line of sight -- the large yaw I had before was a stylistic
+// angle that pushed the muzzle off to one side.
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
