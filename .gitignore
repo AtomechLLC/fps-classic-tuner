@@ -16,3 +16,6 @@ extracted/
 
 # Python cache
 __pycache__/
+
+# Local reference captures (third-party video stills, not redistributed)
+reference/

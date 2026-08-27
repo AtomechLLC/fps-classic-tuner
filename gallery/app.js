@@ -3,7 +3,9 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { scale: 0.55, px: 0.16, py: -0.17, pz: -0.62, rx: 0.01, ry: 0.01, rz: 0.03, near: 0.01 };
+// Tuning knobs over the ROM-derived placement; all neutral by default.
+// `scale` and `pos` multiply the authentic model scale and screen offset.
+window.__P = { scale: 1, pos: 1, rx: 0, ry: 0, rz: 0, near: 0.10 };
 // Aim solved geometrically: the barrel axis is set nearly parallel to the
 // view axis with a slight inward convergence, so perspective carries it
 // onto the crosshair. A weapon aimed at a distant point is almost parallel
@@ -100,10 +102,19 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0d12);
 scene.fog = new THREE.Fog(0x0a0d12, 60, 160);
-const GE_FOVY = 46;            // player.c: c_perspfovy = 46.0f
+// fr.h: FOV_Y_F = 60. player.c initialises c_perspfovy to 46, but level setup
+// immediately calls set_cur_player_fovy(FOV_Y_F) and the zoom system drives it
+// from 60 (hip) down to 6.1 (max sniper zoom), so 60 is what you actually play at.
+const GE_FOVY = 60;
 const cam = new THREE.PerspectiveCamera(GE_FOVY, 1, 0.05, 400);
 cam.position.set(0, 1.6, 0);
-const gunCam = new THREE.PerspectiveCamera(GE_FOVY, 1, 0.02, 60); // separate pass so gun never clips
+// Separate pass so the weapon is never clipped by world geometry. The near
+// plane is GE's own c_perspnear = 10 units = 0.10 m: shoulder-fired weapons
+// (rocket launcher, M16, sniper rifle) are authored with their stock behind
+// the eye, and the game simply clips it. Pulling the near plane closer to
+// 'show more' instead renders that stock centimetres from the lens, where it
+// projects across half the screen.
+const gunCam = new THREE.PerspectiveCamera(GE_FOVY, 1, 0.10, 60);
 
 scene.add(new THREE.HemisphereLight(0xcfd8e8, 0x30302a, 1.15));
 // some GE prop faces have inward normals; ambient keeps them from going pure black
@@ -583,18 +594,24 @@ async function selectWeapon(key) {
   // a model still parented to the previous holder would be measured through that
   // holder's scale -- giving a tiny size and, in turn, an enormous new scale.
   // That was the burst of distorted geometry when cycling weapons quickly.
+  // Placement comes straight from the ROM rather than being fitted per weapon.
+  // gunfire.c builds the weapon matrix in camera space: the basis is the camera
+  // basis scaled by IDO_POINT_ONE (0.1), and the position is the WeaponStats
+  // PosX/PosY/PosZ. So a model unit is 0.1 GE units, and a GE unit is one
+  // centimetre -- the KF7 measures 853 model units end to end, i.e. 85.3 cm
+  // against a real 87 cm weapon, and the shotgun (74.8) and sniper rifle
+  // (109.2) agree just as closely. One constant converts to metres and the
+  // ROM's own offsets do the rest, which is what makes the KF7 fill the screen
+  // at PosZ -16 while the PP7 sits small and far forward at -33.5.
+  const GE_CM = 0.01;                     // 1 GE unit -> metres
+  const [gx, gy, gz] = st.vfx.gun_screen_pos;
   obj.removeFromParent();
   obj.position.set(0, 0, 0);
   obj.scale.set(1, 1, 1);
   obj.rotation.set(0, Math.PI, 0);        // muzzle +z -> camera forward -z
-  obj.updateWorldMatrix(false, true);
-  const raw = new THREE.Box3().setFromObject(obj);
-  obj.position.sub(raw.getCenter(new THREE.Vector3()));
   holder.add(obj);
-  const size = raw.getSize(new THREE.Vector3());
-  const unit = Math.max(size.x, size.y, size.z) || 1;
-  holder.scale.setScalar(P.scale / unit);
-  holder.position.set(P.px, P.py, P.pz);
+  holder.scale.setScalar(0.1 * GE_CM * P.scale);
+  holder.position.set(gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
   holder.rotation.set(P.rx, P.ry, P.rz);
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
@@ -876,6 +893,9 @@ function tick() {
   gunMount.rotation.set(state.recoil * 0.09, 0, 0);
 
   const w = canvas.clientWidth, h = canvas.clientHeight;
+  // A zero-sized canvas (hidden tab, collapsed pane) makes aspect NaN, which
+  // poisons both projection matrices and renders nothing until the next resize.
+  if (w < 8 || h < 8) return;
   if (canvas.width !== w * renderer.getPixelRatio() || canvas.height !== h * renderer.getPixelRatio()) {
     renderer.setSize(w, h, false);
     const aspect = w / h;

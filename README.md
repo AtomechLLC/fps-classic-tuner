@@ -68,14 +68,32 @@ rediscovered:
   (GunLighting / fog+lighting), and a prelit colour otherwise.
 
 **First-person view** (`gallery/app.js`)
-- FOV is **46°** vertical (`player.c: c_perspfovy = 46.0f`). GE renders 4:3, so
-  other aspect ratios preserve the horizontal field instead of stretching.
-- The weapon matrix is the camera matrix scaled by **0.1**
-  (`gunfire.c`, `IDO_POINT_ONE`) translated to the WeaponStats `PosX/PosY/PosZ`,
-  identity rotation. Relative weapon sizes on screen are authentic: the KF7 sits
-  at `PosZ = -16` and dominates, the PP7 at `-33.5` and looks small.
-- `window.__P` nudges placement live (`__repose()` re-applies); `window.__inspect(key,
-  view, size, flat)` and `window.__sheet([keys])` render models in isolation.
+- FOV is **60°** vertical (`fr.h: FOV_Y_F`). `player.c` initialises
+  `c_perspfovy` to 46, but level setup immediately calls
+  `set_cur_player_fovy(FOV_Y_F)` and the zoom system drives it from 60 (hip) down
+  to 6.1 (max sniper zoom) — 46 is never what you play at. Taking the initialiser
+  at face value made every weapon render ~50% too large.
+- Weapon placement is **entirely ROM-derived, with nothing fitted per weapon**.
+  `gunfire.c` builds the weapon matrix in camera space: the basis is the camera
+  basis scaled by `IDO_POINT_ONE` (0.1, uniform — `matrix_scalar_multiply` hits
+  all twelve basis elements), and the position is the WeaponStats
+  `PosX/PosY/PosZ`. So one model unit is 0.1 GE units, and **a GE unit is a
+  centimetre**: the KF7 measures 853 model units end to end (85.3 cm against a
+  real 87 cm), the shotgun 74.8 and the sniper rifle 109.2. Relative sizes on
+  screen are therefore authentic — the KF7 at `PosZ = -16` dominates, the PP7 at
+  `-33.5` looks small.
+- Weapons point along model **+z**; the flash matrix sits at the model's z
+  maximum on every gun (DD44 298/298, PP7 201/201, sniper 804/804).
+- The weapon pass uses GE's own near plane, `c_perspnear = 10` units = 0.10 m.
+  Shoulder-fired weapons are authored with their stock behind the eye (the
+  rocket launcher by 39 cm, the M16 by 9 cm) and the game simply clips it.
+  Pulling the near plane closer to "show more" instead renders that stock
+  centimetres from the lens, where it smears across half the screen.
+- Validated against `reference/ge_ref_TEST_DD44.jpg`: at 854×480 the DD44's
+  muzzle lands within 8 px horizontally and 4 px vertically of the real frame.
+- `window.__P` nudges placement live (`scale`/`pos` multiply the ROM values;
+  `__repose()` re-applies); `window.__inspect(key, view, size, flat)` and
+  `window.__sheet([keys])` render models in isolation.
 
 **Textures** (`decode_images.py`)
 - `g_Textures` (code segment, RAM `0x80049300`) holds 24-bit compressed sizes;
