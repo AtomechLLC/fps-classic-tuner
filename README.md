@@ -167,9 +167,11 @@ rediscovered:
 
 ## Known gaps
 
-- **Animation blending isn't implemented.** GE cross-fades between two frames
-  and two animations (`model->unk2c`, `anim2` and a quaternion slerp); the range
-  samples a single frame, so motion is stepped at 60 Hz rather than interpolated.
+- **Animation cross-fades between different animations aren't implemented.**
+  Frame-to-frame interpolation is (a per-joint quaternion slerp between the two
+  neighbouring frames, as `model.c` does), but GE also blends two *animations*
+  during transitions (`anim2` and the `unk84` slerp); the range switches
+  animations with a hard cut.
   The `MatrixID2` bend/stretch (a y-only half turn with a scale from
   `modelGetBendStretchScale`) is also skipped — no character model in the range
   uses it.

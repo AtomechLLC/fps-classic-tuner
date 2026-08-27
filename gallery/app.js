@@ -250,19 +250,35 @@ function loadAnim(name) {
   return animCache.get(name);
 }
 
-/** Pose one skeleton from one animation frame (sub_GAME_7F06DEC0). */
-const _e = new THREE.Euler(), _q = new THREE.Quaternion(), _qi = new THREE.Quaternion();
+/** Pose one skeleton from a fractional animation frame.
+ *  GE samples two frames (framea/frameb) and blends them with a quaternion
+ *  slerp (model.c, the unk2c path); sampling only whole frames steps visibly
+ *  at 60 Hz on the slower death falls. */
+const _e = new THREE.Euler(), _q = new THREE.Quaternion(), _q2 = new THREE.Quaternion(),
+      _qi = new THREE.Quaternion();
+function jointQuat(f, j, flip, out) {
+  const i = flip ? j.mtxB : j.mtxA;
+  let x = f[i] * TAU / 65535, y = f[i+1] * TAU / 65535, z = f[i+2] * TAU / 65535;
+  if (flip) { y = y ? TAU - y : 0; z = z ? TAU - z : 0; }
+  _e.set(x, y, z, 'ZYX');
+  return out.setFromEuler(_e);
+}
 function poseSkeleton(rig, anim, frame, flip = false) {
-  const f = anim.data[((frame % anim.frames) + anim.frames) % anim.frames];
+  const n = anim.frames;
+  const fa = ((Math.floor(frame) % n) + n) % n;
+  const t = frame - Math.floor(frame);
+  // the frame after the last blends back to the start only when the loop does
+  const fb = fa + 1 < n ? fa + 1 : (anim.loop ? 0 : fa);
+  const A = anim.data[fa], B = anim.data[fb];
   for (const b of rig.bones) {
     if (!b.userData.joint) continue;              // joint 0 is the model root
     const j = rig.joints[b.userData.joint];
     if (!j) continue;
-    const i = flip ? j.mtxB : j.mtxA;
-    let x = f[i] * TAU / 65535, y = f[i+1] * TAU / 65535, z = f[i+2] * TAU / 65535;
-    if (flip) { y = y ? TAU - y : 0; z = z ? TAU - z : 0; }
-    _e.set(x, y, z, 'ZYX');
-    _q.setFromEuler(_e);
+    jointQuat(A, j, flip, _q);
+    if (t > 0 && fb !== fa) {
+      jointQuat(B, j, flip, _q2);
+      _q.slerp(_q2, t);
+    }
     // MatrixID1 bones are the same joint at half the turn (GE's bend/stretch);
     // modelBuildGroupMatrices halves the quaternion rather than the angles.
     if (b.userData.half) _q.slerpQuaternions(_qi.identity(), _q, 0.5);
@@ -1088,7 +1104,7 @@ function tick() {
         if (u.anim.loop || u.animName === 'idle') u.frame %= u.anim.frames;
         else u.frame = u.anim.frames - 1;         // deaths hold their last pose
       }
-      poseSkeleton(u.rig, u.anim, Math.floor(u.frame), u.flip);
+      poseSkeleton(u.rig, u.anim, u.frame, u.flip);
     }
     if (u.downT > 0) {
       u.downT -= dt;
@@ -1296,7 +1312,7 @@ window.__repose = () => {
   return selectWeapon(state.key);
 };
 window.THREE = THREE;
-window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam, tick };
+window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam, tick, poseSkeleton, loadAnim };
 window.__shot = (w = 480) => {
   if (canvas.width < 8) {
     renderer.setSize(960, 540, false);
