@@ -62,6 +62,12 @@ moonraker helmet counts as the head — all per `handles_shot_actors`. Flinches
 pick the animation for the side and limb that was struck. They grunt when hit
 and thump when they fall, using GE's own `GET_HIT_*` and `BODY_FALL_*` samples.
 
+Two pieces of range instrumentation are deliberately *not* from the original
+game: floating damage numbers (colour-coded by multiplier — red ×4, amber ×2,
+white ×1, grey blocked), and an HP bar over a damaged guard that divides itself
+into segments the size of the last hit taken, so the remaining full segments
+read directly as hits-to-kill at that damage.
+
 ## Format notes (the non-obvious parts)
 
 Things that cost real debugging time, recorded so they don't have to be

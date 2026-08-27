@@ -503,6 +503,10 @@ async function mkEnemy(x, z, spec) {
     if (wrist) wrist.add(wepObj);
   }
 
+  const hpBar = makeHpBar();
+  hpBar.sprite.position.set(0, 2.02, 0);
+  g.add(hpBar.sprite);
+
   g.position.set(x, 0, z);
   g.userData = {
     // chr.c:1656 -- every guard spawns with maxdamage 4.0, so weapon damage
@@ -514,6 +518,7 @@ async function mkEnemy(x, z, spec) {
     rig, anim: idle, idleAnim: idle, frame: Math.random() * idle.frames,
     animName: 'idle', flip: Math.random() < 0.5,
     wepObj, wkey: spec.wkey || null, pistol: !!spec.pistol,
+    hpBar, lastDmg: 0,
     nextFire: performance.now() / 1000 + 3 + Math.random() * 6,
   };
   scene.add(g);
@@ -634,10 +639,19 @@ function explode(p, radius, damage) {
     if (u.hp === Infinity || u.downT > 0) continue;
     const dist = t.position.distanceTo(p);
     if (dist < radius) {
-      u.hp -= damage * (1 - dist / radius) * 4;
+      const edmg = damage * (1 - dist / radius) * 4;
+      u.hp -= edmg;
+      if (u.enemy) {
+        spawnDamageNumber(t.position.clone().add(new THREE.Vector3(0, 1.4, 0)), edmg, 1);
+        if (edmg > 0) u.lastDmg = edmg;
+        updateHpBar(t);
+      }
       hitReact(t);
       state.hits++;
-      if (u.hp <= 0) { u.downT = 2.2; state.score += 50; }
+      if (u.hp <= 0) {
+        u.downT = 3.4; state.score += 50;
+        if (u.enemy) { playDeath(t, false); updateHpBar(t); }
+      }
     }
   }
   updateHud();
@@ -652,6 +666,67 @@ function hitReact(t) {
   u.flashMats = mats;
   u.flash = 0.12;
 }
+// ---- range UI: floating damage numbers and HP bars ----
+// Not from the original game -- range instrumentation. The HP bar divides
+// itself into segments the size of the last hit taken, so the number of full
+// segments left is the number of hits like that one still needed.
+function makeTextSprite(text, colour) {
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 64;
+  const ctx = cv.getContext('2d');
+  ctx.font = 'bold 44px monospace';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(0,0,0,0.9)';
+  ctx.strokeText(text, 64, 32);
+  ctx.fillStyle = colour; ctx.fillText(text, 64, 32);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false }));
+  sp.scale.set(0.40, 0.20, 1);
+  return sp;
+}
+function spawnDamageNumber(pos, dmg, mult) {
+  const colour = mult >= 4 ? '#ff5232' : mult >= 2 ? '#ffb63c'
+               : mult > 0 ? '#ffffff' : '#8f9aa6';
+  const text = mult === 0 ? '0' : (Number.isInteger(dmg) ? String(dmg) : dmg.toFixed(1));
+  const sp = makeTextSprite(text, colour);
+  sp.position.copy(pos).add(new THREE.Vector3((Math.random() - 0.5) * 0.12, 0.04, 0));
+  scene.add(sp);
+  addFx(sp, 0.8, 'dmgnum');
+}
+
+function makeHpBar() {
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 20;
+  const tex = new THREE.CanvasTexture(cv);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, depthWrite: false }));
+  sprite.scale.set(0.62, 0.097, 1);
+  sprite.visible = false;
+  sprite.raycast = () => {};   // UI: never blocks a shot (and Sprite.raycast
+                               // needs a camera the hit raycaster doesn't have)
+  return { sprite, cv, tex };
+}
+/** Redraw an enemy's bar. Hidden at full health and while down. */
+function updateHpBar(t) {
+  const u = t.userData, b = u.hpBar;
+  if (!b) return;
+  if (u.downT > 0 || u.hp >= u.maxhp || u.hp <= 0) { b.sprite.visible = false; return; }
+  const frac = u.hp / u.maxhp;
+  const ctx = b.cv.getContext('2d');
+  ctx.clearRect(0, 0, 128, 20);
+  ctx.fillStyle = 'rgba(0,0,0,0.7)'; ctx.fillRect(0, 0, 128, 20);
+  ctx.fillStyle = frac > 0.5 ? '#46c94b' : frac > 0.25 ? '#ffb63c' : '#ff5232';
+  ctx.fillRect(2, 2, 124 * frac, 16);
+  // segment lines every lastDmg of health, from empty toward full: the fill
+  // then reads directly as hits-to-kill at the last shot's damage
+  if (u.lastDmg > 0) {
+    ctx.fillStyle = 'rgba(0,0,0,0.95)';
+    for (let hp = u.lastDmg; hp < u.maxhp - 1e-6; hp += u.lastDmg) {
+      ctx.fillRect(2 + 124 * (hp / u.maxhp) - 1, 2, 2, 16);
+    }
+  }
+  b.tex.needsUpdate = true;
+  b.sprite.visible = true;
+}
+
 // ---- body-part damage (chraction.c handles_shot_actors) ----
 // HITTARGET part numbers, from the op-10 bbox nodes in each body model.
 const PART_HEAD = 8, PART_CHEST = 15;
@@ -1142,7 +1217,13 @@ function shoot(now) {
         const mult = bp ? bp.mult : 1;
         const head = bp ? bp.head : false;
         if (bp && bp.dropHat) dropHat(g, bp.object);
-        g.userData.hp -= st.damage * mult;
+        const dmg = st.damage * mult;
+        g.userData.hp -= dmg;
+        if (g.userData.enemy) {
+          spawnDamageNumber(h.point, dmg, mult);
+          if (dmg > 0) g.userData.lastDmg = dmg;
+          updateHpBar(g);
+        }
         state.score += Math.max(1, Math.round(-g.position.z)) * (head ? 2 : 1);
         if (mult > 0) reactSound(g, h.point, head);
         if (g.userData.hp <= 0) {
@@ -1291,6 +1372,8 @@ function tick() {
       u.downT -= dt;
       if (u.downT <= 0) {
         u.hp = u.maxhp;
+        u.lastDmg = 0;
+        updateHpBar(t);
         if (u.rig) { u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0; }
         else t.rotation.x = 0;
       } else if (!u.rig) {
@@ -1339,6 +1422,9 @@ function tick() {
       m.intensity = 60 * (u.t / u.ttl);
     } else if (u.kind === 'decal' && u.t < 2) {
       m.material.opacity = u.t / 2 * 0.9;
+    } else if (u.kind === 'dmgnum') {
+      m.position.y += 0.75 * dt;
+      m.material.opacity = Math.min(1, u.t / (u.ttl * 0.6));
     }
     if (u.t <= 0) { scene.remove(m); fx.splice(i, 1); }
   }
