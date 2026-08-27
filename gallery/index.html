@@ -49,6 +49,7 @@
 <script type="importmap">
   { "imports": { "three": "./lib/three.module.js" } }
 </script>
-<script type="module" src="app.js"></script>
+<!-- cache-bust the module so edits always take effect during development -->
+<script type="module">import("./app.js?v=" + Date.now());</script>
 </body>
 </html>

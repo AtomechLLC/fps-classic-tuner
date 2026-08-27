@@ -3,7 +3,7 @@ import { OBJLoader } from './lib/OBJLoader.js';
 import { MTLLoader } from './lib/MTLLoader.js';
 
 const EX = '../extracted';
-window.__P = { x: 0.03, y: -0.04, z: -0.03, rx: 0.02, ry: -0.30, rz: 0.02, h: 0.28, len: 0.86, near: 0.03 };
+window.__P = { x: 0, y: 0, z: 0, rx: 0, ry: 0, rz: 0, gain: 1, near: 0.02 };
 
 // ---- display names (canonical GE names) ----
 const DISPLAY = {
@@ -95,9 +95,10 @@ renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x0a0d12);
 scene.fog = new THREE.Fog(0x0a0d12, 60, 160);
-const cam = new THREE.PerspectiveCamera(60, 1, 0.05, 400);
+const GE_FOVY = 46;            // player.c: c_perspfovy = 46.0f
+const cam = new THREE.PerspectiveCamera(GE_FOVY, 1, 0.05, 400);
 cam.position.set(0, 1.6, 0);
-const gunCam = new THREE.PerspectiveCamera(60, 1, 0.02, 60);   // separate pass so gun never clips
+const gunCam = new THREE.PerspectiveCamera(GE_FOVY, 1, 0.02, 60); // separate pass so gun never clips
 
 scene.add(new THREE.HemisphereLight(0xcfd8e8, 0x30302a, 1.15));
 // some GE prop faces have inward normals; ambient keeps them from going pure black
@@ -544,39 +545,20 @@ async function selectWeapon(key) {
   dir.y = 0;
   if (dir.lengthSq() < 1e-6) dir.set(0, 0, 1);
   dir.normalize();
-  // GE positions guns via skeletal idle animation we don't replicate; approximate:
-  // flash-aligned barrel forward, size-normalised, rear anchored bottom-right.
-  obj.quaternion.setFromUnitVectors(dir, new THREE.Vector3(0, 0, -1));
-  obj.position.copy(centre.clone().applyQuaternion(obj.quaternion).negate());
+
+  // GE's own first-person transform (gunfire.c): the weapon matrix is the
+  // camera-space matrix scaled by 0.1 and translated to WeaponStats
+  // PosX/PosY/PosZ, with identity rotation. Model units are ~cm, so metres
+  // need a further 0.01. Part matrices descend from this, which the exporter
+  // has already baked into vertex positions.
+  const GE_SCALE = 0.1, CM = 0.01;
+  const gp = st.vfx.gun_screen_pos;
+  // models are authored barrel-forward in the camera frame, but a few are
+  // mirrored; the flash-derived direction tells us which way the muzzle faces
+  if (dir.z > 0) obj.rotation.y = Math.PI;
   holder.add(obj);
-  // Size the view by the WEAPON, not the whole model: several view models carry
-  // Bond's hand and a long sleeve, and letting those drive the scale shrinks the
-  // gun and pushes the arm into the camera.
-  const wb = new THREE.Box3().setFromObject(holder);
-  const front = new THREE.Box3();
-  const midZ = (wb.min.z + wb.max.z) / 2;
-  const vtmp = new THREE.Vector3();
-  holder.traverse(o => {
-    if (!o.isMesh) return;
-    const pos = o.geometry.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      vtmp.fromBufferAttribute(pos, i);
-      o.localToWorld(vtmp);
-      if (vtmp.z <= midZ) front.expandByPoint(vtmp);   // muzzle half = the gun
-    }
-  });
-  // Scale from the whole model (keeps long guns sane), but anchor on the gun
-  // half so a long sleeve runs back past the camera instead of shrinking it.
-  const wsz = wb.getSize(new THREE.Vector3());
-  const sc = Math.min(P.h / Math.max(wsz.y, 1e-3), P.len / Math.max(wsz.z, 1e-3));
-  holder.scale.setScalar(sc);
-  const wb2 = new THREE.Box3().setFromObject(holder);
-  const anchorZ = front.isEmpty() ? wb2.max.z : front.max.z * sc;
-  // anchor the gun's top-left corner: it hangs down-right into frame like GE,
-  // with the sleeve running back past the camera
-  holder.position.set(P.x - wb2.min.x,
-                      P.y - wb2.max.y,
-                      P.z - anchorZ);
+  holder.scale.setScalar(GE_SCALE * CM * P.gain);
+  holder.position.set(gp[0] * CM + P.x, gp[1] * CM + P.y, gp[2] * CM + P.z);
   holder.rotation.set(P.rx, P.ry, P.rz);
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
@@ -854,8 +836,13 @@ function tick() {
   if (canvas.width !== w * renderer.getPixelRatio() || canvas.height !== h * renderer.getPixelRatio()) {
     renderer.setSize(w, h, false);
     const aspect = w / h;
-    const vfov = a => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(60) / 2) / Math.max(a, 0.4)));
-    cam.aspect = aspect; cam.fov = aspect < 1 ? vfov(aspect) : 60; cam.updateProjectionMatrix();
+    // GE renders 4:3; on wider/narrower windows keep the horizontal field the
+    // game had rather than letting the vertical FOV stretch the view
+    const hFromGE = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(GE_FOVY) / 2) * (4 / 3));
+    const vfov = a => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(hFromGE / 2) / Math.max(a, 0.4)));
+    cam.aspect = aspect;
+    cam.fov = aspect > (4 / 3) ? GE_FOVY : vfov(aspect);
+    cam.updateProjectionMatrix();
     gunCam.aspect = aspect; gunCam.fov = cam.fov; gunCam.near = window.__P.near;
     gunCam.updateProjectionMatrix();
   }
