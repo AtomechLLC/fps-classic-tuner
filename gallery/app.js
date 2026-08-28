@@ -1276,12 +1276,6 @@ function shoot(now) {
   }
   // start (or re-peak) the gunfire.c recoil envelope
   if (st.vfx.recoil_up > 0 || st.vfx.recoil_back > 0) state.recoilTick = 0;
-  // the recoil also kicks the aim cursor: up with RecoilUp plus a little
-  // sideways scatter, and CrosshairSpeed walks it back home -- so automatic
-  // fire climbs unless the player pulls against it
-  state.ret.y = Math.min(0.13, state.ret.y + st.vfx.recoil_up * 0.0045);
-  state.ret.x = Math.max(-0.16, Math.min(0.16,
-    state.ret.x + (Math.random() - 0.5) * st.vfx.recoil_up * 0.0022));
   // gunfire.c noise: firing while the range is hot draws return fire sooner,
   // scaled by the weapon's AI loudness
   if (state.hostile) {
@@ -1363,6 +1357,13 @@ function shoot(now) {
       }
     }
   }
+  // The recoil kicks the aim cursor AFTER the rounds have left -- the bullet
+  // is gone before the gun moves, so the first shot lands exactly where the
+  // cursor pointed and only follow-ups climb. (Kicking before the ray made
+  // the Cougar Magnum throw its own first round high.)
+  state.ret.y = Math.min(0.13, state.ret.y + st.vfx.recoil_up * 0.0045);
+  state.ret.x = Math.max(-0.16, Math.min(0.16,
+    state.ret.x + (Math.random() - 0.5) * st.vfx.recoil_up * 0.0022));
   state.flashT = 0.055;
   // gunfire.c cycles the action: the slide/bolt (Switches[6]/[7]) throw back
   // by BoltRecoilBack model units and return; a revolver advances its cylinder
