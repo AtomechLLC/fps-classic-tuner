@@ -357,6 +357,36 @@ class Decoder:
             return
         if nxt: self.node(nxt, translate, slot_in)
 
+    def overlay_faces(self):
+        """Faces drawn coplanar over an earlier face of another material.
+
+        GE layers coplanar detail (the sniper scope's lens glint over its dark
+        lens disc) purely by display-list order. A z-buffered renderer needs
+        them marked so it can bias them forward; unmarked they shimmer.
+        Returns a set of face indices.
+        """
+        def plane(f):
+            a, b, c = self.verts[f[0]], self.verts[f[1]], self.verts[f[2]]
+            ux, uy, uz = b[0]-a[0], b[1]-a[1], b[2]-a[2]
+            wx, wy, wz = c[0]-a[0], c[1]-a[1], c[2]-a[2]
+            nx, ny, nz = uy*wz-uz*wy, uz*wx-ux*wz, ux*wy-uy*wx
+            ln = (nx*nx+ny*ny+nz*nz) ** 0.5
+            if ln < 1e-9: return None
+            nx, ny, nz = nx/ln, ny/ln, nz/ln
+            d = nx*a[0] + ny*a[1] + nz*a[2]
+            if nz < 0 or (nz == 0 and (ny < 0 or (ny == 0 and nx < 0))):
+                nx, ny, nz, d = -nx, -ny, -nz, -d
+            return (round(nx, 2), round(ny, 2), round(nz, 2), round(d, 0))
+        seen = {}
+        out = set()
+        for i, f in enumerate(self.faces):
+            pl = plane(f)
+            if pl is None: continue
+            first = seen.setdefault(pl, f[3])
+            if first != f[3]:
+                out.add(i)
+        return out
+
     def export_skin(self, path):
         """A poseable copy of the mesh: geometry in bone space, plus the tree.
 
@@ -407,15 +437,16 @@ class Decoder:
         uv = []
         for u in self.uvs: uv += [round(u[0], 4), round(u[1], 4)]
 
-        def mat(tid, sw, lit, env, sec):
+        def mat(tid, sw, lit, env, sec, ovl=False):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return (base + ("_lit" if lit else "") + ("_env" if env else "")
-                    + ("_sec" if sec else ""))
+                    + ("_sec" if sec else "") + ("_ovl" if ovl else ""))
+        ovl = self.overlay_faces()
         groups = {}
-        for a, b, c, tid, sw, lit, env, sec in self.faces:
-            groups.setdefault(mat(tid, sw, lit, env, sec), []).extend((a, b, c))
+        for i, (a, b, c, tid, sw, lit, env, sec) in enumerate(self.faces):
+            groups.setdefault(mat(tid, sw, lit, env, sec, i in ovl), []).extend((a, b, c))
 
         # Half-turn slots carry no bbox of their own; they take the part of
         # the full slot that reads the same joint (they are the same limb).

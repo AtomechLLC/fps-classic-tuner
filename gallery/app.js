@@ -187,8 +187,10 @@ function geMaterial(m, name = m.name) {
     ? new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide })
     : new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
   if (map) nm.alphaTest = 0.35;
-  if (/_sec$/.test(name)) {        // Secondary display list: decals on the skin
+  if (/_sec(_|$)/.test(name)) {    // Secondary display list: decals on the skin
     nm.transparent = true; nm.depthWrite = false;
+    nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
+  } else if (/_ovl$/.test(name)) { // later coplanar face wins (DL order)
     nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
   }
   nm.name = name;
@@ -621,11 +623,12 @@ function spawnDecal(p, normal) {
 }
 const casingGeo = new THREE.BoxGeometry(0.012, 0.012, 0.03);
 const casingMat = new THREE.MeshLambertMaterial({ color: 0xc8a248 });
-function spawnCasing() {
+function spawnCasing(side = 0) {
   const m = new THREE.Mesh(casingGeo, casingMat);
   const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
   const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion);
-  if (state.ejectObj) gunPointWorld(state.ejectObj, m.position);
+  const eo = side === 0 ? state.ejectObj : state.ejectObjL;
+  if (eo) gunPointWorld(eo, m.position);
   else m.position.copy(cam.position).addScaledVector(right, 0.28).addScaledVector(fwd, 0.35)
     .add(new THREE.Vector3(0, -0.12, 0));
   m.userData = { vel: right.clone().multiplyScalar(1.4 + Math.random())
@@ -961,7 +964,8 @@ async function loadGunModel(name) {
     function makeGunMat(m) {
       const fl = m.name.match(/_fl(\d+)/);
       const lit = /_lit(_|$)/.test(m.name);
-      const sec = /_sec$/.test(m.name);
+      const sec = /_sec(_|$)/.test(m.name);
+      const ovl = /_ovl$/.test(m.name);
       const map = m.map || null;
       if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
                  map.wrapS = map.wrapT = THREE.RepeatWrapping; }
@@ -992,6 +996,11 @@ async function loadGunModel(name) {
       if (map && !fl) nm.alphaTest = 0.35;
       if (sec && !fl) {             // Secondary display list: decal on the skin
         nm.transparent = true; nm.depthWrite = false;
+        nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
+      } else if (ovl && !fl) {
+        // Coplanar layering by display-list order (the sniper scope's dark
+        // cover draws over its lens glint): bias the later face forward so it
+        // wins the depth test cleanly instead of shimmering.
         nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
       }
       nm.name = m.name;
@@ -1107,9 +1116,11 @@ const state = {
   recoil: 0, kick: 0, flashT: 0,
   movers: {}, slideT: 0, cylFrom: 0, cylTo: 0, cylT: 1, hammerT: 0,
   reloadStart: 0, reloadDur: 0,
-  // gunfire.c recoil: ticks since the shot, or -1 when settled
-  recoilTick: -1, gunRest: null,
+  // gunfire.c recoil: per hand, ticks since the shot, or -1 when settled
+  recoilTicks: [-1, -1], slideTs: [0, 0], gunRest: null,
   zooming: false, fovCur: 0, sniperZoom: 15, adsK: 0,
+  dual: false, gunL: null, gunRestL: null, moversL: {}, flashMeshesL: {}, ammoL: 0,
+  muzzleObjL: null, ejectObjL: null, dualSide: 0, recoilTickL: -1, slideSide: 0,
   lastSnd: -1,
   ret: { x: 0, y: 0 },          // floating crosshair, NDC
   score: 0, shots: 0, hits: 0,
@@ -1137,6 +1148,7 @@ async function selectWeapon(key) {
   if (!MODELS[modelName]) return;
   state.key = key; state.stats = st;
   state.ammo = st.mag_size > 0 ? st.mag_size : Infinity;
+  state.ammoL = (state.dual && st.flags.includes('CAN_DUAL_WIELD') && st.mag_size > 0) ? st.mag_size : 0;
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
@@ -1174,12 +1186,42 @@ async function selectWeapon(key) {
   holder.position.set(gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
   holder.rotation.set(P.rx, P.ry, P.rz);
   state.gunRest = { pos: holder.position.clone(), rot: holder.rotation.clone() };
-  state.recoilTick = -1;
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
+  // GE dual wield: any CAN_DUAL_WIELD weapon takes a second copy in the left
+  // hand at -PosX (gunSetHorizontalOffset for GUNLEFT), and MIRROR_DUAL ones
+  // render x-mirrored -- gunfire.c negates the gun matrix's first column.
+  state.gunL = null; state.moversL = {}; state.flashMeshesL = {};
+  state.muzzleObjL = null; state.ejectObjL = null; state.recoilTickL = -1;
+  if (state.dual && st.flags.includes('CAN_DUAL_WIELD')) {
+    const objL = obj.clone(true);
+    // match cloned nodes to originals by traversal order
+    const orig = [], copy = [];
+    obj.traverse(o => orig.push(o));
+    objL.traverse(o => copy.push(o));
+    const twin = o => copy[orig.indexOf(o)];
+    const moversL = {};
+    for (const [lbl, m] of Object.entries(movers)) moversL[lbl] = twin(m);
+    const flashMeshesL = {};
+    for (const [f, arr] of Object.entries(flashMeshes)) flashMeshesL[f] = arr.map(twin);
+    const holderL = new THREE.Group();
+    holderL.add(objL);
+    holderL.scale.copy(holder.scale);
+    if (st.flags.includes('MIRROR_DUAL')) holderL.scale.x *= -1;
+    holderL.position.set(-gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
+    holderL.rotation.copy(holder.rotation);
+    gunMount.add(holderL);
+    state.gunL = holderL;
+    state.gunRestL = { pos: holderL.position.clone(), rot: holderL.rotation.clone() };
+    state.moversL = moversL;
+    state.flashMeshesL = flashMeshesL;
+    state.muzzleObjL = twin(muzzleObj);
+    state.ejectObjL = twin(ejectObj);
+  }
   state.gun = holder; state.flashGroups = flashGroups; state.flashMeshes = flashMeshes;
-  state.movers = movers; state.slideT = 0; state.cylFrom = 0; state.cylTo = 0; state.cylT = 1;
-  state.hammerT = 0; state.muzzleObj = muzzleObj; state.ejectObj = ejectObj;
+  state.movers = movers; state.slideTs = [0, 0]; state.recoilTicks = [-1, -1];
+  state.cylFrom = [0, 0]; state.cylTo = [0, 0]; state.cylT = [1, 1]; state.hammerT = [0, 0];
+  state.muzzleObj = muzzleObj; state.ejectObj = ejectObj;
   updateHud();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
@@ -1225,9 +1267,13 @@ function updateHud() {
   const st = state.stats;
   if (!st) return;
   document.getElementById('wname').textContent = DISPLAY[state.key] || state.key;
-  document.getElementById('ammo').innerHTML = state.reloading ? '<small>RELOADING…</small>'
-    : (state.ammo === Infinity ? '∞'
-       : `<span class="ge-reserve">∞</span> <span class="ge-bullet">▮</span> ${state.ammo}`);
+  const fmt = n => n === Infinity ? '∞'
+    : `<span class="ge-reserve">∞</span> <span class="ge-bullet">▮</span> ${n}`;
+  document.getElementById('ammo').innerHTML =
+    state.reloading ? '<small>RELOADING…</small>' : fmt(state.ammo);
+  const al = document.getElementById('ammoL');
+  if (al) al.innerHTML = state.gunL
+    ? (state.reloading ? '<small>RELOADING…</small>' : fmt(state.ammoL)) : '';
   const fi = fireInterval(st);
   document.getElementById('stats').innerHTML =
     `<b>${DISPLAY[state.key] || state.key}</b> · ${fi.auto ? 'auto' : 'single'}` +
@@ -1244,7 +1290,8 @@ const DRYFIRE = soundByName('CLICK_SFX') || soundByName('BEEP_QUIET_SFX');
 
 function reload() {
   const st = state.stats;
-  if (state.reloading || !st || st.mag_size <= 0 || state.ammo === st.mag_size) return;
+  if (state.reloading || !st || st.mag_size <= 0
+      || (state.ammo === st.mag_size && (!state.gunL || state.ammoL === st.mag_size))) return;
   state.reloading = true;
   state.reloadStart = performance.now() / 1000;
   state.reloadDur = 1.4;
@@ -1252,21 +1299,38 @@ function reload() {
   if (CLIPOUT) play(CLIPOUT, { vol: 0.45 });
   setTimeout(() => { if (CLIPIN) play(CLIPIN, { vol: 0.45 }); }, 700);
   setTimeout(() => {
-    state.ammo = st.mag_size; state.reloading = false; updateHud();
+    state.ammo = st.mag_size;
+    if (state.gunL) state.ammoL = st.mag_size;
+    state.reloading = false; updateHud();
   }, 1400);
 }
 
 function shoot(now) {
   const st = state.stats;
   if (!st || state.reloading) return;
-  if (state.ammo <= 0) {
+  const dualUp = !!state.gunL;
+  const altFire = dualUp && st.flags.includes('DUAL_WIELD_ALTERNATING_FIRE');
+  if (state.ammo <= 0 && (!dualUp || state.ammoL <= 0)) {
     if (DRYFIRE) play(DRYFIRE, { vol: 0.3 });
     state.nextShot = now + 0.25;
     reload();
     return;
   }
-  state.ammo--;
-  state.shots++;
+  // which hand(s) shoot: alternating duals swap sides per trigger pull and
+  // skip an empty hand; simultaneous duals fire both together
+  let sides;
+  if (altFire) {
+    state.dualSide = 1 - state.dualSide;
+    if (state.dualSide === 1 && state.ammoL <= 0) state.dualSide = 0;
+    if (state.dualSide === 0 && state.ammo <= 0) state.dualSide = 1;
+    sides = [state.dualSide];
+  } else if (dualUp) {
+    sides = [];
+    if (state.ammo > 0) sides.push(0);
+    if (state.ammoL > 0) sides.push(1);
+  } else sides = [0];
+  for (const sd of sides) { if (sd === 0) state.ammo--; else state.ammoL--; }
+  state.shots += sides.length;
   // SoundTriggerRate: automatics only retrigger the gunshot sample every N
   // ticks (KF7 4, AR33 5, RC-P90 2) -- at full auto the samples would overlap.
   const strate = st.sound_trigger_rate;
@@ -1274,8 +1338,7 @@ function shoot(now) {
     play(soundById(parseInt(st.sound_id, 16)), { vol: 0.55, pitch: 0.97 + Math.random() * 0.06 });
     state.lastSnd = now;
   }
-  // start (or re-peak) the gunfire.c recoil envelope
-  if (st.vfx.recoil_up > 0 || st.vfx.recoil_back > 0) state.recoilTick = 0;
+
   // gunfire.c noise: firing while the range is hot draws return fire sooner,
   // scaled by the weapon's AI loudness
   if (state.hostile) {
@@ -1293,10 +1356,16 @@ function shoot(now) {
   const aim = raycaster.ray.direction.clone().normalize();
   const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
   const up = new THREE.Vector3(0, 1, 0).applyQuaternion(cam.quaternion);
-  const muzzle = state.muzzleObj ? gunPointWorld(state.muzzleObj, new THREE.Vector3())
-    : cam.position.clone()
-      .addScaledVector(right, 0.22).addScaledVector(up, -0.18).addScaledVector(aim, 0.6);
-  for (let pi = 0; pi < pellets; pi++) {
+  // one round per firing hand (five pellets for the single-hand shotgun)
+  const rounds = [];
+  for (const sd of sides) for (let pi = 0; pi < pellets; pi++) rounds.push(sd);
+  let pi = -1;
+  for (const sd of rounds) {
+    pi++;
+    const mo = sd === 0 ? state.muzzleObj : state.muzzleObjL;
+    const muzzle = mo ? gunPointWorld(mo, new THREE.Vector3())
+      : cam.position.clone()
+        .addScaledVector(right, 0.22).addScaledVector(up, -0.18).addScaledVector(aim, 0.6);
     const dir = aim.clone()
       .addScaledVector(right, (Math.random()-0.5)*spread)
       .addScaledVector(up, (Math.random()-0.5)*spread)
@@ -1365,29 +1434,34 @@ function shoot(now) {
   state.ret.x = Math.max(-0.16, Math.min(0.16,
     state.ret.x + (Math.random() - 0.5) * st.vfx.recoil_up * 0.0022));
   state.flashT = 0.055;
-  // gunfire.c cycles the action: the slide/bolt (Switches[6]/[7]) throw back
-  // by BoltRecoilBack model units and return; a revolver advances its cylinder
-  // one chamber and drops the hammer.
-  if ((state.movers.slide || state.movers.bolt) && st.vfx.bolt_recoil_back > 0)
-    state.slideT = 1;
-  if (state.movers.cylinder) {
-    state.cylFrom = state.cylTo; state.cylTo += Math.PI / 3; state.cylT = 0;
-  }
-  if (state.movers.hammer) state.hammerT = 1;
-  const kids = Object.keys(state.flashMeshes || {});
-  if (kids.length) {
-    const j = kids[Math.floor(Math.random() * kids.length)];
-    state.curFlash = state.flashMeshes[j];
-    const s = 1 + Math.random() * 0.25;              // gunfire.c flashscale
-    const ext = st.vfx.muzzle_flash_extension || 1;  // stretch along the barrel
-    const spin = Math.random() * Math.PI * 2;
-    for (const m of state.curFlash) {
-      m.visible = true;
-      m.scale.set(s, s, s * ext);
-      m.rotation.z = spin;
+  // gunfire.c cycles the fired hand's action: slide/bolt throw back by
+  // BoltRecoilBack and return; a revolver advances its cylinder and drops the
+  // hammer. Each firing hand also starts its own recoil envelope.
+  state.curFlash = [];
+  for (const sd of sides) {
+    const movers = sd === 0 ? state.movers : state.moversL;
+    if (st.vfx.recoil_up > 0 || st.vfx.recoil_back > 0) state.recoilTicks[sd] = 0;
+    if ((movers.slide || movers.bolt) && st.vfx.bolt_recoil_back > 0) state.slideTs[sd] = 1;
+    if (movers.cylinder) {
+      state.cylFrom[sd] = state.cylTo[sd]; state.cylTo[sd] += Math.PI / 3; state.cylT[sd] = 0;
     }
+    if (movers.hammer) state.hammerT[sd] = 1;
+    const fm = sd === 0 ? state.flashMeshes : state.flashMeshesL;
+    const kids = Object.keys(fm || {});
+    if (kids.length) {
+      const j = kids[Math.floor(Math.random() * kids.length)];
+      const s = 1 + Math.random() * 0.25;              // gunfire.c flashscale
+      const ext = st.vfx.muzzle_flash_extension || 1;  // stretch along the barrel
+      const spin = Math.random() * Math.PI * 2;
+      for (const m of fm[j]) {
+        m.visible = true;
+        m.scale.set(s, s, s * ext);
+        m.rotation.z = spin;
+        state.curFlash.push(m);
+      }
+    }
+    if (st.vfx.ejects_cartridges) spawnCasing(sd);
   }
-  if (st.vfx.ejects_cartridges) spawnCasing();
   updateHud();
 }
 
@@ -1442,6 +1516,10 @@ document.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
   if (e.code === 'KeyG') toggleHostile();
+  if (e.code === 'KeyX' && state.stats && state.stats.flags.includes('CAN_DUAL_WIELD')) {
+    state.dual = !state.dual;
+    selectWeapon(state.key);      // rebuild with or without the left hand
+  }
   if (e.code === 'KeyP') {
     state.patrol = !state.patrol;
     const el = document.getElementById('patrol');
@@ -1676,7 +1754,7 @@ function tick() {
   // the base FOV (hold the horizontal field on wide windows)
   {
     const aspect = cam.aspect || (16 / 9);
-    state.adsK += ((state.zooming ? 1 : 0) - state.adsK) * Math.min(1, dt * 10);
+    state.adsK += (((state.zooming && !state.gunL) ? 1 : 0) - state.adsK) * Math.min(1, dt * 10);
     const fov43 = (state.zooming && state.stats && state.stats.zoom_fov > 0)
       ? (state.key === 'sniperrifle' ? state.sniperZoom : state.stats.zoom_fov)
       : GE_FOVY;
@@ -1707,26 +1785,52 @@ function tick() {
   // RecoilBack/1000 fraction of the gun-to-aim distance (~RecoilBack cm),
   // rising on a quarter sine over byte0 ticks of RecoilSpeed and recovering
   // on a half cosine over byte1.
-  if (state.gunRest && state.gun) {
+  // both hands: recoil pose and action cycling, each on its own envelope
+  const hands = [];
+  if (state.gunRest && state.gun)
+    hands.push({ i: 0, g: state.gun, rest: state.gunRest, movers: state.movers, mx: 1 });
+  if (state.gunRestL && state.gunL)
+    hands.push({ i: 1, g: state.gunL, rest: state.gunRestL, movers: state.moversL, mx: -1 });
+  for (const hd of hands) {
     const st2 = state.stats;
     let rk = 0;
-    if (st2 && state.recoilTick >= 0) {
+    if (st2 && state.recoilTicks[hd.i] >= 0) {
       const rs = st2.vfx.recoil_speed >>> 0;
       const rise = (rs >>> 24) & 255 || 4, fall = (rs >>> 16) & 255 || 8;
-      state.recoilTick += dt * 60;
-      if (state.recoilTick < rise) rk = Math.sin(state.recoilTick * Math.PI / 2 / rise);
-      else if (state.recoilTick < rise + fall)
-        rk = Math.cos((state.recoilTick - rise) * Math.PI / fall) * 0.5 + 0.5;
-      else { rk = 0; state.recoilTick = -1; }
+      state.recoilTicks[hd.i] += dt * 60;
+      const rt = state.recoilTicks[hd.i];
+      if (rt < rise) rk = Math.sin(rt * Math.PI / 2 / rise);
+      else if (rt < rise + fall) rk = Math.cos((rt - rise) * Math.PI / fall) * 0.5 + 0.5;
+      else { rk = 0; state.recoilTicks[hd.i] = -1; }
     }
-    const g = state.gun;
     const play = st2 ? st2.vfx.gun_play : [3, 3, 8.5];
-    const ads = state.adsK;
-    g.rotation.x = state.gunRest.rot.x + THREE.MathUtils.degToRad(st2 ? st2.vfx.recoil_up : 0) * rk;
-    g.position.set(
-      (state.gunRest.pos.x + state.ret.x * play[2] * 0.01) * (1 - ads),
-      state.gunRest.pos.y * (1 - ads * 0.45) + state.ret.y * play[1] * 0.01,
-      state.gunRest.pos.z + (st2 ? st2.vfx.recoil_back : 0) * 0.01 * rk);
+    const ads = hd.i === 0 ? state.adsK : 0;
+    hd.g.rotation.x = hd.rest.rot.x + THREE.MathUtils.degToRad(st2 ? st2.vfx.recoil_up : 0) * rk;
+    hd.g.position.set(
+      (hd.rest.pos.x + hd.mx * state.ret.x * play[2] * 0.01) * (1 - ads),
+      hd.rest.pos.y * (1 - ads * 0.45) + state.ret.y * play[1] * 0.01,
+      hd.rest.pos.z + (st2 ? st2.vfx.recoil_back : 0) * 0.01 * rk);
+    // slide/bolt throw straight back and return
+    if (state.slideTs[hd.i] > 0) {
+      state.slideTs[hd.i] = Math.max(0, state.slideTs[hd.i] - dt / 0.11);
+      const t2 = state.slideTs[hd.i];
+      const k = t2 > 0.72 ? (1 - t2) / 0.28 : t2 / 0.72;
+      const back = (st2 ? st2.vfx.bolt_recoil_back : 0) * k;
+      for (const part of ['slide', 'bolt']) {
+        const m2 = hd.movers[part];
+        if (m2) m2.position.set(m2.userData.base.x, m2.userData.base.y, m2.userData.base.z - back);
+      }
+    }
+    if (state.cylT[hd.i] < 1 && hd.movers.cylinder) {
+      state.cylT[hd.i] = Math.min(1, state.cylT[hd.i] + dt / 0.16);
+      const e = state.cylT[hd.i] * state.cylT[hd.i] * (3 - 2 * state.cylT[hd.i]);
+      hd.movers.cylinder.rotation.z = state.cylFrom[hd.i] + (state.cylTo[hd.i] - state.cylFrom[hd.i]) * e;
+    }
+    if (state.hammerT[hd.i] > 0 && hd.movers.hammer) {
+      state.hammerT[hd.i] = Math.max(0, state.hammerT[hd.i] - dt / 0.13);
+      const hk = state.hammerT[hd.i] > 0.7 ? (1 - state.hammerT[hd.i]) / 0.3 : state.hammerT[hd.i] / 0.7;
+      hd.movers.hammer.rotation.x = -0.5 * hk;
+    }
   }
 
   // gun mount: metres, fixed to camera; recoil pulls back/up
@@ -1742,26 +1846,6 @@ function tick() {
   gunMount.position.set(dip * 0.03, Math.sin(now * 1.8) * swayAmp - dip * 0.09,
                         dip * 0.04);
   gunMount.rotation.set(-dip * 0.42, 0, dip * 0.18);
-  // action cycling: slide/bolt throw straight back and return
-  if (state.slideT > 0) {
-    state.slideT = Math.max(0, state.slideT - dt / 0.11);
-    const k = state.slideT > 0.72 ? (1 - state.slideT) / 0.28 : state.slideT / 0.72;
-    const back = (state.stats ? state.stats.vfx.bolt_recoil_back : 0) * k;
-    for (const part of ['slide', 'bolt']) {
-      const m2 = state.movers[part];
-      if (m2) m2.position.set(m2.userData.base.x, m2.userData.base.y, m2.userData.base.z - back);
-    }
-  }
-  if (state.cylT < 1 && state.movers.cylinder) {
-    state.cylT = Math.min(1, state.cylT + dt / 0.16);
-    const e = state.cylT * state.cylT * (3 - 2 * state.cylT);
-    state.movers.cylinder.rotation.z = state.cylFrom + (state.cylTo - state.cylFrom) * e;
-  }
-  if (state.hammerT > 0 && state.movers.hammer) {
-    state.hammerT = Math.max(0, state.hammerT - dt / 0.13);
-    const hk = state.hammerT > 0.7 ? (1 - state.hammerT) / 0.3 : state.hammerT / 0.7;
-    state.movers.hammer.rotation.x = -0.5 * hk;
-  }
 
   const w = canvas.clientWidth, h = canvas.clientHeight;
   // A zero-sized canvas (hidden tab, collapsed pane) makes aspect NaN, which

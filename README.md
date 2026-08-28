@@ -34,7 +34,10 @@ python -m http.server 8613
 
 Open `http://localhost:8613/gallery/`. Mouse aims (pointer lock), click/hold
 fires, **R** or right-click reloads, **Z** (held) zooms scoped weapons, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
-music, **G** toggles the targets returning fire (visual only — off by default),
+music, **X** dual-wields any `CAN_DUAL_WIELD` weapon (mirrored left copy per
+`MIRROR_DUAL`, pistols alternate hands per `DUAL_WIELD_ALTERNATING_FIRE`,
+per-hand ammo bottom-right/bottom-left), **G** toggles the targets returning
+fire (visual only — off by default),
 **P** sends half the guards walking patrol loops (GE's own `walking` gaits, at
 `chraction.c`'s 0.5× playback with movement matched to each gait's measured
 planted-foot speed, so feet don't slide),
@@ -122,6 +125,10 @@ rediscovered:
   specular strip that only reads correctly under that light; shown flat it is a
   painted pale streak, and the barrel gloss in reference footage is this
   shading, not a texture effect.
+- Coplanar detail is layered by **display-list order**: the sniper scope's
+  dark cover draws over its white lens-glint disc in the same primary list.
+  The exporter tags later coplanar faces `_ovl` and the renderer biases them
+  forward, or they shimmer.
 - A display-list record has **two** lists. `model.c` draws `Primary` opaque
   (`OPA_SURF`) and then `Secondary` translucent (`XLU_SURF`) — the struct calls
   these "secondary surfaces". They are decals lying exactly on the skin: 12 of
