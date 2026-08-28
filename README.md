@@ -109,6 +109,52 @@ moonraker helmet counts as the head — all per `handles_shot_actors`. Flinches
 pick the animation for the side and limb that was struck. They grunt when hit
 and thump when they fall, using GE's own `GET_HIT_*` and `BODY_FALL_*` samples.
 
+**Impact effects are material-driven, straight from `tex.c`'s
+`g_HitTypeSounds[]` table**: every level surface's texture id carries GE's own
+`hit_texture` (decoded into `IMAGES.json` from `g_Textures`), so a shot into
+level geometry looks up the *actual face's* material -- stone, wood, metal,
+metalobj, glass, water, snow, dirt, mud or tile -- not one hard-coded type for
+a whole room. That table also decides what happens, not just which sound
+plays: `thing2_len` is 0 for water, so a shot into the reservoir gets only
+`HIT_BULLET_WATER_SFX` and nothing else (no decal, no puff) -- GE draws
+nothing there either. Character hits use `isnd_chr`'s puff-only entry: a small
+gray dust puff (`chr.c`'s hit-reaction puff, `glass2.c`'s camera-facing
+billboard) with **no decal and no blood** -- GoldenEye never renders either on
+a body. Every other material gets that same billboard puff plus a dark bullet
+decal sized off `g_ImpactTypes[]` (~6cm for most materials, ~7cm for glass),
+tinted from the real `g_BulletSparkColors[]` palette (white or pale yellow --
+the table's one red entry is never actually selected). Hard surfaces
+(stone/metal/metalobj/tile) occasionally layer in a ricochet whine.
+
+**Glass is properly breakable.** The stage setup's dedicated glass/tinted-glass
+props are real shootable objects: one hit runs `glass.c`'s shard-grid break --
+a scatter of small tumbling panes sized to the window's own area, horizontal
+velocity symmetric and vertical velocity biased upward (matching
+`glassCreateShard`'s randomised ranges), env-mapped blue-white tint, gravity,
+and `GLASS_SHATTERING_SFX` -- then the pane is gone. (A handful of the pad3d
+records this reads decode to implausible window sizes -- the trailing bbox
+isn't a clean min/max pair for every glass record -- so pane dimensions are
+clamped to a plausible 0.3-2.2 m before the shard count is derived from them.)
+Glass-textured *level* geometry that isn't a dedicated prop -- a window built
+into the static room mesh -- gets the same shard sparkle on every hit without
+being removed, since individual triangles can't be pulled from a shared
+buffer; that mirrors GE's own split between `glass.c`'s dedicated break system
+and the generic decal table's separate (smaller) glass entry.
+
+**Explosions** (`explode()`) follow `explosion.c`'s standard grenade/mine
+entry: a fireball that expands and fades over ~0.35 s, ~26 gray tumbling
+shrapnel chunks (biased upward, real entry is 200 -- thinned for the browser,
+same character), and a smoketype-6 cloud that grows over its first second,
+holds, and dissolves over its last 1.5 s (real duration is a 15 s lingering
+plume; compressed to ~8 s here). A hit with a known surface normal leaves a
+scorch decal, bigger and much longer-lived than a bullet hole. Screen shake
+follows the source's own `explosion_size/distance` falloff. The fireball and
+its point light sit offset slightly off the hit surface along its normal --
+centred exactly on the impact point, the sphere clips into the wall and lines
+up with the flush scorch decal underneath it, which reads as a dark hole
+punched through the middle of the fireball rather than two things at
+different depths.
+
 The HUD's stat panel charts each weapon's ROM parameters as bars — damage,
 fire rate, magazine, spread, recoil, kick, penetration and AI loudness —
 normalised against the whole rack so a bar means the same thing on every

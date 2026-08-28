@@ -445,6 +445,9 @@ async function instanceBody(modelName, skelName) {
 // ---- targets ----
 const targets = [];
 const raycaster = new THREE.Raycaster();
+// breakable glass panes (placeDamGlass): shootable, but not "targets" -- no
+// score, no HP bar, just glass.c's shard-grid break on the first hit
+const GLASS_PANES = [];
 // ---- enemies ----
 // Each lane target is a real GoldenEye guard: the game's body model, posed by
 // the game's own animation, wearing the head and hat GE would give it.
@@ -622,16 +625,66 @@ async function buildProps() {
   }
 }
 
-// ---- impact sounds per material (real GE hit SFX + ricochets) ----
+// ---- impact sounds + visuals per material ----
+// tex.c's g_HitTypeSounds[]: one {sfx[], impacttype[]} record per material,
+// indexed by the low nibble of the hit texture's material id. Each record's
+// impacttype list picks a random g_ImpactTypes[] entry (decal/puff size);
+// water's list is EMPTY (thing2_len 0) -- water gets a sound and nothing
+// else, no decal, no puff. Character hits use isnd_chr, apptype 0: a puff,
+// but the table gives it no decal entry either -- GE never draws a bullet
+// hole or blood on a body, only the gray hit-puff from chr.c.
 const sfx = n => soundByName(n);
 const HIT_SOUNDS = {
-  flesh: [sfx('HIT_BULLET_FLESH_SFX')],
-  wood:  [sfx('HIT_BULLET_WOOD_SFX'), ...RICO.slice(0, 4)],
-  metal: [sfx('HIT_BULLET_METAL_A_SFX'), sfx('HIT_BULLET_METAL_B_SFX'), ...RICO.slice(4, 8)],
-  stone: RICO.slice(8, 16),
-  other: RICO.slice(16, 20),
+  default:   [sfx('HIT_BULLET_STONE1_SFX'), sfx('HIT_BULLET_STONE2_SFX')],
+  stone:     [sfx('HIT_BULLET_STONE1_SFX'), sfx('HIT_BULLET_STONE2_SFX')],
+  wood:      [sfx('HIT_BULLET_WOOD_SFX'), sfx('HIT_BULLET_WOOD2_SFX')],
+  metal:     [sfx('HIT_BULLET_METAL_A_SFX'), sfx('HIT_BULLET_METAL_A3_SFX'), sfx('HIT_BULLET_METAL_A4_SFX')],
+  metalobj:  [sfx('HIT_METAL_OBJECT1_SFX'), sfx('HIT_METAL_OBJECT2_SFX')],
+  glass:     [sfx('HIT_BULLET_GLASS_SFX')],
+  glass_xlu: [sfx('HIT_BULLET_GLASS_SFX')],
+  water:     [sfx('HIT_BULLET_WATER_SFX')],
+  snow:      [sfx('HIT_BULLET_SNOW_SFX')],
+  dirt:      [sfx('HIT_BULLET_DIRT1_SFX'), sfx('HIT_BULLET_DIRT2_SFX')],
+  mud:       [sfx('HIT_BULLET_MUD1_SFX'), sfx('HIT_BULLET_MUD2_SFX'), sfx('HIT_BULLET_MUD3_SFX')],
+  tile:      [sfx('HIT_BULLET_TILE_SFX')],
+  flesh:     [sfx('HIT_BULLET_FLESH_SFX')],
+  other:     RICO.slice(16, 20),
 };
-const EXPLO_SOUNDS = ['EXPLOSION_2A_SFX','EXPLOSION_2B_SFX','EXPLOSION_3_SFX','EXPLOSION_4A_SFX']
+// GE's own material table has no decal/puff entry for water or characters
+// (tex.c isnd_water/isnd_chr thing2_len); characters still get chr.c's puff,
+// just no decal -- everyone else (including water) is handled in impactFX().
+const NO_DECAL = new Set(['water', 'flesh']);
+const NO_PUFF = new Set(['water']);
+// Occasional ricochet whine layered over hard-surface hits -- gunfire.c's own
+// ricochet chance is a separate system from the material table; approximated
+// here as a flat chance so hard cover still pings now and then.
+const RICO_KINDS = new Set(['stone', 'metal', 'metalobj', 'tile', 'default']);
+// g_ImpactTypes[]: decal/puff half-size in N64 units (~cm); most solid
+// materials share the {6,6} entry, glass's table picks a bigger 6/8/12 mix.
+const IMPACT_SIZE = {
+  default: 0.045, stone: 0.045, wood: 0.045, metal: 0.045, metalobj: 0.045,
+  tile: 0.045, dirt: 0.045, mud: 0.045, snow: 0.045, other: 0.045,
+  glass: 0.07, glass_xlu: 0.07, flesh: 0.055,
+};
+// texture id -> GE hit-material kind, from IMAGES.json's per-texture
+// hit_texture (itself g_Textures' embedded material id, HIT_STONE etc.)
+const HIT_TEX = {};
+for (let i = 0; i < IMAGES.length; i++) {
+  const h = IMAGES[i] && IMAGES[i].hit_texture;
+  if (h) HIT_TEX[i] = h.replace(/^HIT_/, '').toLowerCase();
+}
+/** Which material a level-geometry face is, from the tex_<id> its hit material
+ *  is baked into (extract_bg.py/extract_models.py both name materials this
+ *  way). Level rooms carry every material GE authored -- water, glass, snow,
+ *  tile -- not just one hard-coded "stone" for the whole mesh. */
+function levelFaceMaterial(obj, face) {
+  const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+  const mi = face && typeof face.materialIndex === 'number' ? face.materialIndex : 0;
+  const name = (mats[mi] || mats[0] || {}).name || '';
+  const m = /^tex_(\d+)/.exec(name);
+  return (m && HIT_TEX[+m[1]]) || 'stone';
+}
+const EXPLO_SOUNDS = ['EXPLOSION_2A_SFX','EXPLOSION_2B_SFX','EXPLOSION_3_SFX','EXPLOSION_4A_SFX','EXPLOSION_4B_SFX']
   .map(sfx).filter(Boolean);
 // guard reactions: GE grunts on a hit and thumps on the way down
 const HURT_MALE = SOUNDS.filter(s => /^GET_HIT_MALE/.test(s.name)).map(s => `${EX}/sounds/${s.file}`);
@@ -645,6 +698,20 @@ function addFx(mesh, ttl, kind) {
   scene.add(mesh); fx.push(mesh);
   return mesh;
 }
+// A soft radial-gradient blob, shared by every dust puff and smoke cloud --
+// glass2.c's bullet_spark_create is a camera-facing billboard, not the hard
+// little spark spheres a modern shooter would draw.
+const puffCanvas = document.createElement('canvas');
+puffCanvas.width = puffCanvas.height = 32;
+{
+  const pc = puffCanvas.getContext('2d');
+  const g = pc.createRadialGradient(16, 16, 0, 16, 16, 16);
+  g.addColorStop(0, 'rgba(255,255,255,0.9)');
+  g.addColorStop(0.5, 'rgba(255,255,255,0.45)');
+  g.addColorStop(1, 'rgba(255,255,255,0)');
+  pc.fillStyle = g; pc.fillRect(0, 0, 32, 32);
+}
+const puffTex = new THREE.CanvasTexture(puffCanvas);
 const sparkGeo = new THREE.SphereGeometry(0.035, 4, 4);
 function spawnSpark(p, big = false) {
   for (let i = 0; i < (big ? 7 : 3); i++) {
@@ -654,19 +721,98 @@ function spawnSpark(p, big = false) {
     addFx(m, 0.22 + Math.random()*0.15, 'spark');
   }
 }
+// g_BulletSparkColors: almost every entry is white or pale yellow (255,255,200);
+// the one red entry in the table is never actually selected in play, matching
+// chr.c having no blood -- so every material's puff draws from these two.
+const PUFF_TINTS = [0xffffff, 0xfffdc8];
+function spawnImpactPuff(p, normal, size = 0.045, tint = null) {
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: puffTex, color: tint || PUFF_TINTS[Math.random() < 0.5 ? 0 : 1],
+    transparent: true, depthWrite: false, opacity: 0.8 }));
+  sp.position.copy(p).addScaledVector(normal, 0.02);
+  const s = size * (2.2 + Math.random() * 0.6);
+  sp.scale.set(s, s, 1);
+  sp.userData = { drift: normal.clone().multiplyScalar(0.3 + Math.random() * 0.2), size0: s };
+  addFx(sp, 0.16 + Math.random() * 0.08, 'puff');
+}
 function spawnTracer(from, to) {
   const g = new THREE.BufferGeometry().setFromPoints([from, to]);
   const l = new THREE.Line(g, new THREE.LineBasicMaterial({
     color: 0xffe9a0, transparent: true, opacity: 0.85 }));
   addFx(l, 0.06, 'tracer');
 }
-const decalGeo = new THREE.CircleGeometry(0.035, 8);
-function spawnDecal(p, normal) {
+const decalGeo = new THREE.CircleGeometry(1, 16);
+function spawnDecal(p, normal, size = 0.035, ttl = 9) {
   const m = new THREE.Mesh(decalGeo, new THREE.MeshBasicMaterial({
     color: 0x111111, transparent: true, opacity: 0.9 }));
+  m.scale.setScalar(size);
   m.position.copy(p).addScaledVector(normal, 0.01);
   m.lookAt(p.clone().add(normal));
-  addFx(m, 9, 'decal');
+  addFx(m, ttl, 'decal');
+}
+// ---- glass: window/pane shards, glass.c's shard-grid break ----
+const shardGeo = new THREE.PlaneGeometry(1, 1);
+function spawnGlassShard(pos, size, tinted) {
+  const m = new THREE.Mesh(shardGeo, new THREE.MeshBasicMaterial({
+    // v1..v3 env-mapped gradient in glass.c runs blue -> pale yellow; a flat
+    // pale blue-white reads the same on an unlit billboard shard
+    color: tinted ? 0x4a5a66 : 0xcfe6ff, transparent: true, opacity: 0.6,
+    side: THREE.DoubleSide, depthWrite: false }));
+  m.position.copy(pos);
+  m.scale.setScalar(size);
+  m.rotation.set(Math.random() * TAU, Math.random() * TAU, Math.random() * TAU);
+  // horizontal drift symmetric, vertical biased upward -- glassCreateShard's
+  // randSymmetricX/Z and randBiasedY (-0.12..1.0), scaled to m/s
+  m.userData = {
+    vel: new THREE.Vector3((Math.random() - 0.5) * 5,
+                            (Math.random() * 1.12 - 0.12) * 5.5,
+                            (Math.random() - 0.5) * 5),
+    spin: new THREE.Vector3(Math.random() * 6, Math.random() * 6, Math.random() * 6),
+  };
+  addFx(m, 1.1 + Math.random() * 0.7, 'shard');
+}
+/** A handful of shards for a glancing hit on glass that's part of the static
+ *  level mesh -- can't remove individual triangles from that shared buffer,
+ *  so the pane itself stays (matches GE: bg glass textures use the plain
+ *  decal/puff table, only dedicated glass PropRecords use glass.c's break). */
+function spawnGlassShards(p, normal, count, tinted) {
+  for (let i = 0; i < count; i++)
+    spawnGlassShard(p.clone().addScaledVector(normal, 0.02 + Math.random() * 0.05),
+                    0.05 + Math.random() * 0.05, tinted);
+}
+/** One bullet impact's full visual+audio response, dispatched by GE hit
+ *  material: tex.c's g_HitTypeSounds table drives every branch here (which
+ *  sound, whether a puff spawns at all, whether a decal follows the puff). */
+function impactFX(kind, point, normal) {
+  const set = HIT_SOUNDS[kind] || HIT_SOUNDS.other;
+  let snd = set[Math.floor(Math.random() * set.length)];
+  if (RICO_KINDS.has(kind) && Math.random() < 0.18) snd = RICO[Math.floor(Math.random() * RICO.length)];
+  if (snd) play(snd, { vol: 0.8, at: point, pitch: 0.9 + Math.random() * 0.2 });
+  if (NO_PUFF.has(kind)) return;                    // water: sound only (tex.c thing2_len 0)
+  const isGlass = kind === 'glass' || kind === 'glass_xlu';
+  spawnImpactPuff(point, normal, IMPACT_SIZE[kind] || 0.045, isGlass ? 0xdcecff : null);
+  if (NO_DECAL.has(kind)) return;                   // flesh: no hole or blood, chr.c has none
+  spawnDecal(point, normal, IMPACT_SIZE[kind] || 0.045);
+  if (isGlass) spawnGlassShards(point, normal, 5, kind === 'glass_xlu');
+}
+/** A whole breakable glass pane (placeDamGlass): glass.c's shard grid --
+ *  count scaled by pane area like sub_GAME_7F0A1DA0's shard_size formula --
+ *  covering the entire pane, then the pane itself is gone. */
+function shatterGlassPane(g) {
+  if (g.userData.broken) return;
+  g.userData.broken = true;
+  const { side, up, lk, ctr, w, h, tinted } = g.userData;
+  play(sfx('GLASS_SHATTERING_SFX') || sfx('HIT_GLASS_SMASH_SFX'), { vol: 1.1, at: ctr });
+  const n = Math.max(10, Math.min(40, Math.round((w * h) / 0.05)));
+  for (let i = 0; i < n; i++) {
+    const pos = ctr.clone()
+      .addScaledVector(side, (Math.random() - 0.5) * w)
+      .addScaledVector(up, (Math.random() - 0.5) * h);
+    spawnGlassShard(pos, 0.06 + Math.random() * 0.08, tinted);
+  }
+  scene.remove(g);
+  const i = GLASS_PANES.indexOf(g);
+  if (i >= 0) GLASS_PANES.splice(i, 1);
 }
 const casingGeo = new THREE.BoxGeometry(0.012, 0.012, 0.03);
 const casingMat = new THREE.MeshLambertMaterial({ color: 0xc8a248 });
@@ -678,26 +824,73 @@ function spawnCasing(side = 0) {
   if (eo) gunPointWorld(eo, m.position);
   else m.position.copy(cam.position).addScaledVector(right, 0.28).addScaledVector(fwd, 0.35)
     .add(new THREE.Vector3(0, -0.12, 0));
+  // dam terrain isn't flat like the range floor -- ground the landing check
+  // under wherever the casing actually falls, not a fixed world y
+  const floorY = (LEVEL === 'dam'
+    ? (damGround(m.position.x, m.position.z, 2, 6, DAM.groundY) ?? DAM.groundY)
+    : 0) + 0.02;
   m.userData = { vel: right.clone().multiplyScalar(1.4 + Math.random())
       .add(new THREE.Vector3(0, 2 + Math.random(), 0)),
-      rot: new THREE.Vector3(Math.random()*20, Math.random()*20, 0) };
+      rot: new THREE.Vector3(Math.random()*20, Math.random()*20, 0), landed: false, floorY };
   addFx(m, 0.9, 'casing');
 }
 let shake = 0;
-function explode(p, radius, damage) {
+// ---- explosion: fireball + gunfire.c-style shrapnel + explosion.c's smoke ----
+function spawnShrapnel(p) {
+  // explosion.c's standard grenade/mine entry: 200 bits, size 6, hvel 30,
+  // vvel 6-15 (N64 units/tick) -- scaled down in COUNT for the browser (a
+  // couple dozen reads the same as two hundred at this camera distance) but
+  // keeping the same character: small gray tumbling debris, biased upward.
+  const n = 26;
+  for (let i = 0; i < n; i++) {
+    const m = new THREE.Mesh(shardGeo, new THREE.MeshBasicMaterial({
+      color: 0x3a3a36, side: THREE.DoubleSide, transparent: true }));
+    m.position.copy(p);
+    m.scale.setScalar(0.04 + Math.random() * 0.05);
+    m.rotation.set(Math.random() * TAU, Math.random() * TAU, Math.random() * TAU);
+    const ang = Math.random() * TAU, h = 2 + Math.random() * 2.5;
+    m.userData = {
+      vel: new THREE.Vector3(Math.cos(ang) * h, 4 + Math.random() * 5, Math.sin(ang) * h),
+      spin: new THREE.Vector3(Math.random() * 8, Math.random() * 8, Math.random() * 8),
+    };
+    addFx(m, 0.9 + Math.random() * 0.5, 'shard');
+  }
+}
+function spawnSmoke(p) {
+  // explosion.c smoketype 6 (the grenade/mine entry): size 300 (~3 m), colour
+  // (64,64,64), duration 900 ticks (~15 s). Compressed to ~8 s here -- still
+  // clearly lingers, without a rocket volley fouling the range in smoke.
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: puffTex, color: 0x404040, transparent: true, depthWrite: false, opacity: 0 }));
+  sp.position.copy(p).add(new THREE.Vector3(0, 0.4, 0));
+  addFx(sp, 8, 'smoke');
+}
+function explode(p, radius, damage, normal = null) {
   play(EXPLO_SOUNDS[Math.floor(Math.random()*EXPLO_SOUNDS.length)],
        { vol: 1.6, at: p, pitch: 0.95 + Math.random()*0.1 });
+  // Float the fireball clear of the wall it hit -- centered exactly on the
+  // impact point, half of the additive sphere clips into the surface and its
+  // silhouette sits flush with the flat scorch decal below, which reads as a
+  // dark polygon cut out of the middle of the ball instead of two separate
+  // things at different depths.
+  const off = normal ? normal.clone().multiplyScalar(radius * 0.15) : new THREE.Vector3();
   const ball = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 12),
     new THREE.MeshBasicMaterial({ color: 0xffa63e, transparent: true, opacity: 0.95,
       blending: THREE.AdditiveBlending, depthWrite: false }));
-  ball.position.copy(p);
+  ball.position.copy(p).add(off);
   addFx(ball, 0.35, 'explosion');
   const light = new THREE.PointLight(0xffa040, 60, radius * 4);
-  light.position.copy(p);
+  light.position.copy(p).add(off);
   addFx(light, 0.25, 'light');
-  spawnSpark(p, true);
+  spawnShrapnel(p);
+  spawnSmoke(p.clone().add(off));
+  // explosionScorchTick: a persistent dark mark on whatever surface it hit --
+  // bigger and longer-lived than an ordinary bullet hole
+  if (normal) spawnDecal(p, normal, 0.5 + Math.random() * 0.3, 30);
+  // explosionScreenShake: sum of explosion_size/distance*15 across active
+  // blasts; explosion_size here is the same radius (m) fireProjectile passed.
   const d = cam.position.distanceTo(p);
-  shake = Math.min(1.2, shake + 3.5 / Math.max(d * 0.35, 1));
+  shake = Math.min(1.4, shake + (radius / Math.max(d, 1)) * 0.6);
   for (const t of targets) {
     const u = t.userData;
     if (u.hp === Infinity || u.downT > 0) continue;
@@ -1463,15 +1656,15 @@ function shoot(now) {
     for (const h of hits) {
       let g = h.object;
       while (g.parent && !g.userData.hit) g = g.parent;
-      // chraction.c handles_shot_actors: the part decides everything below
-      const bp = g.userData.enemy ? resolveBodyPart(g, h) : null;
-      const mat = bp ? bp.sound : (g.userData.hit || 'other');
-      const set = HIT_SOUNDS[mat];
-      play(set[Math.floor(Math.random() * set.length)], { vol: 0.8, at: h.point, pitch: 0.9 + Math.random()*0.2 });
-      spawnSpark(h.point);
       const n = h.face ? h.face.normal.clone().transformDirection(h.object.matrixWorld)
                        : dir.clone().negate();
-      spawnDecal(h.point, n);
+      if (g.userData.glassPane) { shatterGlassPane(g); continue; }
+      // chraction.c handles_shot_actors: the part decides everything below
+      const bp = g.userData.enemy ? resolveBodyPart(g, h) : null;
+      const kind = bp ? bp.sound
+        : g.userData.isLevel ? levelFaceMaterial(h.object, h.face)
+        : (g.userData.hit || 'other');
+      impactFX(kind, h.point, n);
       hitReact(g);
       if (g.userData.rig && (!bp || bp.mult > 0)) playFlinch(g, bp);
       if (g.userData.hp !== Infinity && g.userData.downT <= 0) {
@@ -1717,7 +1910,8 @@ function damGround(x, z, up = 1.6, down = 8, baseY = null) {
 }
 /** What bullets and grenades collide with: the targets plus the surrounding level. */
 function solidObjects() {
-  return LEVEL === 'dam' ? targets.concat(DAM.rooms) : targets.concat(RANGE_BG.rooms);
+  return (LEVEL === 'dam' ? targets.concat(DAM.rooms) : targets.concat(RANGE_BG.rooms))
+    .concat(GLASS_PANES);
 }
 
 /** Load an extract_bg.py level: one mesh per room, GE materials, world scaled
@@ -1747,7 +1941,9 @@ async function loadLevelGeometry(name) {
       return nm;
     });
     o.material = Array.isArray(o.material) ? out : out[0];
-    o.userData = { hit: 'stone', hp: Infinity, downT: 0, wobble: 0, flash: 0, name: o.name };
+    // isLevel: hit material comes from the actual face's texture (levelFaceMaterial),
+    // not one hit type for the whole room -- a room can span stone, water and glass.
+    o.userData = { hit: 'stone', isLevel: true, hp: Infinity, downT: 0, wobble: 0, flash: 0, name: o.name };
     rooms.push(o);
   });
   return { obj, rooms, meta, S };
@@ -1815,9 +2011,16 @@ async function placeDamProp(o, p, pad, S) {
 
 function placeDamGlass(o, pad, S) {
   // glass records use 3D pads: a bbox in the pad's own {side, up, look} frame,
-  // one axis flat -- the pane itself
+  // one axis flat -- the pane itself. A handful of these decode to
+  // implausible extents (tens of metres, or nearly zero) -- the pad3d
+  // trailer isn't a clean axis-aligned min/max pair for every glass record,
+  // and chasing the exact per-type layout is out of scope here, so clamp to
+  // a plausible pane size rather than spawn a building-sized glass sheet.
   const b = pad.bbox;
-  const size = [Math.max(b[1] - b[0], 1), Math.max(b[3] - b[2], 1), Math.max(b[5] - b[4], 1)];
+  const raw = [Math.max(b[1] - b[0], 1), Math.max(b[3] - b[2], 1), Math.max(b[5] - b[4], 1)];
+  const clamp = (v, lo, hi) => Math.min(Math.max(v * S, lo), hi) / S;
+  // width/height (side, up) read as a plausible window; depth (look) stays a pane's thickness
+  const size = [clamp(raw[0], 0.3, 2.2), clamp(raw[1], 0.3, 2.2), clamp(raw[2], 0.02, 0.15)];
   const geo = new THREE.BoxGeometry(size[0] * S, size[1] * S, size[2] * S);
   const tinted = o.type === 'tinted_glass';
   const mat = new THREE.MeshBasicMaterial({
@@ -1835,7 +2038,14 @@ function placeDamGlass(o, pad, S) {
     .addScaledVector(lk, (b[4] + b[5]) / 2)
     .add(new THREE.Vector3(...pad.pos)).multiplyScalar(S);
   m.matrix.makeBasis(side, up, lk).setPosition(ctr);
+  m.userData = {
+    hit: 'glass', glassPane: true, broken: false, hp: Infinity,
+    downT: 0, wobble: 0, flash: 0, name: o.model,
+    side: side.clone().normalize(), up: up.clone(), lk: lk.clone(), ctr: ctr.clone(),
+    w: size[0] * S, h: size[1] * S, tinted,
+  };
   scene.add(m);
+  GLASS_PANES.push(m);
 }
 
 async function populateDam(setup, S) {
@@ -2092,7 +2302,33 @@ function tick() {
       u.vel.y -= 9.8 * dt;
       m.position.addScaledVector(u.vel, dt);
       m.rotation.x += u.rot.x * dt; m.rotation.y += u.rot.y * dt;
-      if (m.position.y < 0.02) { m.position.y = 0.02; u.vel.set(0,0,0); u.rot.set(0,0,0); }
+      if (m.position.y < u.floorY) {
+        m.position.y = u.floorY;
+        if (!u.landed) {
+          u.landed = true;
+          play(sfx('CART_SPENT_SFX'), { vol: 0.3, at: m.position, pitch: 0.85 + Math.random() * 0.3 });
+        }
+        u.vel.set(0,0,0); u.rot.set(0,0,0);
+      }
+    } else if (u.kind === 'puff') {
+      m.position.addScaledVector(u.drift, dt);
+      const k = 1 - u.t / u.ttl, s = u.size0 * (1 + k * 0.6);
+      m.scale.set(s, s, 1);
+      m.material.opacity = 0.8 * (1 - k);
+    } else if (u.kind === 'shard') {
+      u.vel.y -= 8 * dt;
+      m.position.addScaledVector(u.vel, dt);
+      m.rotation.x += u.spin.x * dt; m.rotation.y += u.spin.y * dt; m.rotation.z += u.spin.z * dt;
+      if (m.position.y < 0.02) { m.position.y = 0.02; u.vel.set(0,0,0); }
+      if (u.t < 0.3) m.material.opacity = Math.max(0, u.t / 0.3) * 0.6;
+    } else if (u.kind === 'smoke') {
+      m.position.y += 0.15 * dt;                    // slow upward drift
+      const age = u.ttl - u.t;
+      const grow = Math.min(1, age / 1.0);           // ~1s to fully appear
+      const fade = u.t < 1.5 ? Math.max(0, u.t / 1.5) : 1;   // ~1.5s to dissolve
+      const s = 0.6 + grow * 2.4;                    // explosion.c smoketype size ~3m
+      m.scale.set(s, s, 1);
+      m.material.opacity = 0.55 * grow * fade;
     } else if (u.kind === 'explosion') {
       const k = 1 - u.t / u.ttl;
       m.scale.setScalar(0.4 + k * 5.5);
@@ -2125,8 +2361,10 @@ function tick() {
     if (hit || out || u.life <= 0) {
       const at = hit ? hit.point : p.position.clone();
       if (LEVEL !== 'dam') at.y = Math.max(at.y, 0.05);
+      const n = hit && hit.face ? hit.face.normal.clone().transformDirection(hit.object.matrixWorld) : null;
+      if (hit && hit.object.userData.glassPane) shatterGlassPane(hit.object);
       scene.remove(p); projectiles.splice(i, 1);
-      explode(at, u.radius, state.stats ? state.stats.damage * 8 : 8);
+      explode(at, u.radius, state.stats ? state.stats.damage * 8 : 8, n);
     }
   }
   shake = Math.max(0, shake - dt * 3);
@@ -2378,7 +2616,7 @@ window.__repose = () => {
   return selectWeapon(state.key);
 };
 window.THREE = THREE;
-window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam, tick, poseSkeleton, loadAnim };
+window.__dbg = { state, selectWeapon, shoot, look, targets, scene, cam, renderer, gunMount, gunScene, gunCam, tick, poseSkeleton, loadAnim, GLASS_PANES, fx, DAM, explode, shatterGlassPane, impactFX };
 window.__shot = (w = 480) => {
   if (canvas.width < 8) {
     renderer.setSize(960, 540, false);
