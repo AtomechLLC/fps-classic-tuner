@@ -447,24 +447,27 @@ class Decoder:
 
         # Faces normalise UVs against their own texture, so a vertex shared by
         # faces of differently-sized textures needs one copy per distinct UV.
-        remap = {}          # (vi, uv) -> new index
-        order = []          # new index -> (vi, uv)
-        def emit(vi, tid, env):
+        remap = {}          # (vi, uv, lifted) -> new index
+        order = []          # new index -> (vi, uv, lifted)
+        ovl_pre = self.overlay_faces()
+        def emit(vi, tid, env, lifted):
             uv = self.face_uv(vi, tid, env)
-            key = (vi, round(uv[0], 4), round(uv[1], 4))
+            key = (vi, round(uv[0], 4), round(uv[1], 4), lifted)
             if key not in remap:
                 remap[key] = len(order)
-                order.append((vi, uv))
+                order.append((vi, uv, lifted))
             return remap[key]
         new_faces = []
-        for f in self.faces:
+        for i, f in enumerate(self.faces):
             a2, b2, c2, tid = f[0], f[1], f[2], f[3]
             env = f[6]
-            new_faces.append((emit(a2, tid, env), emit(b2, tid, env), emit(c2, tid, env)) + tuple(f[3:]))
+            lifted = i in ovl_pre
+            new_faces.append((emit(a2, tid, env, lifted), emit(b2, tid, env, lifted),
+                              emit(c2, tid, env, lifted)) + tuple(f[3:]))
 
         pos, col = [], []
         vmtx2 = []
-        for vi, uv in order:
+        for vi, uv, lifted in order:
             v = self.verts[vi]
             a = self.mtx.get(self.vmtx[vi], (0.0, 0.0, 0.0))
             pos += [round(v[0] - a[0], 2), round(v[1] - a[1], 2), round(v[2] - a[2], 2)]
@@ -481,15 +484,40 @@ class Decoder:
             for vi in (a2, b2, c2):
                 geo[vi][0] += fx; geo[vi][1] += fy; geo[vi][2] += fz
         nrm = []
-        for vi, uv in order:
+        for vi, uv, lifted in order:
             nx, ny, nz = self.attrs[vi] if self.lit[vi] else (0.0, 0.0, 0.0)
             if abs(nx) + abs(ny) + abs(nz) < 1e-6:
                 nx, ny, nz = geo[vi]
                 ln = (nx*nx + ny*ny + nz*nz) ** 0.5
                 nx, ny, nz = (0.0, 1.0, 0.0) if ln < 1e-9 else (nx/ln, ny/ln, nz/ln)
             nrm += [round(nx, 3), round(ny, 3), round(nz, 3)]
+        # Overlay faces (drawn later in the DL, expected to win against the
+        # surface they sit on) are lifted 0.75 units outward: a real geometric
+        # separation, so plain depth testing reproduces the game's layering
+        # from every angle (depth-bias tricks proved angle-fragile). The lift
+        # follows the WINDING-derived face normal -- the shading normals are
+        # lighting data and oppose the winding on most of the sniper's check
+        # ring, which pushed those faces inside the body instead.
+        lift_dir = [[0.0, 0.0, 0.0] for _ in order]
+        for nf in new_faces:
+            a3, b3, c3 = nf[0], nf[1], nf[2]
+            if not order[a3][2]: continue          # non-lifted face
+            pa = pos[3*a3:3*a3+3]; pb = pos[3*b3:3*b3+3]; pc = pos[3*c3:3*c3+3]
+            ux, uy, uz = pb[0]-pa[0], pb[1]-pa[1], pb[2]-pa[2]
+            wx, wy, wz = pc[0]-pa[0], pc[1]-pa[1], pc[2]-pa[2]
+            fx, fy, fz = uy*wz - uz*wy, uz*wx - ux*wz, ux*wy - uy*wx
+            for vv in (a3, b3, c3):
+                lift_dir[vv][0] += fx; lift_dir[vv][1] += fy; lift_dir[vv][2] += fz
+        for k, (vi, uv, lifted) in enumerate(order):
+            if not lifted: continue
+            lx, ly, lz = lift_dir[k]
+            ln = (lx*lx + ly*ly + lz*lz) ** 0.5
+            if ln < 1e-9: continue
+            pos[3*k]   = round(pos[3*k]   + 0.75 * lx / ln, 2)
+            pos[3*k+1] = round(pos[3*k+1] + 0.75 * ly / ln, 2)
+            pos[3*k+2] = round(pos[3*k+2] + 0.75 * lz / ln, 2)
         uvflat = []
-        for vi, uv in order: uvflat += [round(uv[0], 4), round(uv[1], 4)]
+        for vi, uv, lifted in order: uvflat += [round(uv[0], 4), round(uv[1], 4)]
 
         def mat(tid, sw, lit, env, sec, ds, wrap, ovl=False):
             base = f"tex_{tid}"
@@ -499,7 +527,7 @@ class Decoder:
                     + ("_sec" if sec else "") + ("_ds" if ds else "")
                     + (f"_w{wrap[0]}{wrap[1]}" if wrap != (0, 0) else "")
                     + ("_ovl" if ovl else ""))
-        ovl = self.overlay_faces()
+        ovl = ovl_pre
         groups = {}
         for i, (a, b, c, tid, sw, lit, env, sec, ds, wrap) in enumerate(new_faces):
             groups.setdefault(mat(tid, sw, lit, env, sec, ds, wrap, i in ovl), []).extend((a, b, c))

@@ -145,12 +145,17 @@ rediscovered:
   centred ADS pose.
 - Coplanar detail is layered by **display-list order**: the sniper scope's
   dark cover draws over its white lens-glint disc in the same primary list.
-  The exporter tags later coplanar faces `_ovl` and the renderer biases them
-  forward, or they shimmer. The plane key must be quantised coarsely and the
-  tag promoted to every face sharing an overlay's (material, plane): float
-  noise otherwise splits a coplanar quad's two triangles across the boundary,
-  and the unbiased half loses the depth tie — the sniper's check ring rendered
-  one grey triangle.
+  The exporter tags later coplanar faces `_ovl` and **lifts them 0.75 model
+  units along the winding-derived face normal** — a real geometric separation,
+  so plain depth testing reproduces the layering from every angle. Two failed
+  approaches are worth recording: depth-bias (polygonOffset) is angle-fragile
+  and cannot express pairwise order where three surfaces meet; and lifting
+  along the *shading* normals pushes faces inside the body, because those are
+  lighting data that oppose the winding on most of the sniper's check ring —
+  winding is the outward authority (it is what the hardware culls by). The
+  plane key for tagging must also be quantised coarsely and promoted per
+  (material, plane), or float noise splits a quad's two triangles across the
+  tag boundary.
 - A display-list record has **two** lists. `model.c` draws `Primary` opaque
   (`OPA_SURF`) and then `Secondary` translucent (`XLU_SURF`) — the struct calls
   these "secondary surfaces". They are decals lying exactly on the skin: 12 of

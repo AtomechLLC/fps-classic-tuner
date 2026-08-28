@@ -207,8 +207,6 @@ function geMaterial(m, name = m.name) {
   if (/_sec(_|$)/.test(name)) {    // Secondary display list: decals on the skin
     nm.transparent = true; nm.depthWrite = false;
     nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
-  } else if (/_ovl$/.test(name)) { // later coplanar face wins (DL order)
-    nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
   }
   nm.name = name;
   return nm;
@@ -978,7 +976,7 @@ async function loadGunModel(name) {
     mtl.preload();
     const flashGroups = {};          // flash frame -> [materials]
 
-    function makeGunMat(m) {
+    function makeGunMat(m, seq) {
       const fl = m.name.match(/_fl(\d+)/);
       const lit = /_lit(_|$)/.test(m.name);
       const sec = /_sec(_|$)/.test(m.name);
@@ -1017,12 +1015,10 @@ async function loadGunModel(name) {
       if (sec && !fl) {             // Secondary display list: decal on the skin
         nm.transparent = true; nm.depthWrite = false;
         nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
-      } else if (ovl && !fl) {
-        // Coplanar layering by display-list order (the sniper scope's dark
-        // cover draws over its lens glint): bias the later face forward so it
-        // wins the depth test cleanly instead of shimmering.
-        nm.polygonOffset = true; nm.polygonOffsetFactor = -2; nm.polygonOffsetUnits = -2;
       }
+      // _ovl faces are geometrically lifted 0.75 units in the exporter, so
+      // plain depth testing reproduces the game's DL-order layering; no
+      // depth-bias tricks (they proved angle-fragile).
       nm.name = m.name;
       if (fl) {                     // muzzle-flash frames (header Switches[1])
         nm.transparent = true; nm.blending = THREE.AdditiveBlending;
@@ -1056,6 +1052,9 @@ async function loadGunModel(name) {
       for (const [sl, list] of Object.entries(bySlot))
         (slots[sl] = slots[sl] || []).push({ matName, tris: list });
     }
+    // material sequence = first appearance in the DL (skin.groups preserves it)
+    const matSeq = {};
+    Object.keys(skin.groups).forEach((n, i) => { matSeq[n] = i; });
     for (const [sl, parts] of Object.entries(slots)) {
       const r = rest(sl);
       const isFlashSlot = parts.every(pt => /_fl\d/.test(pt.matName));
@@ -1075,12 +1074,16 @@ async function loadGunModel(name) {
         for (const pt of solid) {
           g.addGroup(index.length, pt.tris.length, mats.length);
           index.push(...pt.tris);
-          mats.push(makeGunMat(mtl.create(pt.matName) || new THREE.MeshBasicMaterial()));
+          mats.push(makeGunMat(mtl.create(pt.matName) || new THREE.MeshBasicMaterial(), matSeq[pt.matName]));
         }
         g.setIndex(index);
         const mesh = new THREE.Mesh(g, mats);
         mesh.position.set(r[0], r[1], r[2]);
         mesh.userData.base = new THREE.Vector3(r[0], r[1], r[2]);
+        // preserve DL order across meshes so coplanar ties resolve like the
+        // game: renderOrder sorts the opaque pass, LessEqualDepth lets the
+        // later draw win at equal depth
+        mesh.renderOrder = Math.min(...solid.map(pt => matSeq[pt.matName]));
         obj.add(mesh);
         slotMesh[sl] = mesh;
       }
@@ -1100,10 +1103,10 @@ async function loadGunModel(name) {
         ng.computeBoundingBox();
         const c = ng.boundingBox.getCenter(new THREE.Vector3());
         ng.translate(-c.x, -c.y, -c.z);        // scale about the flash centre
-        const mesh = new THREE.Mesh(ng, makeGunMat(mtl.create(pt.matName)));
+        const mesh = new THREE.Mesh(ng, makeGunMat(mtl.create(pt.matName), matSeq[pt.matName]));
         mesh.position.copy(c);
         mesh.visible = false;
-        mesh.renderOrder = 10;
+        mesh.renderOrder = 1000;               // flashes above everything
         obj.add(mesh);
         (flashMeshes[+fm[1]] = flashMeshes[+fm[1]] || []).push(mesh);
       }
