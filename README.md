@@ -32,7 +32,8 @@ the decomp via `GE_DECOMP` (defaults to a scratchpad clone).
 python -m http.server 8613
 ```
 
-Open `http://localhost:8613/gallery/`. Mouse aims (pointer lock), click/hold
+Open `http://localhost:8613/gallery/`. WASD moves (GE-style: strafe+forward is
+unnormalised, so diagonals run ~1.4× like the game), mouse aims (pointer lock), click/hold
 fires, **R** or right-click reloads, **Z** (held) zooms scoped weapons, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
 music, **X** dual-wields any `CAN_DUAL_WIELD` weapon (mirrored left copy per
 `MIRROR_DUAL`, pistols alternate hands per `DUAL_WIELD_ALTERNATING_FIRE`,

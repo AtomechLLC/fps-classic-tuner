@@ -1148,6 +1148,7 @@ const state = {
   ret: { x: 0, y: 0 },          // floating crosshair, NDC
   score: 0, shots: 0, hits: 0,
   hostile: false,               // G: guards return fire (visual only)
+  moving: false,
   patrol: false,                // P: some guards walk patrol loops
 };
 
@@ -1505,6 +1506,37 @@ function shoot(now) {
 
 // ---- input ----
 const look = { yaw: 0, pitch: 0 };
+// WASD movement. GE's own quirk is kept deliberately: forward+strafe are NOT
+// normalised, so diagonals run ~1.4x -- the classic GE/PD speedrun strafe.
+const keys = new Set();
+const MOVE_SPEED = 5.0;                  // m/s, Bond's full run
+function moveTick(dt) {
+  if (!locked) return;
+  let mx = 0, mz = 0;
+  if (keys.has('KeyW')) mz += 1;
+  if (keys.has('KeyS')) mz -= 1;
+  if (keys.has('KeyD')) mx += 1;
+  if (keys.has('KeyA')) mx -= 1;
+  state.moving = !!(mx || mz);
+  if (!state.moving) return;
+  const sy = Math.sin(look.yaw), cy = Math.cos(look.yaw);
+  cam.position.x += (-sy * mz + cy * mx) * MOVE_SPEED * dt;
+  cam.position.z += (-cy * mz - sy * mx) * MOVE_SPEED * dt;
+  // stay inside the range walls
+  cam.position.x = Math.max(-RANGE_W / 2 + 0.4, Math.min(RANGE_W / 2 - 0.4, cam.position.x));
+  cam.position.z = Math.max(-RANGE_L + 6.6, Math.min(5.4, cam.position.z));
+  // don't walk through guards or props: cylinder push-out
+  for (const t of targets) {
+    const dx = cam.position.x - t.position.x, dz = cam.position.z - t.position.z;
+    const d2 = dx * dx + dz * dz;
+    if (d2 > 1e-6 && d2 < 0.45 * 0.45) {
+      const dd = Math.sqrt(d2);
+      cam.position.x = t.position.x + dx / dd * 0.45;
+      cam.position.z = t.position.z + dz / dd * 0.45;
+    }
+  }
+}
+document.addEventListener('keyup', e => keys.delete(e.code));
 let locked = false;
 canvas.addEventListener('click', () => {
   if (!locked) {
@@ -1556,6 +1588,7 @@ function toggleHostile() {
   if (el) el.textContent = state.hostile ? 'RANGE IS HOT' : '';
 }
 document.addEventListener('keydown', e => {
+  keys.add(e.code);
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
   if (e.code === 'KeyG') toggleHostile();
@@ -1891,8 +1924,12 @@ function tick() {
     dip = Math.min(rp / 0.25, 1, (1 - rp) / 0.25);
     dip = dip * dip * (3 - 2 * dip);                 // smoothstep
   }
-  const swayAmp = 0.004 * (state.stats ? state.stats.vfx.sway : 1);   // Sway stat
-  gunMount.position.set(dip * 0.03, Math.sin(now * 1.8) * swayAmp - dip * 0.09,
+  moveTick(dt);
+  // gun bob: the Sway stat scales it, and walking swings it harder and faster
+  const bobRate = state.moving ? 6.5 : 1.8;
+  const swayAmp = (state.moving ? 0.011 : 0.004) * (state.stats ? state.stats.vfx.sway : 1);
+  gunMount.position.set(dip * 0.03 + (state.moving ? Math.sin(now * bobRate * 0.5) * swayAmp * 0.7 : 0),
+                        Math.sin(now * bobRate) * swayAmp - dip * 0.09,
                         dip * 0.04);
   gunMount.rotation.set(-dip * 0.42, 0, dip * 0.18);
 
