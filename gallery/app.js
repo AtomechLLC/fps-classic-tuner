@@ -51,6 +51,8 @@ const master = actx.createGain();
 // ?mute silences everything from launch -- used by automated/Claude sessions so
 // test volleys don't play out loud. = raises the volume again if wanted.
 const MUTED = new URLSearchParams(location.search).has('mute');
+// ?level=dam loads real mission geometry instead of the practice range
+const LEVEL = new URLSearchParams(location.search).get('level') || 'range';
 master.gain.value = MUTED ? 0 : 0.30;     // master volume (- / = keys)
 master.connect(actx.destination);
 const bufCache = new Map();
@@ -1412,7 +1414,7 @@ function shoot(now) {
     if (EXPLOSIVE[state.key]) { fireProjectile(state.key, dir); continue; }
     raycaster.set(cam.position, dir);
     raycaster.far = 300;
-    const allHits = raycaster.intersectObjects(targets, true);
+    const allHits = raycaster.intersectObjects(solidObjects(), true);
     // Penetration: the round passes through up to PenetrationObjects bodies
     // (Ruger 10, RC-P90 3, AR33 2); anything that is not an enemy stops it.
     const hits = [];
@@ -1520,8 +1522,25 @@ function moveTick(dt) {
   state.moving = !!(mx || mz);
   if (!state.moving) return;
   const sy = Math.sin(look.yaw), cy = Math.cos(look.yaw);
-  cam.position.x += (-sy * mz + cy * mx) * MOVE_SPEED * dt;
-  cam.position.z += (-cy * mz - sy * mx) * MOVE_SPEED * dt;
+  const dx = (-sy * mz + cy * mx) * MOVE_SPEED * dt;
+  const dz = (-cy * mz - sy * mx) * MOVE_SPEED * dt;
+  if (LEVEL === 'dam') {
+    if (!DAM.ready) { state.moving = false; return; }
+    const nx = cam.position.x + dx, nz = cam.position.z + dz;
+    const len = Math.hypot(dx, dz);
+    // wall: chest-height ray along the move; ground: step must stay walkable
+    _dray.set(new THREE.Vector3(cam.position.x, DAM.groundY + 0.9, cam.position.z),
+              new THREE.Vector3(dx / len, 0, dz / len));
+    _dray.far = len + 0.35;
+    if (_dray.intersectObjects(damNear(nx, nz), false).length) { state.moving = false; return; }
+    const g = damGround(nx, nz);
+    if (g === null || Math.abs(g - DAM.groundY) > 1.1) { state.moving = false; return; }
+    cam.position.x = nx; cam.position.z = nz;
+    DAM.groundY = g;
+    return;
+  }
+  cam.position.x += dx;
+  cam.position.z += dz;
   // stay inside the range walls
   cam.position.x = Math.max(-RANGE_W / 2 + 0.4, Math.min(RANGE_W / 2 - 0.4, cam.position.x));
   cam.position.z = Math.max(-RANGE_L + 6.6, Math.min(5.4, cam.position.z));
@@ -1633,9 +1652,95 @@ for (const k of roster) {
   picker.appendChild(b);
 }
 
+// ---- GE levels: real mission geometry decoded from the bg segment ----
+// One OBJ per level, one mesh per room; extract_bg.py keeps raw bg-file
+// coordinates, so everything (rooms, setup pads) shares one conversion:
+// world units = bg units / levelscale (bgroomtrans.c), and 1 world unit = 1 cm.
+const DAM = { ready: false, rooms: [], groundY: 0 };
+const _dray = new THREE.Raycaster();
+function damNear(x, z, pad = 1.5) {
+  const out = [];
+  for (const r of DAM.rooms) {
+    const b = r.userData.bbox;
+    if (b && x > b.min.x - pad && x < b.max.x + pad &&
+             z > b.min.z - pad && z < b.max.z + pad) out.push(r);
+  }
+  return out;
+}
+function damGround(x, z, up = 1.6, down = 8) {
+  const base = DAM.ready ? DAM.groundY : cam.position.y;
+  _dray.set(new THREE.Vector3(x, base + up, z), new THREE.Vector3(0, -1, 0));
+  _dray.far = up + down;
+  const h = _dray.intersectObjects(damNear(x, z), false)[0];
+  return h ? h.point.y : null;
+}
+/** Bullets and grenades collide with the level in dam mode, targets in range mode. */
+function solidObjects() { return LEVEL === 'dam' ? DAM.rooms : targets; }
+
+async function buildDam() {
+  // outdoors: Siberian overcast instead of the range's indoor gloom
+  scene.background = new THREE.Color(0x4d5a66);
+  scene.fog = new THREE.Fog(0x4d5a66, 90, 460);
+  cam.far = 700; cam.updateProjectionMatrix();
+  const [mtl, meta, setup] = await Promise.all([
+    new MTLLoader().setPath(`${EX}/levels/`).loadAsync('dam.mtl'),
+    fetch(`${EX}/levels/dam.json`, { cache: 'no-cache' }).then(r => r.json()),
+    fetch(`${EX}/setups/dam.json`, { cache: 'no-cache' }).then(r => r.json()),
+  ]);
+  mtl.preload();
+  const obj = await new OBJLoader().setMaterials(mtl).setPath(`${EX}/levels/`).loadAsync('dam.obj');
+  const S = meta.world_per_bg * 0.01;    // bg units -> world units (cm) -> metres
+  obj.scale.setScalar(S);
+  obj.traverse(o => {
+    if (!o.isMesh) return;
+    const mats = Array.isArray(o.material) ? o.material : [o.material];
+    const out = mats.map(m => {
+      const nm = geMaterial(m);
+      // bg geometry is authored against a mix of cull states the room DLs set
+      // as they go; double-sided keeps every wall present from both sides
+      nm.side = THREE.DoubleSide;
+      if (m.opacity !== undefined && m.opacity < 1) {   // MTL "d" = mean vertex alpha (_sec pass)
+        nm.transparent = true; nm.opacity = m.opacity; nm.depthWrite = false;
+      }
+      return nm;
+    });
+    o.material = Array.isArray(o.material) ? out : out[0];
+    o.userData = { hit: 'stone', hp: Infinity, downT: 0, wobble: 0, flash: 0, name: o.name };
+    DAM.rooms.push(o);
+  });
+  scene.add(obj);
+  obj.updateMatrixWorld(true);
+  for (const r of DAM.rooms) r.userData.bbox = new THREE.Box3().setFromObject(r);
+  // spawn on the setup's first pad (the guard post before the first tunnel)
+  const pad = setup.pads[0].pos;
+  cam.position.set(pad[0] * S, pad[1] * S + 1.6, pad[2] * S);
+  look.yaw = 0;   // face down the road toward the first guard post
+  const g = damGround(cam.position.x, cam.position.z, 60, 300);
+  DAM.groundY = g !== null ? g : pad[1] * S;
+  cam.position.y = DAM.groundY + 1.6;
+  DAM.ready = true;
+}
+
+// ---- level picker (start overlay): reload with ?level=, keeping ?mute etc ----
+for (const b of document.querySelectorAll('#levels button')) {
+  if ((b.dataset.level || 'range') === LEVEL) b.classList.add('sel');
+  b.addEventListener('click', e => {
+    e.stopPropagation();
+    if ((b.dataset.level || 'range') === LEVEL) return;
+    const q = new URLSearchParams(location.search);
+    if (b.dataset.level) q.set('level', b.dataset.level); else q.delete('level');
+    location.search = q.toString();
+  });
+}
+if (LEVEL === 'dam') document.getElementById('entermsg').textContent = 'Click to enter the Dam';
+
 // ---- main loop ----
-buildRange();
-buildTargets().then(buildProps);
+if (LEVEL === 'dam') {
+  buildDam();
+} else {
+  buildRange();
+  buildTargets().then(buildProps);
+}
 selectWeapon('wppk');
 
 let last = performance.now() / 1000;
@@ -1802,15 +1907,17 @@ function tick() {
     const dir = u.vel.clone().normalize();
     raycaster.set(p.position, dir);
     raycaster.far = step + 0.15;
-    const hit = raycaster.intersectObjects(targets, true)[0];
+    const hit = raycaster.intersectObjects(solidObjects(), true)[0];
     p.position.addScaledVector(u.vel, dt);
     p.lookAt(p.position.clone().add(dir));
     u.life -= dt;
-    const out = p.position.y <= 0.02 || p.position.z <= -113 || Math.abs(p.position.x) >= 12.8
-      || p.position.z >= 6 || p.position.y >= 6.9;
+    // the range's box bounds double as its collision; the dam's rooms are real hits
+    const out = LEVEL === 'dam' ? false
+      : (p.position.y <= 0.02 || p.position.z <= -113 || Math.abs(p.position.x) >= 12.8
+         || p.position.z >= 6 || p.position.y >= 6.9);
     if (hit || out || u.life <= 0) {
       const at = hit ? hit.point : p.position.clone();
-      at.y = Math.max(at.y, 0.05);
+      if (LEVEL !== 'dam') at.y = Math.max(at.y, 0.05);
       scene.remove(p); projectiles.splice(i, 1);
       explode(at, u.radius, state.stats ? state.stats.damage * 8 : 8);
     }
@@ -1925,6 +2032,9 @@ function tick() {
     dip = dip * dip * (3 - 2 * dip);                 // smoothstep
   }
   moveTick(dt);
+  // in the dam, ease the eye toward the ground the last step landed on
+  if (LEVEL === 'dam' && DAM.ready)
+    cam.position.y += (DAM.groundY + 1.6 - cam.position.y) * Math.min(1, dt * 12);
   // gun bob: the Sway stat scales it, and walking swings it harder and faster
   const bobRate = state.moving ? 6.5 : 1.8;
   const swayAmp = (state.moving ? 0.011 : 0.004) * (state.stats ? state.stats.vfx.sway : 1);

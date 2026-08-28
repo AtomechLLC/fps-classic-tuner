@@ -40,6 +40,9 @@
   #picker button { background: rgba(8,18,8,.7); color: #cfe8cf; border: 1px solid rgba(120,180,120,.3);
     border-radius: 4px; font-size: 11px; padding: 4px 8px; cursor: pointer; }
   #picker button.sel { background: #2c5f2c; color: #fff; border-color: #7c7; }
+  #levels button { background: rgba(8,18,8,.7); color: #cfe8cf; border: 1px solid rgba(120,180,120,.3);
+    border-radius: 4px; font-size: 12px; padding: 5px 12px; cursor: pointer; }
+  #levels button.sel { background: #2c5f2c; color: #fff; border-color: #7c7; }
   #msg { position: absolute; left: 50%; top: 58%; transform: translateX(-50%);
     font-size: 15px; color: #eee; text-shadow: 0 1px 3px #000; text-align: center; }
   #score { position: absolute; left: 18px; top: 14px; font-size: 14px; text-shadow: 0 1px 3px #000; }
@@ -61,7 +64,10 @@
   <div id="score"></div>
   <div id="hostile"></div>
   <div id="patrol"></div>
-  <div id="msg">Click to enter the range<br>
+  <div id="msg"><div id="levels" style="margin-bottom:10px;pointer-events:auto">
+    <button data-level="">Shooting Range</button>
+    <button data-level="dam">Dam</button>
+  </div><span id="entermsg">Click to enter the range</span><br>
     <span style="font-size:12px;color:#9fb99f">WASD — move &nbsp;·&nbsp; mouse — aim &nbsp;·&nbsp; click/hold — fire &nbsp;·&nbsp;
     R — reload &nbsp;·&nbsp; hold RMB — aim / zoom &nbsp;·&nbsp; wheel / [ ] — switch weapon &nbsp;·&nbsp; M — music &nbsp;·&nbsp; G — targets fire back &nbsp;·&nbsp; P — patrols &nbsp;·&nbsp; X — dual wield &nbsp;·&nbsp; - / = — volume &nbsp;·&nbsp; Esc — release mouse</span></div>
 </div>

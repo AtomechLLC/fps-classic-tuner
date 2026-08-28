@@ -16,6 +16,7 @@ python extract_models.py    # OBJ+MTL, 510 models       -> extracted/models/
 python extract_sounds.py    # 261 SFX as WAV            -> extracted/sounds/
 python extract_weapons.py   # ballistics/rates/VFX      -> extracted/weapons/
 python decode_setups.py     # stage setups              -> extracted/setups/
+python extract_bg.py dam    # level (bg) geometry       -> extracted/levels/
 python extract_characters.py # heads, hats, skeletons, roster -> extracted/characters/
 python extract_animations.py # skeletal animations      -> extracted/animations/
 python render_music.py 2    # a music track as WAV      -> extracted/music/
@@ -44,6 +45,13 @@ fire (visual only — off by default),
 planted-foot speed, so feet don't slide),
 `-` / `=` set volume. Launching with `?mute` starts silent (used by automated
 sessions); `=` brings the volume back.
+
+The start overlay has a **level picker**: the practice range (default) or the
+**Dam** — the real mission geometry decoded from the ROM's bg segment
+(`?level=dam` deep-links it). In the dam you spawn on the setup's first pad at
+the road tunnel, walk the whole level with raycast ground-following (steps over
+~1.1 m or walking off an edge are blocked, chest-height rays stop you at
+walls), and bullets and grenades impact the level itself.
 
 Fire rates (60Hz ticks), spread, damage, magazine size, recoil and muzzle-flash
 frames all come from ROM data; gunshots, ricochets and reloads are the decoded
@@ -264,6 +272,23 @@ rediscovered:
 - Rare's own codecs: huffman, RLE, lookup tables, 7 blur predictors, plus a
   zlib/1172 path. 1×1 textures are flat colours used with texture-gen.
 
+**Level backgrounds (`bg/*.seg`)**
+- The bg segs sit raw in the ROM at the file-table offsets (`MANIFEST.txt`);
+  header words `[1]`/`[2]`/`[3]` are room table / portals / env data as
+  segment-0x0F tagged offsets (`off + 0xF1000000` strips the tag).
+- Room table entries (24 bytes): three chunk pointers {point table, primary DL,
+  secondary DL} + `f32 pos[3]`. Entry 0 is null and the last entry is a
+  terminator whose pointers mark section ends — rooms run `1..N-1`.
+- Each chunk is its own 1172 block inside the seg. The point table inflates to
+  a plain N64 `Vtx` array; the DLs are the same Fast3D dialect as the models
+  (`0xC0` texture command with the global image id and s/t wrap modes,
+  `G_VTX` from segment 0x0E = the room's Vtx array, TRI4/TRI1). No lighting is
+  ever enabled — bg is fully prelit by vertex colours, which really do go
+  near-black in shadowed places (tunnel ceilings, the concrete barriers).
+- World space: `bgroomtrans.c` scales rooms by `1/levelscale` — bg-file
+  coordinates × (1/levelscale) are world units (cm), and the setup pads share
+  the bg-file coordinate space (dam: ×4.28).
+
 **Audio**
 - SFX: ALBankFile ctl at `0x2ebde0`, tbl at `0x2f1990`, VADPCM, 22050 Hz.
   Weapon `Sound` is a direct index into this bank.
@@ -279,6 +304,4 @@ rediscovered:
   The `MatrixID2` bend/stretch (a y-only half turn with a scale from
   `modelGetBendStretchScale`) is also skipped — no character model in the range
   uses it.
-- **Level geometry** (`bg/*.seg`) isn't decoded; those files use a different
-  container.
 - Grenades, mines and throwing knives aren't simulated in the range.
