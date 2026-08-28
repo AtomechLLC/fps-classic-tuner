@@ -33,7 +33,7 @@ python -m http.server 8613
 ```
 
 Open `http://localhost:8613/gallery/`. Mouse aims (pointer lock), click/hold
-fires, **R** reloads, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
+fires, **R** or right-click reloads, **Z** (held) zooms scoped weapons, **Tab** / wheel / `[` `]` switches weapon, **M** toggles
 music, **G** toggles the targets returning fire (visual only — off by default),
 **P** sends half the guards walking patrol loops (GE's own `walking` gaits, at
 `chraction.c`'s 0.5× playback with movement matched to each gait's measured

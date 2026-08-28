@@ -1420,11 +1420,10 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mousedown', e => {
   if (locked && e.button === 0) state.firing = true;
-  if (locked && e.button === 2 && state.stats && state.stats.zoom_fov > 0) state.zooming = true;
+  if (locked && e.button === 2) reload();
 });
 document.addEventListener('mouseup', e => {
   if (e.button === 0) state.firing = false;
-  if (e.button === 2) state.zooming = false;
 });
 document.addEventListener('contextmenu', e => { if (locked) e.preventDefault(); });
 function toggleHostile() {
@@ -1438,10 +1437,14 @@ function toggleHostile() {
   const el = document.getElementById('hostile');
   if (el) el.textContent = state.hostile ? 'RANGE IS HOT' : '';
 }
+document.addEventListener('keyup', e => {
+  if (e.code === 'KeyZ') state.zooming = false;
+});
 document.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
   if (e.code === 'KeyG') toggleHostile();
+  if (e.code === 'KeyZ' && state.stats && state.stats.zoom_fov > 0) state.zooming = true;
   if (e.code === 'KeyP') {
     state.patrol = !state.patrol;
     const el = document.getElementById('patrol');
