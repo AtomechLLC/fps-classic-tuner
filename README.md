@@ -146,7 +146,11 @@ rediscovered:
 - Coplanar detail is layered by **display-list order**: the sniper scope's
   dark cover draws over its white lens-glint disc in the same primary list.
   The exporter tags later coplanar faces `_ovl` and the renderer biases them
-  forward, or they shimmer.
+  forward, or they shimmer. The plane key must be quantised coarsely and the
+  tag promoted to every face sharing an overlay's (material, plane): float
+  noise otherwise splits a coplanar quad's two triangles across the boundary,
+  and the unbiased half loses the depth tie — the sniper's check ring rendered
+  one grey triangle.
 - A display-list record has **two** lists. `model.c` draws `Primary` opaque
   (`OPA_SURF`) and then `Secondary` translucent (`XLU_SURF`) — the struct calls
   these "secondary surfaces". They are decals lying exactly on the skin: 12 of

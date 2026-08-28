@@ -398,14 +398,26 @@ class Decoder:
             d = nx*a[0] + ny*a[1] + nz*a[2]
             if nz < 0 or (nz == 0 and (ny < 0 or (ny == 0 and nx < 0))):
                 nx, ny, nz, d = -nx, -ny, -nz, -d
-            return (round(nx, 2), round(ny, 2), round(nz, 2), round(d, 0))
+            # coarse quantisation: float noise in the accumulated origins must
+            # not split a coplanar quad's two triangles into different planes
+            return (round(nx, 1), round(ny, 1), round(nz, 1), round(d))
         seen = {}
         out = set()
+        keys = []
         for i, f in enumerate(self.faces):
             pl = plane(f)
+            keys.append((pl, f[3]))
             if pl is None: continue
             first = seen.setdefault(pl, f[3])
             if first != f[3]:
+                out.add(i)
+        # a quad split across the tag boundary renders half-biased, and the
+        # unbiased triangle loses the depth tie to the surface behind it (the
+        # sniper's check ring showed one grey triangle) -- promote every face
+        # sharing an overlay face's (material, plane)
+        promoted = {(pl, tid) for i, (pl, tid) in enumerate(keys) if i in out and pl}
+        for i, (pl, tid) in enumerate(keys):
+            if pl and (pl, tid) in promoted:
                 out.add(i)
         return out
 
