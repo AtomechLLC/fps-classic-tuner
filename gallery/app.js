@@ -447,7 +447,7 @@ const HAT_BASE = { PhatberetblueZ: 'PhatberetZ', PhatberetredZ: 'PhatberetZ',
 
 const MM = 0.001;                     // character models are in millimetres too
 
-async function mkEnemy(x, z, spec) {
+async function mkEnemy(x, z, spec, y = 0) {
   const g = new THREE.Group();
   const skelName = CHARS.body_skeleton[spec.body] || 'guard';
   const rig = await instanceBody(spec.body, skelName);
@@ -486,10 +486,10 @@ async function mkEnemy(x, z, spec) {
   }
 
   // Stand the figure on the floor: its root joint sits at hip height, so the
-  // drop is wherever the posed feet land.
-  g.position.set(x, 0, z);
+  // drop is wherever the posed feet land (relative to the group's own ground y).
+  g.position.set(x, y, z);
   g.updateWorldMatrix(false, true);
-  rig.holder.position.y = -skinnedBounds(rig).min.y;
+  rig.holder.position.y = g.position.y - skinnedBounds(rig).min.y;
 
   let wepObj = null;
   if (spec.wep) {
@@ -526,7 +526,7 @@ async function mkEnemy(x, z, spec) {
   hpBar.sprite.position.set(0, 2.02, 0);
   g.add(hpBar.sprite);
 
-  g.position.set(x, 0, z);
+  g.position.set(x, y, z);
   g.userData = {
     // chr.c:1656 -- every guard spawns with maxdamage 4.0, so weapon damage
     // straight from WeaponStats gives the real number of hits: four PP7 body
@@ -1537,6 +1537,17 @@ function moveTick(dt) {
     if (g === null || Math.abs(g - DAM.groundY) > 1.1) { state.moving = false; return; }
     cam.position.x = nx; cam.position.z = nz;
     DAM.groundY = g;
+    // same cylinder push-out as the range: no walking through guards or crates
+    for (const t of targets) {
+      if (t.userData.dead) continue;
+      const dx2 = cam.position.x - t.position.x, dz2 = cam.position.z - t.position.z;
+      const d2 = dx2 * dx2 + dz2 * dz2;
+      if (d2 > 1e-6 && d2 < 0.45 * 0.45) {
+        const dd = Math.sqrt(d2);
+        cam.position.x = t.position.x + dx2 / dd * 0.45;
+        cam.position.z = t.position.z + dz2 / dd * 0.45;
+      }
+    }
     return;
   }
   cam.position.x += dx;
@@ -1667,15 +1678,15 @@ function damNear(x, z, pad = 1.5) {
   }
   return out;
 }
-function damGround(x, z, up = 1.6, down = 8) {
-  const base = DAM.ready ? DAM.groundY : cam.position.y;
+function damGround(x, z, up = 1.6, down = 8, baseY = null) {
+  const base = baseY !== null ? baseY : (DAM.ready ? DAM.groundY : cam.position.y);
   _dray.set(new THREE.Vector3(x, base + up, z), new THREE.Vector3(0, -1, 0));
   _dray.far = up + down;
   const h = _dray.intersectObjects(damNear(x, z), false)[0];
   return h ? h.point.y : null;
 }
-/** Bullets and grenades collide with the level in dam mode, targets in range mode. */
-function solidObjects() { return LEVEL === 'dam' ? DAM.rooms : targets; }
+/** What bullets and grenades collide with: the targets, plus the level itself in dam mode. */
+function solidObjects() { return LEVEL === 'dam' ? targets.concat(DAM.rooms) : targets; }
 
 async function buildDam() {
   // outdoors: Siberian overcast instead of the range's indoor gloom
@@ -1714,11 +1725,138 @@ async function buildDam() {
   // spawn on the setup's first pad (the guard post before the first tunnel)
   const pad = setup.pads[0].pos;
   cam.position.set(pad[0] * S, pad[1] * S + 1.6, pad[2] * S);
-  look.yaw = 0;   // face down the road toward the first guard post
+  // face down the road, toward the next pad (the checkpoint tunnel) -- the
+  // spawn pad's own look vector points at the tower stairs beside the pad
+  const p1 = (setup.pads[1] || setup.pads[0]).pos;
+  look.yaw = Math.atan2(-(p1[0] - pad[0]), -(p1[2] - pad[2]));
   const g = damGround(cam.position.x, cam.position.z, 60, 300);
   DAM.groundY = g !== null ? g : pad[1] * S;
   cam.position.y = DAM.groundY + 1.6;
   DAM.ready = true;
+  populateDam(setup, S).catch(e => console.log('populate failed', e));
+}
+
+// ---- populate the level from its stage setup ----
+// Object records give a PROP_* model and a pad; OBJECTS.json (from the
+// decomp's PitemZ_entries / c_item_entries tables) maps those to model files
+// and authored scales. objInit's world size = record scale x extrascale/256,
+// in the same cm units as the guns, so metres = model units x scale x 0.01.
+const DAM_WOOD = /crate|box|desk|table|chair|shelf|card|book|bin1|stool/i;
+function padYaw(pad) { return Math.atan2(pad.look[0], pad.look[2]); }
+
+async function placeDamProp(o, p, pad, S) {
+  const src = await loadProp(p.file);
+  const inst = src.clone(true);
+  const sc = p.scale * (o.extrascale || 1) * 0.01;
+  inst.scale.setScalar(sc);
+  const g = new THREE.Group();
+  g.add(inst);
+  g.rotation.y = padYaw(pad);
+  g.position.set(pad.pos[0] * S, pad.pos[1] * S, pad.pos[2] * S);
+  if (o.type === 'prop') {
+    // pads sit at the object's centre; stand the base on the floor beneath
+    const bb = new THREE.Box3().setFromObject(inst);
+    const gnd = damGround(g.position.x, g.position.z, 2, 6, g.position.y);
+    if (gnd !== null && Math.abs(gnd - g.position.y) < 1.5) g.position.y = gnd - bb.min.y;
+  }
+  g.userData = {
+    hp: Infinity, maxhp: Infinity, downT: 0, wobble: 0, flash: 0,
+    hit: DAM_WOOD.test(p.file) ? 'wood' : 'metal', name: o.model, prop: true,
+  };
+  scene.add(g);
+  targets.push(g);
+}
+
+function placeDamGlass(o, pad, S) {
+  // glass records use 3D pads: a bbox in the pad's own {side, up, look} frame,
+  // one axis flat -- the pane itself
+  const b = pad.bbox;
+  const size = [Math.max(b[1] - b[0], 1), Math.max(b[3] - b[2], 1), Math.max(b[5] - b[4], 1)];
+  const geo = new THREE.BoxGeometry(size[0] * S, size[1] * S, size[2] * S);
+  const tinted = o.type === 'tinted_glass';
+  const mat = new THREE.MeshBasicMaterial({
+    color: tinted ? 0x24343c : 0x9fb8c8, transparent: true,
+    opacity: tinted ? 0.75 : 0.28, depthWrite: false, side: THREE.DoubleSide,
+  });
+  const m = new THREE.Mesh(geo, mat);
+  const up = new THREE.Vector3(...pad.up).normalize();
+  const lk = new THREE.Vector3(...pad.look).normalize();
+  const side = new THREE.Vector3().crossVectors(up, lk);
+  m.matrixAutoUpdate = false;
+  const ctr = new THREE.Vector3()
+    .addScaledVector(side, (b[0] + b[1]) / 2)
+    .addScaledVector(up, (b[2] + b[3]) / 2)
+    .addScaledVector(lk, (b[4] + b[5]) / 2)
+    .add(new THREE.Vector3(...pad.pos)).multiplyScalar(S);
+  m.matrix.makeBasis(side, up, lk).setPosition(ctr);
+  scene.add(m);
+}
+
+async function populateDam(setup, S) {
+  const tables = await fetch(`${EX}/setups/OBJECTS.json`, { cache: 'no-cache' }).then(r => r.json());
+  const padAt = i => (i >= 10000 ? setup.pad3ds[i - 10000] : setup.pads[i]) || null;
+  const WKEY = { PROP_CHRKALASH: 'ak47', PROP_CHRTT33: 'tt33', PROP_CHRSNIPERRIFLE: 'sniperrifle' };
+  // GE randomises guard heads at spawn (head == -1); hats follow the body
+  const HAT_FOR = { ColiveguardZ: 'PhattbirdZ', Cgreatguard2Z: 'PhathelmetgreyZ', CcommguardZ: 'PhattbirdbrownZ' };
+  const NAME_FOR = { ColiveguardZ: 'Russian Soldier', Cgreatguard2Z: 'Siberian Guard', CcommguardZ: 'Russian Commandant' };
+  const maleHeads = CHARS.heads.filter(h => h.hats && Object.keys(h.hats).length);
+  const guards = [];
+  let lastGuard = null;
+  const propJobs = [];
+  for (const o of setup.objects) {
+    const flags = parseInt(o.flags || '0', 16);
+    if (o.type === 'guard') {
+      const body = (tables.bodies[o.body] || {}).file;
+      const pad = padAt(o.pad);
+      if (!body || !pad) { lastGuard = null; continue; }
+      lastGuard = { body, pad, head: maleHeads.length ? maleHeads[(guards.length * 5 + 3) % maleHeads.length].model : null,
+                    hat: HAT_FOR[body] || null, name: NAME_FOR[body] || o.body.replace(/^BODY_/, '').replace(/_/g, ' '),
+                    wep: 'PchrkalashZ', wkey: 'ak47' };
+      guards.push(lastGuard);
+    } else if (o.type === 'collectable' && lastGuard && (flags & 0x4000)) {
+      // a held-item collectable right after a guard is that guard's weapon
+      const p = tables.props[o.model];
+      if (p) {
+        lastGuard.wep = p.file;
+        lastGuard.wkey = WKEY[o.model] || lastGuard.wkey;
+        lastGuard.pistol = o.model === 'PROP_CHRTT33';
+      }
+      lastGuard = null;
+    } else if (o.type === 'glass' || o.type === 'tinted_glass') {
+      const pad = padAt(o.pad);
+      if (pad && pad.bbox) try { placeDamGlass(o, pad, S); } catch (e) { console.log('glass failed', e); }
+    } else if (['prop', 'door', 'monitor', 'multi_monitor', 'safe', 'rack'].includes(o.type)) {
+      const p = tables.props[o.model];
+      const pad = padAt(o.pad);
+      if (p && pad) propJobs.push([o, p, pad]);
+    }
+  }
+  for (const [o, p, pad] of propJobs) {
+    try { await placeDamProp(o, p, pad, S); } catch (e) { console.log('prop failed', o.model, e); }
+  }
+  let gi = 0;
+  for (const spec of guards) {
+    try {
+      const x = spec.pad.pos[0] * S, z = spec.pad.pos[2] * S;
+      // pads sit at floor height; only take the raycast if it agrees, so an
+      // overhang above the pad can't hoist the guard onto its roof
+      const padY = spec.pad.pos[1] * S;
+      const gy = damGround(x, z, 1, 3, padY);
+      const g = await mkEnemy(x, z, spec, gy !== null && Math.abs(gy - padY) < 1.2 ? gy : padY);
+      const yaw = padYaw(spec.pad);
+      g.rotation.y = yaw;
+      g.userData.homeYaw = yaw;
+      if ((gi & 1) === 0) {         // every other guard walks a small beat
+        g.userData.patrol = {
+          points: [[g.position.x - 2.2, g.position.z], [g.position.x, g.position.z - 1.8],
+                   [g.position.x + 2.2, g.position.z], [g.position.x, g.position.z + 1.8]],
+          next: (gi >> 1) % 4,
+        };
+      }
+      gi++;
+    } catch (e) { console.log('guard failed', spec.body, e); }
+  }
+  console.log(`dam populated: ${gi} guards, ${propJobs.length} props`);
 }
 
 // ---- level picker (start overlay): reload with ?level=, keeping ?mute etc ----
@@ -1766,6 +1904,7 @@ function tick() {
   // targets: animation, fall/respawn, wobble, hit flash
   for (const t of targets) {
     const u = t.userData;
+    if (u.dead) continue;               // dam corpses hold their final pose
     if (u.rig && u.anim) {
       // GE animations run at 60 Hz, one bitstream frame per tick; walks play
       // at chraction.c's half rate.
@@ -1803,8 +1942,18 @@ function tick() {
             u.patrol.next = (u.patrol.next + 1) % u.patrol.points.length;
           } else {
             const speed = (WALK_SPEED[u.walkAnim] || 2.19) * (u.animRate || 1);
+            const px = t.position.x, pz = t.position.z;
             t.position.x += dx / dist * speed * dt;
             t.position.z += dz / dist * speed * dt;
+            if (LEVEL === 'dam') {          // walk the terrain, not a flat plane
+              const gy = damGround(t.position.x, t.position.z, 0.5, 1.5, t.position.y);
+              // a guard's beat stays on walkable ground -- no scaling cliffs
+              if (gy !== null && Math.abs(gy - t.position.y) < 0.45) t.position.y = gy;
+              else if (gy === null || Math.abs(gy - t.position.y) >= 0.45) {
+                t.position.x = px; t.position.z = pz;
+                u.patrol.next = (u.patrol.next + 1) % u.patrol.points.length;
+              }
+            }
             // face the walk direction (enemies are authored facing +z)
             const want = Math.atan2(dx, dz);
             let dy = want - t.rotation.y;
@@ -1816,9 +1965,20 @@ function tick() {
         if (u.animName !== 'idle' && u.downT <= 0) {
           u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0; u.animRate = 1;
         }
-        // off duty: turn back to the firing line
-        if (Math.abs(t.rotation.y) > 0.01 && u.downT <= 0)
-          t.rotation.y *= Math.max(0, 1 - dt * 5);
+        // off duty: turn back to the post's own facing (0 = the firing line)
+        const home = u.homeYaw || 0;
+        if (Math.abs(t.rotation.y - home) > 0.01 && u.downT <= 0 && !(state.hostile && LEVEL === 'dam'))
+          t.rotation.y = home + (t.rotation.y - home) * Math.max(0, 1 - dt * 5);
+      }
+      // a hot dam guard squares up to the player before firing
+      if (LEVEL === 'dam' && state.hostile && u.wkey && u.downT <= 0 && canWalk && !(state.patrol && u.patrol)) {
+        const dxp = cam.position.x - t.position.x, dzp = cam.position.z - t.position.z;
+        if (dxp * dxp + dzp * dzp < 3600) {
+          const want = Math.atan2(dxp, dzp);
+          let dy = want - t.rotation.y;
+          while (dy > Math.PI) dy -= TAU; while (dy < -Math.PI) dy += TAU;
+          t.rotation.y += dy * Math.min(1, dt * 4);
+        }
       }
       // The death animations pivot the body around the hip joint, but the
       // animation's root translation isn't decoded, so without help the corpse
@@ -1826,7 +1986,7 @@ function tick() {
       // vertices while falling; once the pose holds, stop paying for it.
       if (u.downT > 0 && !animEnded) {
         t.updateWorldMatrix(true, true);
-        u.rig.holder.position.y -= skinnedBounds(u.rig).min.y;
+        u.rig.holder.position.y += t.position.y - skinnedBounds(u.rig).min.y;
       }
       if (state.hostile && u.wkey && u.downT <= 0 &&
           (u.animName === 'idle' || u.animName.startsWith('walking')) && now >= u.nextFire) {
@@ -1837,6 +1997,8 @@ function tick() {
     if (u.downT > 0) {
       u.downT -= dt;
       if (u.downT <= 0) {
+        // in a real level the dead stay dead; the range recycles its targets
+        if (LEVEL === 'dam' && u.enemy) { u.dead = true; if (u.hpBar) u.hpBar.sprite.visible = false; continue; }
         u.hp = u.maxhp;
         u.lastDmg = 0;
         updateHpBar(t);
@@ -1844,7 +2006,7 @@ function tick() {
           u.anim = u.idleAnim; u.animName = 'idle'; u.frame = 0;
           poseSkeleton(u.rig, u.anim, 0, u.flip);
           t.updateWorldMatrix(true, true);
-          u.rig.holder.position.y -= skinnedBounds(u.rig).min.y;
+          u.rig.holder.position.y += t.position.y - skinnedBounds(u.rig).min.y;
         }
         else t.rotation.x = 0;
       } else if (!u.rig) {

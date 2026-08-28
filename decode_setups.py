@@ -119,7 +119,9 @@ def decode_setup(path):
         if 0 < name_off < len(d):
             e = d.find(b"\x00", name_off)
             name = d[name_off:e].decode("ascii", "replace")
-        plist.append({"pos": [round(x,1) for x in v[0:3]], "name": name})
+        plist.append({"pos": [round(x,1) for x in v[0:3]],
+                      "up": [round(x,3) for x in v[3:6]],
+                      "look": [round(x,3) for x in v[6:9]], "name": name})
     out["pads"] = plist
 
     # pad3ds (64 bytes: pos3 up3 look3 bbox6 name)
@@ -132,6 +134,8 @@ def decode_setup(path):
             e = d.find(b"\x00", name_off)
             name = d[name_off:e].decode("ascii", "replace")
         p3list.append({"pos": [round(x,1) for x in v[0:3]],
+                       "up": [round(x,3) for x in v[3:6]],
+                       "look": [round(x,3) for x in v[6:9]],
                        "bbox": [round(x,1) for x in v[9:15]], "name": name})
     out["pad3ds"] = p3list
 
@@ -155,7 +159,10 @@ def decode_setup(path):
         elif t in OBJRECORD_TYPES:
             model, pad = struct.unpack(">hh", d[pos+4:pos+8])
             flags = struct.unpack(">I", d[pos+8:pos+12])[0]
-            rec.update(model=prop_name(model), pad=pad, flags=f"{flags:#010x}")
+            # header word0 = {u16 extrascale, u8 state, u8 type}; objInit scales
+            # the model by extrascale/256 (0x0100 = authored size)
+            rec.update(model=prop_name(model), pad=pad, flags=f"{flags:#010x}",
+                       extrascale=round((w0 >> 16) / 256.0, 4))
         elif t == 35:  # watch menu objective text
             rec.update(objective=words[1], textid=f"{words[2]:#x}", text=get_text(words[2]))
         elif t == 23:  # objective start

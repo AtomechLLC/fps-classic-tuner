@@ -17,6 +17,7 @@ python extract_sounds.py    # 261 SFX as WAV            -> extracted/sounds/
 python extract_weapons.py   # ballistics/rates/VFX      -> extracted/weapons/
 python decode_setups.py     # stage setups              -> extracted/setups/
 python extract_bg.py dam    # level (bg) geometry       -> extracted/levels/
+python extract_objects.py   # prop/body model tables    -> extracted/setups/OBJECTS.json
 python extract_characters.py # heads, hats, skeletons, roster -> extracted/characters/
 python extract_animations.py # skeletal animations      -> extracted/animations/
 python render_music.py 2    # a music track as WAV      -> extracted/music/
@@ -48,10 +49,25 @@ sessions); `=` brings the volume back.
 
 The start overlay has a **level picker**: the practice range (default) or the
 **Dam** — the real mission geometry decoded from the ROM's bg segment
-(`?level=dam` deep-links it). In the dam you spawn on the setup's first pad at
-the road tunnel, walk the whole level with raycast ground-following (steps over
-~1.1 m or walking off an edge are blocked, chest-height rays stop you at
-walls), and bullets and grenades impact the level itself.
+(`?level=dam` deep-links it). In the dam you spawn on the setup's first pad
+facing the checkpoint tunnel, walk the whole level with raycast
+ground-following (steps over ~1.1 m or walking off an edge are blocked,
+chest-height rays stop you at walls), and bullets and grenades impact the
+level itself.
+
+The dam is **populated from its own stage setup**: all 36 guards stand at
+their setup pads (body models via the decomp's `c_item_entries` table --
+olive-greatcoat Russian Soldiers, helmeted Siberian Guards, the Commandant --
+with GE's randomised heads, body-appropriate hats, and the held weapon taken
+from the guard's own collectable record, KF7 for the rank and file), and all
+~120 object records place their real models via `PitemZ_entries`: the crate
+stacks and oil drums, desks/keyboards/monitors/mainframes in the control
+rooms, the satellite dish, doors (gate, chain-link, tunnel) and the glass
+panes, each scaled by the table's authored scale x the record's
+`extrascale/256` and oriented by its pad's look vector. **G** makes them
+square up to the player and return fire, **P** walks patrol beats that follow
+the terrain, and dead guards stay dead -- the range recycles its targets, a
+mission doesn't.
 
 Fire rates (60Hz ticks), spread, damage, magazine size, recoil and muzzle-flash
 frames all come from ROM data; gunshots, ricochets and reloads are the decoded
