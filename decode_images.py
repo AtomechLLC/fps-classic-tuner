@@ -171,7 +171,13 @@ def colour_to_rgba(c, fmt):
     if fmt == FMT_RGBA16: return rgba5551(c)
     if fmt == FMT_RGB15:  return rgba5551(c << 1 | 1)
     if fmt == FMT_IA16:   return ia88(c)
-    if fmt in (FMT_IA8, FMT_I8): v = c & 0xFF; return (v, v, v, 255)
+    if fmt == FMT_IA8:    v = (c >> 4 & 15) * 17; return (v, v, v, (c & 15) * 17)
+    if fmt == FMT_I8:     v = c & 0xFF; return (v, v, v, 255)
+    # 4-bit formats must expand to 8-bit here just like channels_to_rgba does --
+    # without it every I4 texture on the direct/lookup path came out 0..15
+    # near-black (the dam's checkpoint tower, barriers and tunnel walls)
+    if fmt == FMT_I4:     v = (c & 15) * 17; return (v, v, v, 255)
+    if fmt == FMT_IA4:    v = (c >> 1 & 7) * 255 // 7; return (v, v, v, 255 if c & 1 else 0)
     return (c, c, c, 255)
 
 def decode_nonzlib_image(bs):

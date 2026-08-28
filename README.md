@@ -287,6 +287,11 @@ rediscovered:
   offsets are prefix sums from segment base `0x8f7df0`.
 - Rare's own codecs: huffman, RLE, lookup tables, 7 blur predictors, plus a
   zlib/1172 path. 1×1 textures are flat colours used with texture-gen.
+- The direct/lookup decode paths must expand 4-bit texels to 8-bit exactly like
+  the planar-channel paths do (I4 ×17, IA4 = 3-bit intensity ×255/7 + alpha
+  bit, IA8 = two 4-bit nibbles ×17). Without the expansion every I4 texture on
+  those paths decoded 0..15 near-black -- the dam's concrete (tower, barriers,
+  tunnel walls) and its road-marking decals were the visible casualties.
 
 **Level backgrounds (`bg/*.seg`)**
 - The bg segs sit raw in the ROM at the file-table offsets (`MANIFEST.txt`);

@@ -1689,10 +1689,12 @@ function damGround(x, z, up = 1.6, down = 8, baseY = null) {
 function solidObjects() { return LEVEL === 'dam' ? targets.concat(DAM.rooms) : targets; }
 
 async function buildDam() {
-  // outdoors: Siberian overcast instead of the range's indoor gloom
-  scene.background = new THREE.Color(0x4d5a66);
-  scene.fog = new THREE.Fog(0x4d5a66, 90, 460);
-  cam.far = 700; cam.updateProjectionMatrix();
+  // bgfog.c stage table, LEVELID_DAM: fog colour (0x10,0x30,0x60), the dusk
+  // blue. NearFog 3333 / FarFog 15000 are bg-file units divided by the level's
+  // visibility scale (0.2 for the dam), so the blue haze runs ~165 m..750 m.
+  scene.background = new THREE.Color(0x103060);
+  scene.fog = new THREE.Fog(0x103060, 165, 750);
+  cam.far = 900; cam.updateProjectionMatrix();
   const [mtl, meta, setup] = await Promise.all([
     new MTLLoader().setPath(`${EX}/levels/`).loadAsync('dam.mtl'),
     fetch(`${EX}/levels/dam.json`, { cache: 'no-cache' }).then(r => r.json()),
