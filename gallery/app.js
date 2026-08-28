@@ -1107,6 +1107,11 @@ const state = {
   recoil: 0, kick: 0, flashT: 0,
   movers: {}, slideT: 0, cylFrom: 0, cylTo: 0, cylT: 1, hammerT: 0,
   reloadStart: 0, reloadDur: 0,
+  // gunfire.c recoil: ticks since the shot, or -1 when settled
+  recoilTick: -1, gunRest: null,
+  zooming: false, fovCur: 0, sniperZoom: 15,
+  lastSnd: -1,
+  ret: { x: 0, y: 0 },          // floating crosshair, NDC
   score: 0, shots: 0, hits: 0,
   hostile: false,               // G: guards return fire (visual only)
   patrol: false,                // P: some guards walk patrol loops
@@ -1168,6 +1173,8 @@ async function selectWeapon(key) {
   holder.scale.setScalar(0.1 * GE_CM * P.scale);
   holder.position.set(gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
   holder.rotation.set(P.rx, P.ry, P.rz);
+  state.gunRest = { pos: holder.position.clone(), rot: holder.rotation.clone() };
+  state.recoilTick = -1;
   gunMount.add(holder);
   gunMount.scale.setScalar(1);
   state.gun = holder; state.flashGroups = flashGroups; state.flashMeshes = flashMeshes;
@@ -1260,11 +1267,30 @@ function shoot(now) {
   }
   state.ammo--;
   state.shots++;
-  play(soundById(parseInt(st.sound_id, 16)), { vol: 0.55, pitch: 0.97 + Math.random() * 0.06 });
+  // SoundTriggerRate: automatics only retrigger the gunshot sample every N
+  // ticks (KF7 4, AR33 5, RC-P90 2) -- at full auto the samples would overlap.
+  const strate = st.sound_trigger_rate;
+  if (!strate || now - state.lastSnd >= strate / 60 - 1e-4) {
+    play(soundById(parseInt(st.sound_id, 16)), { vol: 0.55, pitch: 0.97 + Math.random() * 0.06 });
+    state.lastSnd = now;
+  }
+  // start (or re-peak) the gunfire.c recoil envelope
+  if (st.vfx.recoil_up > 0 || st.vfx.recoil_back > 0) state.recoilTick = 0;
+  // gunfire.c noise: firing while the range is hot draws return fire sooner,
+  // scaled by the weapon's AI loudness
+  if (state.hostile) {
+    const loud = Math.min(1, (st.ai_noise.loudness_max || 0) / 25);
+    const tnow = performance.now() / 1000;
+    for (const t of targets)
+      if (t.userData.enemy && t.userData.wkey && t.userData.downT <= 0 && Math.random() < loud * 0.35)
+        t.userData.nextFire = Math.min(t.userData.nextFire, tnow + 0.6 + Math.random() * 1.5);
+  }
   // spread: inaccuracy in GE arbitrary units; scale to radians
   const spread = st.inaccuracy * 0.0022;
   const pellets = (state.key === 'shotgun' || state.key === 'autoshot') ? 5 : 1;
-  const aim = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion).normalize();
+  // shots go through the floating crosshair, not the screen centre
+  raycaster.setFromCamera(new THREE.Vector2(state.ret.x, state.ret.y), cam);
+  const aim = raycaster.ray.direction.clone().normalize();
   const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
   const up = new THREE.Vector3(0, 1, 0).applyQuaternion(cam.quaternion);
   const muzzle = state.muzzleObj ? gunPointWorld(state.muzzleObj, new THREE.Vector3())
@@ -1278,12 +1304,23 @@ function shoot(now) {
     if (EXPLOSIVE[state.key]) { fireProjectile(state.key, dir); continue; }
     raycaster.set(cam.position, dir);
     raycaster.far = 300;
-    const hits = raycaster.intersectObjects(targets, true);
-    const end = hits.length ? hits[0].point
+    const allHits = raycaster.intersectObjects(targets, true);
+    // Penetration: the round passes through up to PenetrationObjects bodies
+    // (Ruger 10, RC-P90 3, AR33 2); anything that is not an enemy stops it.
+    const hits = [];
+    const seenRoots = new Set();
+    for (const hh of allHits) {
+      let root = hh.object;
+      while (root.parent && !root.userData.hit) root = root.parent;
+      if (seenRoots.has(root)) continue;
+      seenRoots.add(root);
+      hits.push(hh);
+      if (!root.userData.enemy || hits.length >= (st.penetration_objects || 1)) break;
+    }
+    const end = hits.length ? hits[hits.length - 1].point
       : cam.position.clone().addScaledVector(dir, 130);
     spawnTracer(muzzle, end);
-    if (hits.length) {
-      const h = hits[0];
+    for (const h of hits) {
       let g = h.object;
       while (g.parent && !g.userData.hit) g = g.parent;
       // chraction.c handles_shot_actors: the part decides everything below
@@ -1320,10 +1357,6 @@ function shoot(now) {
       }
     }
   }
-  shake = Math.min(1, shake + st.vfx.recoil_up * 0.004 + 0.02);
-  // recoil + flash
-  state.recoil = Math.min(1.5, state.recoil + st.vfx.recoil_up * 0.012 + 0.05);
-  state.kick = Math.min(1, state.kick + st.vfx.recoil_back * 0.05 + 0.15);
   state.flashT = 0.055;
   // gunfire.c cycles the action: the slide/bolt (Switches[6]/[7]) throw back
   // by BoltRecoilBack model units and return; a revolver advances its cylinder
@@ -1370,12 +1403,23 @@ document.addEventListener('pointerlockchange', () => {
 });
 document.addEventListener('mousemove', e => {
   if (!locked) return;
-  look.yaw -= e.movementX * 0.0022;
-  look.pitch -= e.movementY * 0.0022;
+  const sens = 0.0022 * (state.fovCur ? Math.min(1, state.fovCur / 46.8) : 1);
+  look.yaw -= e.movementX * sens;
+  look.pitch -= e.movementY * sens;
   look.pitch = Math.max(-1.35, Math.min(1.35, look.pitch));
+  // the crosshair leads the turn and eases back (GE floating aim)
+  state.ret.x = Math.max(-0.16, Math.min(0.16, state.ret.x + e.movementX * 0.0009));
+  state.ret.y = Math.max(-0.13, Math.min(0.13, state.ret.y - e.movementY * 0.0009));
 });
-document.addEventListener('mousedown', e => { if (locked && e.button === 0) state.firing = true; });
-document.addEventListener('mouseup', e => { if (e.button === 0) state.firing = false; });
+document.addEventListener('mousedown', e => {
+  if (locked && e.button === 0) state.firing = true;
+  if (locked && e.button === 2 && state.stats && state.stats.zoom_fov > 0) state.zooming = true;
+});
+document.addEventListener('mouseup', e => {
+  if (e.button === 0) state.firing = false;
+  if (e.button === 2) state.zooming = false;
+});
+document.addEventListener('contextmenu', e => { if (locked) e.preventDefault(); });
 function toggleHostile() {
   state.hostile = !state.hostile;
   if (state.hostile) {
@@ -1402,7 +1446,15 @@ document.addEventListener('keydown', e => {
   if (e.code === 'BracketRight') cycle(1);
   if (e.code === 'BracketLeft') cycle(-1);
 });
-document.addEventListener('wheel', e => cycle(e.deltaY > 0 ? 1 : -1));
+document.addEventListener('wheel', e => {
+  // while the sniper is zoomed the wheel drives its 6.1..60 degree zoom range
+  // (camera_sniper_zoom_in/out); otherwise it switches weapons
+  if (state.zooming && state.key === 'sniperrifle') {
+    state.sniperZoom = Math.max(6.1, Math.min(60, state.sniperZoom * (e.deltaY > 0 ? 1.12 : 1 / 1.12)));
+    return;
+  }
+  cycle(e.deltaY > 0 ? 1 : -1);
+});
 function cycle(d) {
   const list = roster;
   const i = (list.indexOf(state.key) + d + list.length) % list.length;
@@ -1440,8 +1492,6 @@ function tick() {
     if (!fi.auto) state.firing = false;
   }
   // recoil decay
-  state.recoil = Math.max(0, state.recoil - dt * 6);
-  state.kick = Math.max(0, state.kick - dt * 8);
   if (state.flashT > 0) {
     state.flashT -= dt;
     if (state.flashT <= 0 && state.curFlash)
@@ -1608,11 +1658,67 @@ function tick() {
   const shx = shake > 0 ? (Math.random() - 0.5) * shake * 0.03 : 0;
   const shy = shake > 0 ? (Math.random() - 0.5) * shake * 0.03 : 0;
 
-  const kickPitch = state.recoil * 0.03;
+  // GE's recoil moves the GUN, not the view: the camera stays level and the
+  // crosshair stays put (shake is explosions only).
   cam.rotation.set(0, 0, 0);
   cam.rotation.order = 'YXZ';
   cam.rotation.y = look.yaw + shy;
-  cam.rotation.x = look.pitch + kickPitch + shx;
+  cam.rotation.x = look.pitch + shx;
+
+  // zoom: ItemStats Zoom, eased; GE fovs are 4:3 vertical, so convert like
+  // the base FOV (hold the horizontal field on wide windows)
+  {
+    const aspect = cam.aspect || (16 / 9);
+    const fov43 = (state.zooming && state.stats && state.stats.zoom_fov > 0)
+      ? (state.key === 'sniperrifle' ? state.sniperZoom : state.stats.zoom_fov)
+      : GE_FOVY;
+    const h = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(fov43) / 2) * (4 / 3));
+    const want = aspect > 4 / 3
+      ? THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(h / 2) / aspect))
+      : fov43;
+    if (!state.fovCur) state.fovCur = want;
+    state.fovCur += (want - state.fovCur) * Math.min(1, dt * 9);
+    if (Math.abs(state.fovCur - cam.fov) > 0.01) {
+      cam.fov = state.fovCur; cam.updateProjectionMatrix();
+      gunCam.fov = state.fovCur; gunCam.updateProjectionMatrix();
+    }
+  }
+
+  // floating crosshair eases home at CrosshairSpeed; the crosshair element and
+  // the weapon follow it (gunfire.c gunofs += reticle * GunPlay)
+  {
+    const xs = state.stats ? state.stats.crosshair_speed || 0.8 : 0.8;
+    const k = Math.exp(-dt * 4 * xs);
+    state.ret.x *= k; state.ret.y *= k;
+    const el = document.getElementById('crosshair');
+    if (el) el.style.transform =
+      `translate(-50%,-50%) translate(${(state.ret.x * canvas.clientWidth / 2).toFixed(1)}px, ${(-state.ret.y * canvas.clientHeight / 2).toFixed(1)}px)`;
+  }
+
+  // gunfire.c recoil: pitch to RecoilUp degrees muzzle-up and pull back a
+  // RecoilBack/1000 fraction of the gun-to-aim distance (~RecoilBack cm),
+  // rising on a quarter sine over byte0 ticks of RecoilSpeed and recovering
+  // on a half cosine over byte1.
+  if (state.gunRest && state.gun) {
+    const st2 = state.stats;
+    let rk = 0;
+    if (st2 && state.recoilTick >= 0) {
+      const rs = st2.vfx.recoil_speed >>> 0;
+      const rise = (rs >>> 24) & 255 || 4, fall = (rs >>> 16) & 255 || 8;
+      state.recoilTick += dt * 60;
+      if (state.recoilTick < rise) rk = Math.sin(state.recoilTick * Math.PI / 2 / rise);
+      else if (state.recoilTick < rise + fall)
+        rk = Math.cos((state.recoilTick - rise) * Math.PI / fall) * 0.5 + 0.5;
+      else { rk = 0; state.recoilTick = -1; }
+    }
+    const g = state.gun;
+    const play = st2 ? st2.vfx.gun_play : [3, 3, 8.5];
+    g.rotation.x = state.gunRest.rot.x + THREE.MathUtils.degToRad(st2 ? st2.vfx.recoil_up : 0) * rk;
+    g.position.set(
+      state.gunRest.pos.x + state.ret.x * play[2] * 0.01,
+      state.gunRest.pos.y + state.ret.y * play[1] * 0.01,
+      state.gunRest.pos.z + (st2 ? st2.vfx.recoil_back : 0) * 0.01 * rk);
+  }
 
   // gun mount: metres, fixed to camera; recoil pulls back/up
   // Reload dips the weapon down and tilts it out of view, GE-style: ease in
@@ -1623,9 +1729,10 @@ function tick() {
     dip = Math.min(rp / 0.25, 1, (1 - rp) / 0.25);
     dip = dip * dip * (3 - 2 * dip);                 // smoothstep
   }
-  gunMount.position.set(dip * 0.03, Math.sin(now * 1.8) * 0.004 + state.recoil * 0.012 - dip * 0.09,
-                        state.kick * 0.07 + dip * 0.04);
-  gunMount.rotation.set(state.recoil * 0.09 - dip * 0.42, 0, dip * 0.18);
+  const swayAmp = 0.004 * (state.stats ? state.stats.vfx.sway : 1);   // Sway stat
+  gunMount.position.set(dip * 0.03, Math.sin(now * 1.8) * swayAmp - dip * 0.09,
+                        dip * 0.04);
+  gunMount.rotation.set(-dip * 0.42, 0, dip * 0.18);
   // action cycling: slide/bolt throw straight back and return
   if (state.slideT > 0) {
     state.slideT = Math.max(0, state.slideT - dt / 0.11);

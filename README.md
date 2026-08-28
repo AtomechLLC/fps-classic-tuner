@@ -43,7 +43,17 @@ sessions); `=` brings the volume back.
 
 Fire rates (60Hz ticks), spread, damage, magazine size, recoil and muzzle-flash
 frames all come from ROM data; gunshots, ricochets and reloads are the decoded
-SFX, and impact sounds vary by target material.
+SFX, and impact sounds vary by target material. The rest of the WeaponStats
+drive behaviour too: recoil is gunfire.c's -- the gun (not the view) pitches to
+`RecoilUp` degrees and pulls back ~`RecoilBack` cm on a quarter-sine rise and
+half-cosine recovery whose tick counts are the top two bytes of `RecoilSpeed`;
+`Zoom` is the right-mouse zoom (KF7 30°, AR33 20°, sniper 6.1–60° on the wheel);
+`PenetrationObjects` lets a round pass through that many bodies (Ruger 10);
+`SoundTriggerRate` gates the gunshot sample under full auto; `Sway` scales the
+idle bob; the crosshair floats ahead of the turn, eases home at
+`CrosshairSpeed`, and the weapon follows it by `GunPlay`; and firing while the
+range is hot draws return fire sooner in proportion to the weapon's AI
+loudness.
 
 Targets are the guards the game actually places: identities come from the guard
 records in the decoded stage setups, each wears the head and hat model GE would
