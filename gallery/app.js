@@ -146,6 +146,43 @@ function geTex(id, rep = 1) {
 // ---- the range ----
 const RANGE_L = 120, RANGE_W = 26, WALL_H = 7;
 function buildRange() {
+  // lane dividers at the firing line
+  for (const x of [-4, 4]) {
+    const d = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.3, 3),
+      new THREE.MeshLambertMaterial({ color: 0x3a4048 }));
+    d.position.set(x, 0.65, -1.5);
+    scene.add(d);
+  }
+  buildRangeBackdrop();
+}
+
+/** The range lives on the Runway's tarmac instead of a generic grey box: the
+ *  level geometry shifts so the firing line sits at the range origin and the
+ *  lanes run down the airstrip (flat at world y -6.59 for well over 120 m). */
+const RANGE_BG = { rooms: [] };
+async function buildRangeBackdrop() {
+  try {
+    const { obj, rooms } = await loadLevelGeometry('run');
+    // firing line at world (92, -6.59, -105): past the threshold trench, with
+    // the full flat strip ahead and the hangar apron behind the shooter
+    obj.position.set(-92, 6.59, 105);
+    scene.add(obj);
+    obj.updateMatrixWorld(true);
+    for (const r of rooms) r.userData.bbox = new THREE.Box3().setFromObject(r);
+    RANGE_BG.rooms = rooms;
+    // bgfog.c LEVELID_RUNWAY: fog colour (0x10,0x30,0x40) -- the airstrip's
+    // teal night -- NearFog 6000 / FarFog 15000 at visibility 1.0 = 60..150 m
+    scene.background = new THREE.Color(0x103040);
+    scene.fog = new THREE.Fog(0x103040, 60, 150);
+    cam.far = 400; cam.updateProjectionMatrix();
+  } catch (e) {
+    console.log('backdrop failed, building the plain box', e);
+    buildRangeBox();
+  }
+}
+
+/** The original enclosed range, kept as the fallback if the level assets are missing. */
+function buildRangeBox() {
   const floorT = geTex(20, 24);    // GRAVELGREY
   const wallT = geTex(85, 16);     // DARK_CONCRETE_WALL
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(RANGE_W, RANGE_L),
@@ -167,13 +204,6 @@ function buildRange() {
   ceil.rotation.x = Math.PI / 2;
   ceil.position.set(0, WALL_H, -RANGE_L / 2 + 6);
   scene.add(ceil);
-  // lane dividers
-  for (const x of [-4, 4]) {
-    const d = new THREE.Mesh(new THREE.BoxGeometry(0.15, 1.3, 3),
-      new THREE.MeshLambertMaterial({ color: 0x3a4048 }));
-    d.position.set(x, 0.65, -1.5);
-    scene.add(d);
-  }
 }
 
 
@@ -1685,25 +1715,24 @@ function damGround(x, z, up = 1.6, down = 8, baseY = null) {
   const h = _dray.intersectObjects(damNear(x, z), false)[0];
   return h ? h.point.y : null;
 }
-/** What bullets and grenades collide with: the targets, plus the level itself in dam mode. */
-function solidObjects() { return LEVEL === 'dam' ? targets.concat(DAM.rooms) : targets; }
+/** What bullets and grenades collide with: the targets plus the surrounding level. */
+function solidObjects() {
+  return LEVEL === 'dam' ? targets.concat(DAM.rooms) : targets.concat(RANGE_BG.rooms);
+}
 
-async function buildDam() {
-  // bgfog.c stage table, LEVELID_DAM: fog colour (0x10,0x30,0x60), the dusk
-  // blue. NearFog 3333 / FarFog 15000 are bg-file units divided by the level's
-  // visibility scale (0.2 for the dam), so the blue haze runs ~165 m..750 m.
-  scene.background = new THREE.Color(0x103060);
-  scene.fog = new THREE.Fog(0x103060, 165, 750);
-  cam.far = 900; cam.updateProjectionMatrix();
-  const [mtl, meta, setup] = await Promise.all([
-    new MTLLoader().setPath(`${EX}/levels/`).loadAsync('dam.mtl'),
-    fetch(`${EX}/levels/dam.json`, { cache: 'no-cache' }).then(r => r.json()),
-    fetch(`${EX}/setups/dam.json`, { cache: 'no-cache' }).then(r => r.json()),
+/** Load an extract_bg.py level: one mesh per room, GE materials, world scaled
+ *  to metres (bg units x 1/levelscale = cm). Shared by the dam and the range's
+ *  runway backdrop. */
+async function loadLevelGeometry(name) {
+  const [mtl, meta] = await Promise.all([
+    new MTLLoader().setPath(`${EX}/levels/`).loadAsync(`${name}.mtl`),
+    fetch(`${EX}/levels/${name}.json`, { cache: 'no-cache' }).then(r => r.json()),
   ]);
   mtl.preload();
-  const obj = await new OBJLoader().setMaterials(mtl).setPath(`${EX}/levels/`).loadAsync('dam.obj');
+  const obj = await new OBJLoader().setMaterials(mtl).setPath(`${EX}/levels/`).loadAsync(`${name}.obj`);
   const S = meta.world_per_bg * 0.01;    // bg units -> world units (cm) -> metres
   obj.scale.setScalar(S);
+  const rooms = [];
   obj.traverse(o => {
     if (!o.isMesh) return;
     const mats = Array.isArray(o.material) ? o.material : [o.material];
@@ -1719,8 +1748,23 @@ async function buildDam() {
     });
     o.material = Array.isArray(o.material) ? out : out[0];
     o.userData = { hit: 'stone', hp: Infinity, downT: 0, wobble: 0, flash: 0, name: o.name };
-    DAM.rooms.push(o);
+    rooms.push(o);
   });
+  return { obj, rooms, meta, S };
+}
+
+async function buildDam() {
+  // bgfog.c stage table, LEVELID_DAM: fog colour (0x10,0x30,0x60), the dusk
+  // blue. NearFog 3333 / FarFog 15000 are bg-file units divided by the level's
+  // visibility scale (0.2 for the dam), so the blue haze runs ~165 m..750 m.
+  scene.background = new THREE.Color(0x103060);
+  scene.fog = new THREE.Fog(0x103060, 165, 750);
+  cam.far = 900; cam.updateProjectionMatrix();
+  const [{ obj, rooms, S }, setup] = await Promise.all([
+    loadLevelGeometry('dam'),
+    fetch(`${EX}/setups/dam.json`, { cache: 'no-cache' }).then(r => r.json()),
+  ]);
+  DAM.rooms.push(...rooms);
   scene.add(obj);
   obj.updateMatrixWorld(true);
   for (const r of DAM.rooms) r.userData.bbox = new THREE.Box3().setFromObject(r);
@@ -2075,10 +2119,9 @@ function tick() {
     p.position.addScaledVector(u.vel, dt);
     p.lookAt(p.position.clone().add(dir));
     u.life -= dt;
-    // the range's box bounds double as its collision; the dam's rooms are real hits
-    const out = LEVEL === 'dam' ? false
-      : (p.position.y <= 0.02 || p.position.z <= -113 || Math.abs(p.position.x) >= 12.8
-         || p.position.z >= 6 || p.position.y >= 6.9);
+    // both levels have real geometry in solidObjects() now; the floor plane
+    // check just catches a grenade skimming the flat tarmac between rays
+    const out = LEVEL === 'dam' ? false : p.position.y <= 0.02;
     if (hit || out || u.life <= 0) {
       const at = hit ? hit.point : p.position.clone();
       if (LEVEL !== 'dam') at.y = Math.max(at.y, 0.05);

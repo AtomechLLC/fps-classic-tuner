@@ -16,7 +16,7 @@ python extract_models.py    # OBJ+MTL, 510 models       -> extracted/models/
 python extract_sounds.py    # 261 SFX as WAV            -> extracted/sounds/
 python extract_weapons.py   # ballistics/rates/VFX      -> extracted/weapons/
 python decode_setups.py     # stage setups              -> extracted/setups/
-python extract_bg.py dam    # level (bg) geometry       -> extracted/levels/
+python extract_bg.py dam run # level (bg) geometry      -> extracted/levels/
 python extract_objects.py   # prop/body model tables    -> extracted/setups/OBJECTS.json
 python extract_characters.py # heads, hats, skeletons, roster -> extracted/characters/
 python extract_animations.py # skeletal animations      -> extracted/animations/
@@ -46,6 +46,12 @@ fire (visual only — off by default),
 planted-foot speed, so feet don't slide),
 `-` / `=` set volume. Launching with `?mute` starts silent (used by automated
 sessions); `=` brings the volume back.
+
+The practice range is set up on the **Runway's airstrip** -- the real level
+geometry, shifted so the firing line sits just past the threshold trench with
+the lanes running down the runway centreline, snow cliffs to both sides, the
+hangar apron behind the shooter, and the airstrip's teal night fog from
+bgfog.c (60-150 m). Stray rounds and grenades impact the terrain.
 
 The start overlay has a **level picker**: the practice range (default) or the
 **Dam** — the real mission geometry decoded from the ROM's bg segment
