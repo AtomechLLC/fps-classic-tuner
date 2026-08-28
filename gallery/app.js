@@ -1109,7 +1109,7 @@ const state = {
   reloadStart: 0, reloadDur: 0,
   // gunfire.c recoil: ticks since the shot, or -1 when settled
   recoilTick: -1, gunRest: null,
-  zooming: false, fovCur: 0, sniperZoom: 15,
+  zooming: false, fovCur: 0, sniperZoom: 15, adsK: 0,
   lastSnd: -1,
   ret: { x: 0, y: 0 },          // floating crosshair, NDC
   score: 0, shots: 0, hits: 0,
@@ -1420,10 +1420,11 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mousedown', e => {
   if (locked && e.button === 0) state.firing = true;
-  if (locked && e.button === 2) reload();
+  if (locked && e.button === 2) state.zooming = true;   // ADS: hold to aim
 });
 document.addEventListener('mouseup', e => {
   if (e.button === 0) state.firing = false;
+  if (e.button === 2) state.zooming = false;
 });
 document.addEventListener('contextmenu', e => { if (locked) e.preventDefault(); });
 function toggleHostile() {
@@ -1437,14 +1438,10 @@ function toggleHostile() {
   const el = document.getElementById('hostile');
   if (el) el.textContent = state.hostile ? 'RANGE IS HOT' : '';
 }
-document.addEventListener('keyup', e => {
-  if (e.code === 'KeyZ') state.zooming = false;
-});
 document.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
   if (e.code === 'KeyG') toggleHostile();
-  if (e.code === 'KeyZ' && state.stats && state.stats.zoom_fov > 0) state.zooming = true;
   if (e.code === 'KeyP') {
     state.patrol = !state.patrol;
     const el = document.getElementById('patrol');
@@ -1679,6 +1676,7 @@ function tick() {
   // the base FOV (hold the horizontal field on wide windows)
   {
     const aspect = cam.aspect || (16 / 9);
+    state.adsK += ((state.zooming ? 1 : 0) - state.adsK) * Math.min(1, dt * 10);
     const fov43 = (state.zooming && state.stats && state.stats.zoom_fov > 0)
       ? (state.key === 'sniperrifle' ? state.sniperZoom : state.stats.zoom_fov)
       : GE_FOVY;
@@ -1698,7 +1696,7 @@ function tick() {
   // the weapon follow it (gunfire.c gunofs += reticle * GunPlay)
   {
     const xs = state.stats ? state.stats.crosshair_speed || 0.8 : 0.8;
-    const k = Math.exp(-dt * 4 * xs);
+    const k = Math.exp(-dt * 4 * xs * (1 + state.adsK * 5));
     state.ret.x *= k; state.ret.y *= k;
     const el = document.getElementById('crosshair');
     if (el) el.style.transform =
@@ -1723,10 +1721,11 @@ function tick() {
     }
     const g = state.gun;
     const play = st2 ? st2.vfx.gun_play : [3, 3, 8.5];
+    const ads = state.adsK;
     g.rotation.x = state.gunRest.rot.x + THREE.MathUtils.degToRad(st2 ? st2.vfx.recoil_up : 0) * rk;
     g.position.set(
-      state.gunRest.pos.x + state.ret.x * play[2] * 0.01,
-      state.gunRest.pos.y + state.ret.y * play[1] * 0.01,
+      (state.gunRest.pos.x + state.ret.x * play[2] * 0.01) * (1 - ads),
+      state.gunRest.pos.y * (1 - ads * 0.45) + state.ret.y * play[1] * 0.01,
       state.gunRest.pos.z + (st2 ? st2.vfx.recoil_back : 0) * 0.01 * rk);
   }
 
