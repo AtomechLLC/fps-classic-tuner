@@ -125,6 +125,15 @@ rediscovered:
   specular strip that only reads correctly under that light; shown flat it is a
   painted pale streak, and the barrel gloss in reference footage is this
   shading, not a texture effect.
+- Backface culling is data: the display lists set and clear `G_CULL_BACK`
+  (`0x2000`) per record, and the exporter tags cull-cleared faces `_ds`.
+  Forcing DoubleSide draws faces the game culls — harmless mostly, wrong when
+  a view exposes an interior. A mirrored dual-wield copy must swap the cull
+  side, since negative scale flips winding.
+- The zoomed weapon stays at its hip position in GE. Centring a scoped rifle
+  for an aim pose puts the camera dead behind the scope, a view the model was
+  never authored for (its interior shows); only non-scoped weapons take the
+  centred ADS pose.
 - Coplanar detail is layered by **display-list order**: the sniper scope's
   dark cover draws over its white lens-glint disc in the same primary list.
   The exporter tags later coplanar faces `_ovl` and the renderer biases them

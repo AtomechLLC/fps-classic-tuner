@@ -181,16 +181,18 @@ class Decoder:
                     if x == y == z == 0: continue
                     tris.append((x, y, z))
                 env = bool(self.geomode & 0x40000)
+                ds = not (self.geomode & 0x2000)   # G_CULL_BACK clear = two-sided
                 for x, y, z in tris:
                     if vbuf[x] < 0 or vbuf[y] < 0 or vbuf[z] < 0: continue
                     self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex,
-                                       self.cur_switch, lit, env, self.cur_sec))
+                                       self.cur_switch, lit, env, self.cur_sec, ds))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
                 ia, ib, ic = vbuf[a//10], vbuf[b//10], vbuf[c//10]
                 if ia >= 0 and ib >= 0 and ic >= 0:
                     self.faces.append((ia, ib, ic, self.cur_tex, self.cur_switch, lit,
-                                       bool(self.geomode & 0x40000), self.cur_sec))
+                                       bool(self.geomode & 0x40000), self.cur_sec,
+                                       not (self.geomode & 0x2000)))
             # everything else (rdp state, matrices) ignored
 
     def calc_matrices(self, addr, parent, seen=None, parent_id=-1):
@@ -437,16 +439,17 @@ class Decoder:
         uv = []
         for u in self.uvs: uv += [round(u[0], 4), round(u[1], 4)]
 
-        def mat(tid, sw, lit, env, sec, ovl=False):
+        def mat(tid, sw, lit, env, sec, ds, ovl=False):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return (base + ("_lit" if lit else "") + ("_env" if env else "")
-                    + ("_sec" if sec else "") + ("_ovl" if ovl else ""))
+                    + ("_sec" if sec else "") + ("_ds" if ds else "")
+                    + ("_ovl" if ovl else ""))
         ovl = self.overlay_faces()
         groups = {}
-        for i, (a, b, c, tid, sw, lit, env, sec) in enumerate(self.faces):
-            groups.setdefault(mat(tid, sw, lit, env, sec, i in ovl), []).extend((a, b, c))
+        for i, (a, b, c, tid, sw, lit, env, sec, ds) in enumerate(self.faces):
+            groups.setdefault(mat(tid, sw, lit, env, sec, ds, i in ovl), []).extend((a, b, c))
 
         # Half-turn slots carry no bbox of their own; they take the part of
         # the full slot that reads the same joint (they are the same limb).
@@ -469,17 +472,17 @@ class Decoder:
                   open(path + ".skin.json", "w"), separators=(",", ":"))
 
     def export_obj(self, path, name):
-        def mat(tid, sw, lit, env, sec):
+        def mat(tid, sw, lit, env, sec, ds):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return (base + ("_lit" if lit else "") + ("_env" if env else "")
-                    + ("_sec" if sec else ""))
-        used = sorted(set((f[3], f[4], f[5], f[6], f[7]) for f in self.faces),
-                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4]))
+                    + ("_sec" if sec else "") + ("_ds" if ds else ""))
+        used = sorted(set((f[3], f[4], f[5], f[6], f[7], f[8]) for f in self.faces),
+                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4], x[5]))
         with open(path + ".mtl", "w") as m:
-            for tid, sw, lit, env, sec in used:
-                m.write(f"newmtl {mat(tid, sw, lit, env, sec)}\n")
+            for tid, sw, lit, env, sec, ds in used:
+                m.write(f"newmtl {mat(tid, sw, lit, env, sec, ds)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
@@ -511,10 +514,10 @@ class Decoder:
                         nx, ny, nz = nx/ln, ny/ln, nz/ln
                 f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
             last = object()
-            for a, b, c, tid, sw, lit, env, sec in self.faces:
-                key = (tid, sw, lit, env, sec)
+            for a, b, c, tid, sw, lit, env, sec, ds in self.faces:
+                key = (tid, sw, lit, env, sec, ds)
                 if key != last:
-                    f.write(f"usemtl {mat(tid, sw, lit, env, sec)}\n"); last = key
+                    f.write(f"usemtl {mat(tid, sw, lit, env, sec, ds)}\n"); last = key
                 f.write(f"f {a+1}/{a+1}/{a+1} {b+1}/{b+1}/{b+1} {c+1}/{c+1}/{c+1}\n")
 
 def main():

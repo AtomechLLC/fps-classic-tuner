@@ -183,9 +183,10 @@ function geMaterial(m, name = m.name) {
   if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
              map.wrapS = map.wrapT = THREE.RepeatWrapping; }
   const lit = /_lit(_|$)/.test(name);
+  const side = /_ds(_|$)/.test(name) ? THREE.DoubleSide : THREE.FrontSide;
   const nm = lit
-    ? new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide })
-    : new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
+    ? new THREE.MeshLambertMaterial({ map, side })
+    : new THREE.MeshBasicMaterial({ map, side, vertexColors: true });
   if (map) nm.alphaTest = 0.35;
   if (/_sec(_|$)/.test(name)) {    // Secondary display list: decals on the skin
     nm.transparent = true; nm.depthWrite = false;
@@ -966,6 +967,11 @@ async function loadGunModel(name) {
       const lit = /_lit(_|$)/.test(m.name);
       const sec = /_sec(_|$)/.test(m.name);
       const ovl = /_ovl$/.test(m.name);
+      // G_CULL_BACK from the display list: only faces the game leaves
+      // two-sided render two-sided. DoubleSide everywhere was showing the
+      // BACKS of forward-facing detail discs (the sniper's white lens
+      // glint) that the game culls away.
+      const side = /_ds(_|$)/.test(m.name) ? THREE.DoubleSide : THREE.FrontSide;
       const map = m.map || null;
       if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
                  map.wrapS = map.wrapT = THREE.RepeatWrapping; }
@@ -978,20 +984,20 @@ async function loadGunModel(name) {
       if (isEnv && map) {
         // N64 texture generation samples by the VIEW-space normal; a matcap
         // does the same, where baked UVs pinned faces to one texel.
-        nm = new THREE.MeshMatcapMaterial({ matcap: map, side: THREE.DoubleSide });
+        nm = new THREE.MeshMatcapMaterial({ matcap: map, side });
       } else if (flatCol && lit) {  // 1x1 flat colour = solid tinted metal
         const c = (ie && (ie.opaque || ie.avg)) || [24, 24, 28];
         nm = new THREE.MeshPhongMaterial({
           color: new THREE.Color(c[0] / 255, c[1] / 255, c[2] / 255),
-          specular: 0xcccccc, shininess: 26, side: THREE.DoubleSide });
+          specular: 0xcccccc, shininess: 26, side });
       } else if (envStrip && lit) { // specular strip texture: keep the texture, untinted
         nm = new THREE.MeshPhongMaterial({ map, specular: 0xbbbbbb,
-          shininess: 22, side: THREE.DoubleSide });
+          shininess: 22, side });
       } else if (lit) {
         // GunLighting: TEXEL0 * SHADE from vertex normals under GE's gun light.
-        nm = new THREE.MeshLambertMaterial({ map, side: THREE.DoubleSide });
+        nm = new THREE.MeshLambertMaterial({ map, side });
       } else {                      // prelit: baked vertex colours
-        nm = new THREE.MeshBasicMaterial({ map, side: THREE.DoubleSide, vertexColors: true });
+        nm = new THREE.MeshBasicMaterial({ map, side, vertexColors: true });
       }
       if (map && !fl) nm.alphaTest = 0.35;
       if (sec && !fl) {             // Secondary display list: decal on the skin
@@ -1207,7 +1213,21 @@ async function selectWeapon(key) {
     const holderL = new THREE.Group();
     holderL.add(objL);
     holderL.scale.copy(holder.scale);
-    if (st.flags.includes('MIRROR_DUAL')) holderL.scale.x *= -1;
+    if (st.flags.includes('MIRROR_DUAL')) {
+      holderL.scale.x *= -1;
+      // mirroring flips triangle winding: single-sided materials must cull
+      // the opposite face on this copy, so it gets its own swapped clones
+      objL.traverse(o => {
+        if (!o.isMesh) return;
+        const mats = (Array.isArray(o.material) ? o.material : [o.material]).map(mm => {
+          if (mm.side === THREE.DoubleSide) return mm;
+          const c2 = mm.clone();
+          c2.side = mm.side === THREE.FrontSide ? THREE.BackSide : THREE.FrontSide;
+          return c2;
+        });
+        o.material = Array.isArray(o.material) ? mats : mats[0];
+      });
+    }
     holderL.position.set(-gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
     holderL.rotation.copy(holder.rotation);
     gunMount.add(holderL);
@@ -1754,7 +1774,13 @@ function tick() {
   // the base FOV (hold the horizontal field on wide windows)
   {
     const aspect = cam.aspect || (16 / 9);
-    state.adsK += (((state.zooming && !state.gunL) ? 1 : 0) - state.adsK) * Math.min(1, dt * 10);
+    // GE keeps the weapon at its hip position while zooming -- the scoped
+    // rifles were never authored to be seen from dead behind, and centring
+    // them exposed the scope's interior. Only non-scoped weapons take the
+    // centred aim pose; Zoom-stat weapons zoom in place like the game.
+    const wantAds = state.zooming && !state.gunL
+      && !(state.stats && state.stats.zoom_fov > 0);
+    state.adsK += ((wantAds ? 1 : 0) - state.adsK) * Math.min(1, dt * 10);
     const fov43 = (state.zooming && state.stats && state.stats.zoom_fov > 0)
       ? (state.key === 'sniperrifle' ? state.sniperZoom : state.stats.zoom_fov)
       : GE_FOVY;
