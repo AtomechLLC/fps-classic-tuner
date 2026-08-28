@@ -625,7 +625,8 @@ function spawnCasing() {
   const m = new THREE.Mesh(casingGeo, casingMat);
   const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
   const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion);
-  m.position.copy(cam.position).addScaledVector(right, 0.28).addScaledVector(fwd, 0.35)
+  if (state.ejectObj) gunPointWorld(state.ejectObj, m.position);
+  else m.position.copy(cam.position).addScaledVector(right, 0.28).addScaledVector(fwd, 0.35)
     .add(new THREE.Vector3(0, -0.12, 0));
   m.userData = { vel: right.clone().multiplyScalar(1.4 + Math.random())
       .add(new THREE.Vector3(0, 2 + Math.random(), 0)),
@@ -919,7 +920,8 @@ function projMesh(kind) {
 function fireProjectile(kind, dir) {
   const spec = EXPLOSIVE[kind];
   const m = projMesh(kind);
-  m.position.copy(cam.position).addScaledVector(dir, 0.9).add(new THREE.Vector3(0, -0.15, 0));
+  if (state.muzzleObj) gunPointWorld(state.muzzleObj, m.position);
+  else m.position.copy(cam.position).addScaledVector(dir, 0.9).add(new THREE.Vector3(0, -0.15, 0));
   m.lookAt(m.position.clone().add(dir));
   m.userData = { vel: dir.clone().multiplyScalar(spec.speed), grav: spec.grav,
                  radius: spec.radius, life: 6 };
@@ -1081,7 +1083,18 @@ async function loadGunModel(name) {
     const movers = {};
     for (const [label, sl] of Object.entries((MODELS[name] || {}).movers || {}))
       if (slotMesh[sl]) movers[label] = slotMesh[sl];
-    return { obj, flashGroups, flashMeshes, all, flash, movers };
+    // markers: the muzzle is where the flash quads sit (fall back to the front
+    // of the model), the eject port is at the action (slide/bolt rest)
+    const muzzleObj = new THREE.Object3D();
+    if (!flash.isEmpty()) flash.getCenter(muzzleObj.position);
+    else { all.getCenter(muzzleObj.position); muzzleObj.position.z = all.max.z; }
+    obj.add(muzzleObj);
+    const ejectObj = new THREE.Object3D();
+    const action = movers.slide || movers.bolt;
+    if (action) ejectObj.position.copy(action.userData.base).add(new THREE.Vector3(30, 20, 0));
+    else { all.getCenter(ejectObj.position); ejectObj.position.z = all.min.z * 0.3 + all.max.z * 0.7; }
+    obj.add(ejectObj);
+    return { obj, flashGroups, flashMeshes, all, flash, movers, muzzleObj, ejectObj };
   })();
   gunCache.set(name, p);
   return p;
@@ -1099,6 +1112,14 @@ const state = {
   patrol: false,                // P: some guards walk patrol loops
 };
 
+/** World position of a point on the first-person gun. The gun renders in its
+ *  own camera-space scene (gunCam at the origin), so a marker's scene position
+ *  maps to the world through the player camera's matrix. */
+function gunPointWorld(markerObj, out) {
+  markerObj.getWorldPosition(out);
+  return out.applyMatrix4(cam.matrixWorld);
+}
+
 function fireInterval(st) {
   const auto = st.auto_firing_rate_ticks, single = st.single_firing_rate_ticks;
   if (auto !== null && auto !== undefined) return { t: Math.max(auto, 1) / 60, auto: true };
@@ -1114,7 +1135,7 @@ async function selectWeapon(key) {
   state.reloading = false;
   document.querySelectorAll('#picker button').forEach(b =>
     b.classList.toggle('sel', b.dataset.key === key));
-  const { obj, flashGroups, flashMeshes, movers } = await loadGunModel(modelName);
+  const { obj, flashGroups, flashMeshes, movers, muzzleObj, ejectObj } = await loadGunModel(modelName);
   if (state.key !== key) return;
   gunMount.clear();
   const P = window.__P;
@@ -1151,7 +1172,7 @@ async function selectWeapon(key) {
   gunMount.scale.setScalar(1);
   state.gun = holder; state.flashGroups = flashGroups; state.flashMeshes = flashMeshes;
   state.movers = movers; state.slideT = 0; state.cylFrom = 0; state.cylTo = 0; state.cylT = 1;
-  state.hammerT = 0;
+  state.hammerT = 0; state.muzzleObj = muzzleObj; state.ejectObj = ejectObj;
   updateHud();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
@@ -1212,8 +1233,9 @@ function shoot(now) {
   const aim = new THREE.Vector3(0, 0, -1).applyQuaternion(cam.quaternion).normalize();
   const right = new THREE.Vector3(1, 0, 0).applyQuaternion(cam.quaternion);
   const up = new THREE.Vector3(0, 1, 0).applyQuaternion(cam.quaternion);
-  const muzzle = cam.position.clone()
-    .addScaledVector(right, 0.22).addScaledVector(up, -0.18).addScaledVector(aim, 0.6);
+  const muzzle = state.muzzleObj ? gunPointWorld(state.muzzleObj, new THREE.Vector3())
+    : cam.position.clone()
+      .addScaledVector(right, 0.22).addScaledVector(up, -0.18).addScaledVector(aim, 0.6);
   for (let pi = 0; pi < pellets; pi++) {
     const dir = aim.clone()
       .addScaledVector(right, (Math.random()-0.5)*spread)

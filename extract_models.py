@@ -511,7 +511,9 @@ def main():
         if not dec.faces:
             failed.append(name); continue
         dec.export_obj(os.path.join(OUT, name), name)
-        if len(set(dec.vmtx)) > 1:
+        # every model gets the sidecar: single-slot guns (sniper rifle, rocket
+        # launcher) still need it now that the gun renderer builds from it
+        if dec.vmtx:
             dec.export_skin(os.path.join(OUT, name))
         switches = {}
         for f in dec.faces:
