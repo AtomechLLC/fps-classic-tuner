@@ -178,10 +178,26 @@ function buildRange() {
 /** The material rules for GE props and characters, shared so a skinned body
  *  and a static prop are shaded identically. `skinning` needs no flag in three
  *  r150+; the SkinnedMesh drives it. */
+// N64 s/t sampling modes from the texture command, encoded in the material
+// name as _w<state><t>: 0 wrap, 1 mirror, 2/3 clamp. Mirrored art stores half a
+// symmetric image; Repeat instead of MirroredRepeat cuts circles in half.
+const WRAP_MODES = [THREE.RepeatWrapping, THREE.MirroredRepeatWrapping,
+                    THREE.ClampToEdgeWrapping, THREE.ClampToEdgeWrapping];
+function applyWrap(map, name) {
+  const wm = name.match(/_w(\d)(\d)/);
+  const ws = wm ? WRAP_MODES[+wm[1]] : THREE.RepeatWrapping;
+  const wt = wm ? WRAP_MODES[+wm[2]] : THREE.RepeatWrapping;
+  let m2 = map;
+  if (ws !== THREE.RepeatWrapping || wt !== THREE.RepeatWrapping) {
+    m2 = map.clone(); m2.needsUpdate = true;   // wrap is per-usage, texture is shared
+  }
+  m2.magFilter = THREE.NearestFilter; m2.colorSpace = THREE.SRGBColorSpace;
+  m2.wrapS = ws; m2.wrapT = wt;
+  return m2;
+}
+
 function geMaterial(m, name = m.name) {
-  const map = m.map || null;
-  if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
-             map.wrapS = map.wrapT = THREE.RepeatWrapping; }
+  const map = m.map ? applyWrap(m.map, name) : null;
   const lit = /_lit(_|$)/.test(name);
   const side = /_ds(_|$)/.test(name) ? THREE.DoubleSide : THREE.FrontSide;
   const nm = lit
@@ -972,9 +988,7 @@ async function loadGunModel(name) {
       // BACKS of forward-facing detail discs (the sniper's white lens
       // glint) that the game culls away.
       const side = /_ds(_|$)/.test(m.name) ? THREE.DoubleSide : THREE.FrontSide;
-      const map = m.map || null;
-      if (map) { map.magFilter = THREE.NearestFilter; map.colorSpace = THREE.SRGBColorSpace;
-                 map.wrapS = map.wrapT = THREE.RepeatWrapping; }
+      const map = m.map ? applyWrap(m.map, m.name) : null;
       let nm;
       const tid = +(m.name.match(/^tex_(\d+)/) || [0, -1])[1];
       const ie = IMAGES[tid];
@@ -1153,6 +1167,7 @@ async function selectWeapon(key) {
   const modelName = `G${key}Z`;
   if (!MODELS[modelName]) return;
   state.key = key; state.stats = st;
+  state.zooming = false;
   state.ammo = st.mag_size > 0 ? st.mag_size : Infinity;
   state.ammoL = (state.dual && st.flags.includes('CAN_DUAL_WIELD') && st.mag_size > 0) ? st.mag_size : 0;
   state.reloading = false;
@@ -1514,11 +1529,16 @@ document.addEventListener('mousemove', e => {
 });
 document.addEventListener('mousedown', e => {
   if (locked && e.button === 0) state.firing = true;
-  if (locked && e.button === 2) state.zooming = true;   // ADS: hold to aim
+  if (locked && e.button === 2) {
+    // scoped weapons: tap toggles the zoom (a quick click-and-release was
+    // unzooming before the ease was even visible); others: hold to aim
+    if (state.stats && state.stats.zoom_fov > 0) state.zooming = !state.zooming;
+    else state.zooming = true;
+  }
 });
 document.addEventListener('mouseup', e => {
   if (e.button === 0) state.firing = false;
-  if (e.button === 2) state.zooming = false;
+  if (e.button === 2 && !(state.stats && state.stats.zoom_fov > 0)) state.zooming = false;
 });
 document.addEventListener('contextmenu', e => { if (locked) e.preventDefault(); });
 function toggleHostile() {

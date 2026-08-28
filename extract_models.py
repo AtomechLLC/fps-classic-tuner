@@ -93,6 +93,8 @@ class Decoder:
         # renderer can blend rather than depth-fight with the primary skin.
         self.cur_sec = False
         self.cur_mtx_id = 0           # matrix slot the current vertices bind to
+        self.cur_wrap = (0, 0)        # s/t sampling mode from the texture command
+        self.env_uvs = []             # per-vertex texture-gen uv, or None
         self.vmtx = []                # per-vertex matrix slot, parallel to verts
         self.tree = {}                # matrix slot -> {origin, parent, joint, half}
         self.hitparts = {}            # matrix slot -> HITTARGET part number (op-10 bbox)
@@ -113,9 +115,14 @@ class Decoder:
     def vertex(self, addr, translate, lit):
         x, y, z, f, s, t = struct.unpack(">6h", self.d[addr:addr+12])
         translate = self.cur_mtx
-        w, h = self.tex.get(self.cur_tex, (32, 32))
-        u = s / 32.0 / max(w, 1)
-        v = 1.0 - t / 32.0 / max(h, 1)
+        # Store RAW texel coordinates (s10.5 fixed point). Normalising here
+        # against the currently loaded texture is wrong: the RSP's vertex
+        # buffer persists across texture switches, so vertices loaded under a
+        # 32x32 texture are frequently drawn under 64x64 art -- normalising at
+        # load time doubled those UVs and tiled the sniper eyepiece's single
+        # lens circle into arcs. Faces normalise against THEIR texture at
+        # export instead.
+        env_uv = None
         self.verts.append((x+translate[0], y+translate[1], z+translate[2]))
         self.vmtx.append(self.cur_mtx_id)
         if lit:   # colour slots hold a signed vertex normal
@@ -124,11 +131,11 @@ class Decoder:
             nx, ny, nz = nx/ln, ny/ln, nz/ln
             self.attrs.append((nx, ny, nz))
             if self.geomode & 0x40000:   # G_TEXTURE_GEN: UVs come from the normal
-                u = nx * 0.5 + 0.5
-                v = 1.0 - (ny * 0.5 + 0.5)
+                env_uv = (nx * 0.5 + 0.5, 1.0 - (ny * 0.5 + 0.5))
         else:     # prelit vertex colour
             self.attrs.append((self.d[addr+12]/255, self.d[addr+13]/255, self.d[addr+14]/255))
-        self.uvs.append((u, v))
+        self.uvs.append((s / 32.0, t / 32.0))
+        self.env_uvs.append(env_uv)
         self.lit.append(lit)
         return len(self.verts) - 1
 
@@ -153,7 +160,11 @@ class Decoder:
             elif cmd == 0xB6:      # G_CLEARGEOMETRYMODE
                 self.geomode &= ~w1
             elif cmd == 0xC0:
-                self.cur_tex = w1 & 0xFFFF
+                self.cur_tex = w1 & 0xFFF
+                # tex.c texLoadFromGdl: s/t sampling modes ride in w0 --
+                # 0 wrap, 1 mirror, 2/3 clamp. Mirrored art stores half a
+                # symmetric image (the sniper scope's lens rings).
+                self.cur_wrap = ((w0 >> 22) & 3, (w0 >> 20) & 3)
             elif cmd == 0x04:      # G_VTX
                 n = ((w0 >> 20) & 0xF) + 1
                 v0 = (w0 >> 16) & 0xF
@@ -185,14 +196,15 @@ class Decoder:
                 for x, y, z in tris:
                     if vbuf[x] < 0 or vbuf[y] < 0 or vbuf[z] < 0: continue
                     self.faces.append((vbuf[x], vbuf[y], vbuf[z], self.cur_tex,
-                                       self.cur_switch, lit, env, self.cur_sec, ds))
+                                       self.cur_switch, lit, env, self.cur_sec, ds,
+                                       self.cur_wrap))
             elif cmd == 0xBF:  # TRI1
                 a, b, c = (w1 >> 16) & 0xFF, (w1 >> 8) & 0xFF, w1 & 0xFF
                 ia, ib, ic = vbuf[a//10], vbuf[b//10], vbuf[c//10]
                 if ia >= 0 and ib >= 0 and ic >= 0:
                     self.faces.append((ia, ib, ic, self.cur_tex, self.cur_switch, lit,
                                        bool(self.geomode & 0x40000), self.cur_sec,
-                                       not (self.geomode & 0x2000)))
+                                       not (self.geomode & 0x2000), self.cur_wrap))
             # everything else (rdp state, matrices) ignored
 
     def calc_matrices(self, addr, parent, seen=None, parent_id=-1):
@@ -359,6 +371,14 @@ class Decoder:
             return
         if nxt: self.node(nxt, translate, slot_in)
 
+    def face_uv(self, vi, tid, env):
+        """UV for vertex vi as used by a face textured with tid."""
+        if env and self.env_uvs[vi] is not None:
+            return self.env_uvs[vi]
+        w, h = self.tex.get(tid, (32, 32))
+        rs, rt = self.uvs[vi]
+        return (rs / max(w, 1), 1.0 - rt / max(h, 1))
+
     def overlay_faces(self):
         """Faces drawn coplanar over an earlier face of another material.
 
@@ -413,12 +433,32 @@ class Decoder:
             tree[m] = e
             pending.append(e["parent"])
 
+        # Faces normalise UVs against their own texture, so a vertex shared by
+        # faces of differently-sized textures needs one copy per distinct UV.
+        remap = {}          # (vi, uv) -> new index
+        order = []          # new index -> (vi, uv)
+        def emit(vi, tid, env):
+            uv = self.face_uv(vi, tid, env)
+            key = (vi, round(uv[0], 4), round(uv[1], 4))
+            if key not in remap:
+                remap[key] = len(order)
+                order.append((vi, uv))
+            return remap[key]
+        new_faces = []
+        for f in self.faces:
+            a2, b2, c2, tid = f[0], f[1], f[2], f[3]
+            env = f[6]
+            new_faces.append((emit(a2, tid, env), emit(b2, tid, env), emit(c2, tid, env)) + tuple(f[3:]))
+
         pos, col = [], []
-        for i, v in enumerate(self.verts):
-            a = self.mtx.get(self.vmtx[i], (0.0, 0.0, 0.0))
+        vmtx2 = []
+        for vi, uv in order:
+            v = self.verts[vi]
+            a = self.mtx.get(self.vmtx[vi], (0.0, 0.0, 0.0))
             pos += [round(v[0] - a[0], 2), round(v[1] - a[1], 2), round(v[2] - a[2], 2)]
-            r, g, b = (1.0, 1.0, 1.0) if self.lit[i] else self.attrs[i]
+            r, g, b = (1.0, 1.0, 1.0) if self.lit[vi] else self.attrs[vi]
             col += [round(r, 3), round(g, 3), round(b, 3)]
+            vmtx2.append(self.vmtx[vi])
         # normals, same rebuild rules as the OBJ writer (degenerates from faces)
         geo = [[0.0, 0.0, 0.0] for _ in self.verts]
         for a2, b2, c2, *_r in self.faces:
@@ -429,27 +469,28 @@ class Decoder:
             for vi in (a2, b2, c2):
                 geo[vi][0] += fx; geo[vi][1] += fy; geo[vi][2] += fz
         nrm = []
-        for i in range(len(self.verts)):
-            nx, ny, nz = self.attrs[i] if self.lit[i] else (0.0, 0.0, 0.0)
+        for vi, uv in order:
+            nx, ny, nz = self.attrs[vi] if self.lit[vi] else (0.0, 0.0, 0.0)
             if abs(nx) + abs(ny) + abs(nz) < 1e-6:
-                nx, ny, nz = geo[i]
+                nx, ny, nz = geo[vi]
                 ln = (nx*nx + ny*ny + nz*nz) ** 0.5
                 nx, ny, nz = (0.0, 1.0, 0.0) if ln < 1e-9 else (nx/ln, ny/ln, nz/ln)
             nrm += [round(nx, 3), round(ny, 3), round(nz, 3)]
-        uv = []
-        for u in self.uvs: uv += [round(u[0], 4), round(u[1], 4)]
+        uvflat = []
+        for vi, uv in order: uvflat += [round(uv[0], 4), round(uv[1], 4)]
 
-        def mat(tid, sw, lit, env, sec, ds, ovl=False):
+        def mat(tid, sw, lit, env, sec, ds, wrap, ovl=False):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return (base + ("_lit" if lit else "") + ("_env" if env else "")
                     + ("_sec" if sec else "") + ("_ds" if ds else "")
+                    + (f"_w{wrap[0]}{wrap[1]}" if wrap != (0, 0) else "")
                     + ("_ovl" if ovl else ""))
         ovl = self.overlay_faces()
         groups = {}
-        for i, (a, b, c, tid, sw, lit, env, sec, ds) in enumerate(self.faces):
-            groups.setdefault(mat(tid, sw, lit, env, sec, ds, i in ovl), []).extend((a, b, c))
+        for i, (a, b, c, tid, sw, lit, env, sec, ds, wrap) in enumerate(new_faces):
+            groups.setdefault(mat(tid, sw, lit, env, sec, ds, wrap, i in ovl), []).extend((a, b, c))
 
         # Half-turn slots carry no bbox of their own; they take the part of
         # the full slot that reads the same joint (they are the same limb).
@@ -460,8 +501,8 @@ class Decoder:
             if k not in hitparts and v["joint"] in by_joint:
                 hitparts[k] = by_joint[v["joint"]]
         json.dump({"matrices": {str(k): v for k, v in sorted(tree.items())},
-                   "vertexMatrix": self.vmtx,
-                   "position": pos, "uv": uv, "color": col, "normal": nrm,
+                   "vertexMatrix": vmtx2,
+                   "position": pos, "uv": uvflat, "color": col, "normal": nrm,
                    "groups": groups,
                    # rest = the slot's translation with the gunfire.c runtime
                    # overrides applied -- group at rest + bone-space vertices
@@ -472,17 +513,18 @@ class Decoder:
                   open(path + ".skin.json", "w"), separators=(",", ":"))
 
     def export_obj(self, path, name):
-        def mat(tid, sw, lit, env, sec, ds):
+        def mat(tid, sw, lit, env, sec, ds, wrap):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return (base + ("_lit" if lit else "") + ("_env" if env else "")
-                    + ("_sec" if sec else "") + ("_ds" if ds else ""))
-        used = sorted(set((f[3], f[4], f[5], f[6], f[7], f[8]) for f in self.faces),
-                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4], x[5]))
+                    + ("_sec" if sec else "") + ("_ds" if ds else "")
+                    + (f"_w{wrap[0]}{wrap[1]}" if wrap != (0, 0) else ""))
+        used = sorted(set((f[3], f[4], f[5], f[6], f[7], f[8], f[9]) for f in self.faces),
+                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4], x[5], str(x[6])))
         with open(path + ".mtl", "w") as m:
-            for tid, sw, lit, env, sec, ds in used:
-                m.write(f"newmtl {mat(tid, sw, lit, env, sec, ds)}\n")
+            for tid, sw, lit, env, sec, ds, wrap in used:
+                m.write(f"newmtl {mat(tid, sw, lit, env, sec, ds, wrap)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
@@ -491,7 +533,22 @@ class Decoder:
             for i, v in enumerate(self.verts):
                 r, g, b = (1.0, 1.0, 1.0) if self.lit[i] else self.attrs[i]
                 f.write(f"v {v[0]} {v[1]} {v[2]} {r:.3f} {g:.3f} {b:.3f}\n")
-            for u in self.uvs: f.write(f"vt {u[0]:.4f} {u[1]:.4f}\n")
+            # per-face-texture UVs (raw texel coords / that face's texture)
+            vt_map = {}
+            vt_list = []
+            face_vt = []
+            for fc in self.faces:
+                tid, env = fc[3], fc[6]
+                tri = []
+                for vi in fc[:3]:
+                    uvv = self.face_uv(vi, tid, env)
+                    key = (round(uvv[0], 4), round(uvv[1], 4))
+                    if key not in vt_map:
+                        vt_map[key] = len(vt_list)
+                        vt_list.append(key)
+                    tri.append(vt_map[key])
+                face_vt.append(tri)
+            for u in vt_list: f.write(f"vt {u[0]:.4f} {u[1]:.4f}\n")
             # Some models store degenerate (0,0,0) vertex normals. Those normalize
             # to NaN in a shader and render pure black, so rebuild them from face
             # geometry (area-weighted) and fall back to +Y if still undefined.
@@ -514,11 +571,12 @@ class Decoder:
                         nx, ny, nz = nx/ln, ny/ln, nz/ln
                 f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
             last = object()
-            for a, b, c, tid, sw, lit, env, sec, ds in self.faces:
-                key = (tid, sw, lit, env, sec, ds)
+            for fi, (a, b, c, tid, sw, lit, env, sec, ds, wrap) in enumerate(self.faces):
+                key = (tid, sw, lit, env, sec, ds, wrap)
                 if key != last:
-                    f.write(f"usemtl {mat(tid, sw, lit, env, sec, ds)}\n"); last = key
-                f.write(f"f {a+1}/{a+1}/{a+1} {b+1}/{b+1}/{b+1} {c+1}/{c+1}/{c+1}\n")
+                    f.write(f"usemtl {mat(tid, sw, lit, env, sec, ds, wrap)}\n"); last = key
+                t0, t1, t2 = face_vt[fi]
+                f.write(f"f {a+1}/{t0+1}/{a+1} {b+1}/{t1+1}/{b+1} {c+1}/{t2+1}/{c+1}\n")
 
 def main():
     only = sys.argv[1:] or None

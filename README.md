@@ -125,6 +125,15 @@ rediscovered:
   specular strip that only reads correctly under that light; shown flat it is a
   painted pale streak, and the barrel gloss in reference footage is this
   shading, not a texture effect.
+- **Never normalise UVs at vertex-load time.** The RSP's vertex buffer
+  persists across texture switches, so vertices loaded under a 32×32 texture
+  are frequently drawn under 64×64 art. UVs are raw s10.5 texel coordinates,
+  normalised per FACE against that face's texture at export (duplicating a
+  vertex when differently-sized textures share it). Getting this wrong tiled
+  the sniper eyepiece's single lens circle into repeating arcs.
+- The texture command's w0 carries s/t sampling modes (0 wrap, 1 mirror, 2/3
+  clamp), exported as a `_w<st>` material suffix. Mirrored art stores half a
+  symmetric image; Repeat instead of MirroredRepeat cuts circles in half.
 - Backface culling is data: the display lists set and clear `G_CULL_BACK`
   (`0x2000`) per record, and the exporter tags cull-cleared faces `_ds`.
   Forcing DoubleSide draws faces the game culls — harmless mostly, wrong when
