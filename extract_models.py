@@ -553,18 +553,24 @@ class Decoder:
                   open(path + ".skin.json", "w"), separators=(",", ":"))
 
     def export_obj(self, path, name):
-        def mat(tid, sw, lit, env, sec, ds, wrap):
+        def mat(tid, sw, lit, env, sec, ds, wrap, ovl=False):
             base = f"tex_{tid}"
             if isinstance(sw, tuple):
                 base += (f"_fl{sw[1]}" if sw[0] == 'fl' else f"_sw{sw[0]}_{sw[1]}")
             return (base + ("_lit" if lit else "") + ("_env" if env else "")
                     + ("_sec" if sec else "") + ("_ds" if ds else "")
-                    + (f"_w{wrap[0]}{wrap[1]}" if wrap != (0, 0) else ""))
-        used = sorted(set((f[3], f[4], f[5], f[6], f[7], f[8], f[9]) for f in self.faces),
-                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4], x[5], str(x[6])))
+                    + (f"_w{wrap[0]}{wrap[1]}" if wrap != (0, 0) else "")
+                    + ("_ovl" if ovl else ""))
+        # the MTL must define every name the skin groups use -- _ovl included:
+        # a missing entry loads as an unmapped grey material (the sniper ring's
+        # "untextured" triangles were exactly the _ovl half of each facet)
+        ovl = self.overlay_faces()
+        used = sorted(set((f[3], f[4], f[5], f[6], f[7], f[8], f[9], i in ovl)
+                          for i, f in enumerate(self.faces)),
+                      key=lambda x: (str(x[0]), str(x[1]), x[2], x[3], x[4], x[5], str(x[6]), x[7]))
         with open(path + ".mtl", "w") as m:
-            for tid, sw, lit, env, sec, ds, wrap in used:
-                m.write(f"newmtl {mat(tid, sw, lit, env, sec, ds, wrap)}\n")
+            for tid, sw, lit, env, sec, ds, wrap, ov in used:
+                m.write(f"newmtl {mat(tid, sw, lit, env, sec, ds, wrap, ov)}\n")
                 png = self.texmap.get(tid)
                 if png: m.write(f"map_Kd ../images/{png}\n")
                 m.write("\n")
@@ -612,9 +618,9 @@ class Decoder:
                 f.write(f"vn {nx:.3f} {ny:.3f} {nz:.3f}\n")
             last = object()
             for fi, (a, b, c, tid, sw, lit, env, sec, ds, wrap) in enumerate(self.faces):
-                key = (tid, sw, lit, env, sec, ds, wrap)
+                key = (tid, sw, lit, env, sec, ds, wrap, fi in ovl)
                 if key != last:
-                    f.write(f"usemtl {mat(tid, sw, lit, env, sec, ds, wrap)}\n"); last = key
+                    f.write(f"usemtl {mat(tid, sw, lit, env, sec, ds, wrap, fi in ovl)}\n"); last = key
                 t0, t1, t2 = face_vt[fi]
                 f.write(f"f {a+1}/{t0+1}/{a+1} {b+1}/{t1+1}/{b+1} {c+1}/{t2+1}/{c+1}\n")
 

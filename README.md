@@ -155,7 +155,10 @@ rediscovered:
   winding is the outward authority (it is what the hardware culls by). The
   plane key for tagging must also be quantised coarsely and promoted per
   (material, plane), or float noise splits a quad's two triangles across the
-  tag boundary.
+  tag boundary. And the MTL must define every name the skin groups use —
+  `_ovl` included: `MTLLoader.create` on a missing name silently yields an
+  unmapped grey material, which rendered every overlay triangle untextured
+  and mimicked a geometry bug convincingly enough to burn a day.
 - A display-list record has **two** lists. `model.c` draws `Primary` opaque
   (`OPA_SURF`) and then `Secondary` translucent (`XLU_SURF`) — the struct calls
   these "secondary surfaces". They are decals lying exactly on the skin: 12 of
