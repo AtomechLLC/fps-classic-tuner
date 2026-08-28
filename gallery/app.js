@@ -1276,6 +1276,12 @@ function shoot(now) {
   }
   // start (or re-peak) the gunfire.c recoil envelope
   if (st.vfx.recoil_up > 0 || st.vfx.recoil_back > 0) state.recoilTick = 0;
+  // the recoil also kicks the aim cursor: up with RecoilUp plus a little
+  // sideways scatter, and CrosshairSpeed walks it back home -- so automatic
+  // fire climbs unless the player pulls against it
+  state.ret.y = Math.min(0.13, state.ret.y + st.vfx.recoil_up * 0.0045);
+  state.ret.x = Math.max(-0.16, Math.min(0.16,
+    state.ret.x + (Math.random() - 0.5) * st.vfx.recoil_up * 0.0022));
   // gunfire.c noise: firing while the range is hot draws return fire sooner,
   // scaled by the weapon's AI loudness
   if (state.hostile) {
