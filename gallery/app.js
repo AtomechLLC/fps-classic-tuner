@@ -1177,6 +1177,43 @@ async function selectWeapon(key) {
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
 
+// Per-parameter bar chart, normalised against the whole rack so a bar means
+// the same thing on every weapon. Values are the ROM's own numbers.
+const STAT_ROWS = [
+  { label: 'damage',  get: st => st.damage },
+  { label: 'rate',    get: st => Math.round(60 / fireInterval(st).t), unit: 'rpm' },
+  { label: 'mag',     get: st => st.mag_size },
+  { label: 'spread',  get: st => st.inaccuracy },
+  { label: 'recoil',  get: st => st.vfx.recoil_up },
+  { label: 'kick',    get: st => st.vfx.recoil_back },
+  { label: 'pierce',  get: st => st.penetration_objects },
+  { label: 'noise',   get: st => st.ai_noise.loudness_max },
+];
+// Robust scale: the Golden Gun's damage (100, against the Ruger's 2.5) would
+// flatten every other bar, so when the top value is a big outlier the scale is
+// the runner-up and the outlier clamps at full.
+const STAT_MAX = STAT_ROWS.map(r => {
+  // distinct values, descending; the scale is the largest one that is not a
+  // >3x outlier over the next (both golden guns tie at damage 100, so ties
+  // must collapse before the outlier test)
+  const u = [...new Set(ROSTER.map(k => r.get(WEAPONS[k]) || 0))].sort((a, b) => b - a);
+  let scale = u[u.length - 1] || 0;
+  for (let i = 0; i < u.length - 1; i++)
+    if (u[i] <= 3 * u[i + 1]) { scale = u[i]; break; }
+  return Math.max(scale, 1e-6);
+});
+
+function statBars(st) {
+  return STAT_ROWS.map((r, i) => {
+    const v = r.get(st) || 0;
+    const pct = Math.min(100, v / STAT_MAX[i] * 100);
+    const txt = (Number.isInteger(v) ? v : v.toFixed(1)) + (r.unit ? ' ' + r.unit : '');
+    return `<div class="sbrow"><span class="sbl">${r.label}</span>` +
+      `<span class="sbt"><span class="sbf" style="width:${pct.toFixed(1)}%"></span></span>` +
+      `<span class="sbv">${txt}</span></div>`;
+  }).join('');
+}
+
 function updateHud() {
   const st = state.stats;
   if (!st) return;
@@ -1185,13 +1222,10 @@ function updateHud() {
     : (state.ammo === Infinity ? '∞'
        : `<span class="ge-reserve">∞</span> <span class="ge-bullet">▮</span> ${state.ammo}`);
   const fi = fireInterval(st);
-  const rpm = Math.round(60 / fi.t);
   document.getElementById('stats').innerHTML =
-    `<b>${DISPLAY[state.key] || state.key}</b><br>` +
-    `damage <b>${st.damage}</b> · spread <b>${st.inaccuracy}</b><br>` +
-    `${fi.auto ? 'auto' : 'single'} · <b>${rpm}</b> rpm · mag <b>${st.mag_size}</b><br>` +
-    `penetration <b>${st.penetration_objects}</b> · loudness <b>${st.ai_noise.loudness_max}</b><br>` +
-    `sound <b>${(st.sound_name || '').replace('_SFX','')}</b>`;
+    `<b>${DISPLAY[state.key] || state.key}</b> · ${fi.auto ? 'auto' : 'single'}` +
+    ` · ${(st.sound_name || '').replace('_SFX','').toLowerCase()}<br>` +
+    statBars(st);
   document.getElementById('score').innerHTML =
     `hits <b>${state.hits}</b> / ${state.shots} &nbsp; score <b>${state.score}</b>`;
 }
