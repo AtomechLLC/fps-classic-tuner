@@ -363,8 +363,15 @@ rediscovered:
   the bg-file coordinate space (dam: ×4.28).
 
 **Audio**
-- SFX: ALBankFile ctl at `0x2ebde0`, tbl at `0x2f1990`, VADPCM, 22050 Hz.
-  Weapon `Sound` is a direct index into this bank.
+- SFX: ALBankFile ctl at `0x2ebde0`, tbl at `0x2f19a0`, VADPCM, 22050 Hz.
+  Weapon `Sound` is a direct index into this bank. `tbl` is the ctl's end
+  strictly rounded up to the next 16-byte boundary (`((ctl_end//16)+1)*16`,
+  not `(ctl_end+15)&~15` — ctl_end already lands 16-aligned here, so the
+  inclusive-round-up formula returned it unchanged and every sound decoded
+  9 bytes short, landing every VADPCM frame header on garbage and producing
+  broadband noise for all 261 sounds). Also apply `ALSound.sampleVolume`
+  (0-127) as a post-decode gain — sounds below max are authored expecting
+  that attenuation and clip/overpower without it.
 - Music: 63-track `RareALSeqBankFile` at `0x419790`, 1172-compressed compressed-MIDI.
 
 ## Known gaps

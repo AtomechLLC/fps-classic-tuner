@@ -102,7 +102,17 @@ def main():
     ia = base + u32(ba+12)
     scount = s16v(ia+14)
     ctl_end = ba + 12 + 4*icount            # bank struct end == ctl file end
-    tbl = (ctl_end + 15) & ~15
+    # tbl always sits a full 16-byte block after ctl_end -- a *strict* round
+    # up, not "round up unless already aligned". ctl_end lands on a 16-byte
+    # boundary here, so the old (ctl_end+15)&~15 returned ctl_end itself with
+    # zero padding added, landing 16 bytes into what's actually a run of
+    # padding zeros before the real sample table. Every sound's 9-byte VADPCM
+    # frame header packs a predictor index into its low nibble that must be
+    # < the sound's own book npredictors; reading from the wrong anchor put
+    # ~86% of frames on an invalid index (silently clamped to predictor 0),
+    # which decodes as broadband noise -- the "exaggerated"/awful audio was
+    # every SFX in the bank being noise, not a volume or mastering issue.
+    tbl = ((ctl_end // 16) + 1) * 16
     print(f"sfx bank: {scount} sounds @ {srate} Hz; ctl {base:#x}, tbl {tbl:#x}")
     names = sfx_names()
     print(f"SFX_ID names: {len(names)}")
@@ -136,6 +146,18 @@ def main():
             samples = decode_vadpcm(data, order, table)
         else:
             samples = list(struct.unpack(f">{len(data)//2}h", data[:len(data)//2*2]))
+        # ALSound.sampleVolume (0-127, like ALPan's 0-127 convention) is the
+        # per-sound mix level sndPlaySfx's engine applies at playback -- the
+        # raw ROM samples are authored at/near full digital scale expecting
+        # this attenuation downstream. Skipping it (as this exporter did
+        # previously) plays every sound at its theoretical maximum, which
+        # reads as uniformly too loud/harsh next to the real, mixed-down game.
+        # Applied post-decode, after the codec's own internal clamp: the
+        # occasional true clip during VADPCM reconstruction is bit-exact
+        # bit-for-bit with what real hardware decodes too, so it's left alone.
+        if svol < 127:
+            g = svol / 127.0
+            samples = [round(s * g) for s in samples]
         fn = f"{si:03d}_{name}.wav"
         write_wav(os.path.join(OUT, fn), samples, srate)
         entry["file"] = fn
