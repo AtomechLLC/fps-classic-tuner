@@ -83,7 +83,7 @@ function toggleMusic() {
 async function loadBuf(url) {
   if (!url) return null;
   if (!bufCache.has(url)) {
-    bufCache.set(url, fetch(url).then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).catch(() => null));
+    bufCache.set(url, fetch(url, { cache: 'no-cache' }).then(r => r.arrayBuffer()).then(b => actx.decodeAudioData(b)).catch(() => null));
   }
   return bufCache.get(url);
 }
@@ -472,6 +472,11 @@ const ENEMIES = [
   { body: 'CtechmanZ',      head: 'CheadchrisZ',     hat: null,              name: 'Scientist' },
   { body: 'CtechwomanZ',    head: 'CheadsallyZ',     hat: null,              name: 'Civilian', female: true },
 ];
+// Jaws: GE's one designated heavy (BODY_Jaws, a single spawn in the whole ROM,
+// azt only). Named-cast bodies sculpt the head in, so head/hat are null; he's
+// unarmed in every appearance -- a melee threat, not a shooter. hp is a
+// SetMyHealthTotal-style override (see mkEnemy) well above the grunt default.
+const HEAVY = { body: 'CjawsZ', head: null, hat: null, name: 'Jaws', hp: 64 };
 const HEAD_BY_MODEL = Object.fromEntries(CHARS.heads.map(h => [h.model, h]));
 // The colour variants are the same mesh as the entry the table is keyed on.
 const HAT_BASE = { PhatberetblueZ: 'PhatberetZ', PhatberetredZ: 'PhatberetZ',
@@ -492,10 +497,15 @@ async function mkEnemy(x, z, spec, y = 0) {
   // The head is its own model in GE, attached at the neck joint; chr.c renders
   // it with the neck's matrix. SKEL_NECK is joint 3, so parent the head to
   // whichever bone reads that joint and it follows the animation for free.
+  // Unique named-cast bodies (Jaws, Trevelyan, ...) sculpt the head into the
+  // body mesh itself instead of using the generic interchangeable head prop,
+  // so spec.head is null for those and there's nothing to attach here.
   const neck = rig.bones.find(b => b.userData.joint === 3) || rig.bones[0];
-  const head = (await loadProp(spec.head)).clone(true);
-  head.userData.zone = 'head';        // the hit test walks ancestors for this
-  neck.add(head);
+  if (spec.head) {
+    const head = (await loadProp(spec.head)).clone(true);
+    head.userData.zone = 'head';      // the hit test walks ancestors for this
+    neck.add(head);
+  }
 
   if (spec.hat) {
     const key = HAT_BASE[spec.hat] || spec.hat;
@@ -563,8 +573,10 @@ async function mkEnemy(x, z, spec, y = 0) {
   g.userData = {
     // chr.c:1656 -- every guard spawns with maxdamage 4.0, so weapon damage
     // straight from WeaponStats gives the real number of hits: four PP7 body
-    // shots, one Golden Gun round.
-    hp: CHARS.guard_max_damage, maxhp: CHARS.guard_max_damage,
+    // shots, one Golden Gun round. A level's AI script can override this per
+    // character with SetMyHealthTotal (aicommands.def GUARD_SET_HEALTH_TOTAL)
+    // to make a specific guard tougher -- spec.hp mirrors that same override.
+    hp: spec.hp ?? CHARS.guard_max_damage, maxhp: spec.hp ?? CHARS.guard_max_damage,
     hit: 'flesh', downT: 0, wobble: 0, flash: 0,
     name: spec.name, female: !!spec.female, enemy: true,
     rig, anim: idle, idleAnim: idle, frame: Math.random() * idle.frames,
@@ -581,15 +593,19 @@ async function mkEnemy(x, z, spec, y = 0) {
 
 async function buildTargets() {
   const lanes = [-6.5, 0, 6.5];
-  const rows = [-14, -32, -55, -85];
+  const rows = [-14, -32, -55, -85, -110, -132];
   let i = 0;
   for (const z of rows)
     for (const x of lanes) {
       const spec = ENEMIES[i % ENEMIES.length];
       const patrols = (i % 2) === 1;            // every other guard walks a beat
       i++;
+      // the front row's centre lane sits directly between the player and
+      // Jaws (0, -20) -- shift that one target out past the right lane so
+      // he isn't the first thing blocking the shot to the heavy.
+      const lx = (z === -14 && x === 0) ? 9.5 : x;
       try {
-        const g = await mkEnemy(x + (Math.abs(z) % 7) * 0.1 - 0.3, z, spec);
+        const g = await mkEnemy(lx + (Math.abs(z) % 7) * 0.1 - 0.3, z, spec);
         if (patrols) {
           const hx = g.position.x, hz = g.position.z;
           const rx = 2.2, rz = Math.min(1.8, Math.abs(hz) - 6 > 0 ? 1.8 : 0.8);
@@ -601,6 +617,9 @@ async function buildTargets() {
       }
       catch (e) { console.log('enemy failed', spec.body, e); }
     }
+  // one heavy, dead centre of the firing lanes, ahead of the regular grid
+  try { await mkEnemy(0, -20, HEAVY); }
+  catch (e) { console.log('heavy failed', e); }
 }
 
 /** Real GoldenEye props: material test pieces and range dressing. */
