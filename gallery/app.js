@@ -2494,17 +2494,19 @@ function tick() {
   if (w < 8 || h < 8) return;
   if (canvas.width !== w * renderer.getPixelRatio() || canvas.height !== h * renderer.getPixelRatio()) {
     renderer.setSize(w, h, false);
-    const aspect = w / h;
-    // GE renders 4:3 at 60 degrees vertical, i.e. a ~75 degree horizontal
-    // field. Hold THAT constant: on wide windows the vertical FOV shrinks
-    // (vert-) instead of the horizontal blowing out to ~91 degrees at 16:9,
-    // which stretched everything near the screen edges.
-    const hFromGE = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(GE_FOVY) / 2) * (4 / 3));
-    const vfov = a => THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(hFromGE / 2) / Math.max(a, 0.4)));
-    cam.aspect = aspect;
-    cam.fov = aspect > (4 / 3) ? vfov(aspect) : GE_FOVY;
+    // fov itself is NOT set here -- the zoom block above already recomputes
+    // it every frame from cam.aspect (GE's 4:3-vertical hold, un-zoomed or
+    // not), and is the single owner of cam.fov/gunCam.fov. This block used to
+    // also assign cam.fov directly on every detected resize; on a fixed-size
+    // test viewport that only ever fires once at load and is harmless, but on
+    // a real window it can re-trigger most frames (fractional devicePixelRatio,
+    // a docked DevTools panel nudging clientWidth by sub-pixel amounts), which
+    // silently overwrote the zoom block's fov right back to the un-zoomed
+    // default every frame -- zooming eased fovCur correctly the whole time,
+    // it just never reached the screen.
+    cam.aspect = w / h;
     cam.updateProjectionMatrix();
-    gunCam.aspect = aspect; gunCam.fov = cam.fov; gunCam.near = window.__P.near;
+    gunCam.aspect = cam.aspect; gunCam.near = window.__P.near;
     gunCam.updateProjectionMatrix();
   }
   renderer.autoClear = true;
