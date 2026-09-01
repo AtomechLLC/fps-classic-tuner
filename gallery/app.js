@@ -1411,7 +1411,7 @@ function fireInterval(st) {
 }
 
 async function selectWeapon(key) {
-  const st = WEAPONS[key];
+  const st = activeStats(key);          // stock ROM stats, or the editor's tune
   const modelName = `G${key}Z`;
   if (!MODELS[modelName]) return;
   state.key = key; state.stats = st;
@@ -1506,6 +1506,7 @@ async function selectWeapon(key) {
   state.cylFrom = [0, 0]; state.cylTo = [0, 0]; state.cylT = [1, 1]; state.hammerT = [0, 0];
   state.muzzleObj = muzzleObj; state.ejectObj = ejectObj;
   updateHud();
+  renderEditor();
   loadBuf(soundById(parseInt(st.sound_id, 16)));
 }
 
@@ -1549,7 +1550,8 @@ function statBars(st) {
 function updateHud() {
   const st = state.stats;
   if (!st) return;
-  document.getElementById('wname').textContent = DISPLAY[state.key] || state.key;
+  document.getElementById('wname').textContent = (DISPLAY[state.key] || state.key)
+    + (MODS[state.key] && MODS[state.key].on ? ' ⚙TUNED' : '');
   const fmt = n => n === Infinity ? '∞'
     : `<span class="ge-reserve">∞</span> <span class="ge-bullet">▮</span> ${n}`;
   document.getElementById('ammo').innerHTML =
@@ -1565,6 +1567,206 @@ function updateHud() {
   document.getElementById('score').innerHTML =
     `hits <b>${state.hits}</b> / ${state.shots} &nbsp; score <b>${state.score}</b>`;
 }
+
+// ---- weapon editor ----
+// WEAPONS keeps the ROM's own numbers untouched; edits live in a per-weapon
+// deep clone here, and `on` flips which of the two state.stats points at.
+// Everything the sim reads (fire rate, spread, recoil, zoom...) is read live
+// per shot/frame, so a swap or slider drag takes effect on the very next one.
+const MODS = {};                        // key -> { stats: clone, on: bool }
+function activeStats(key) {
+  const m = MODS[key];
+  return m && m.on ? m.stats : WEAPONS[key];
+}
+function modFor(key) {
+  if (!MODS[key]) MODS[key] = { stats: JSON.parse(JSON.stringify(WEAPONS[key])), on: false };
+  return MODS[key];
+}
+const edGet = (o, p) => p.split('.').reduce((a, k) => a == null ? a : a[k], o);
+function edSet(o, p, v) {
+  const ks = p.split('.'), last = ks.pop();
+  ks.reduce((a, k) => a[k], o)[last] = v;
+}
+// One row per WeaponStats field the gallery reads (plus the two the sim
+// doesn't use yet, marked °). auto ticks is nullable: null = semi-auto,
+// so it gets a checkbox that writes null when cleared.
+const ED_FIELDS = [
+  { path: 'damage',                     label: 'damage',       min: 0,   max: 100, step: 0.1 },
+  { path: 'auto_firing_rate_ticks',     label: 'auto ticks',   min: 1,   max: 30,  step: 1, nullable: true },
+  { path: 'single_firing_rate_ticks',   label: 'single ticks', min: 0,   max: 60,  step: 1 },
+  { path: 'mag_size',                   label: 'mag size',     min: 0,   max: 100, step: 1 },
+  { path: 'inaccuracy',                 label: 'spread',       min: 0,   max: 60,  step: 0.5 },
+  { path: 'penetration_objects',        label: 'pierce',       min: 0,   max: 10,  step: 1 },
+  { path: 'zoom_fov',                   label: 'zoom fov',     min: 0,   max: 60,  step: 1 },
+  { path: 'crosshair_speed',            label: 'xhair speed',  min: 0,   max: 2,   step: 0.05 },
+  { path: 'sound_trigger_rate',         label: 'snd every',    min: 0,   max: 10,  step: 1 },
+  { path: 'ai_noise.loudness_max',      label: 'ai loudness',  min: 0,   max: 200, step: 1 },
+  { path: 'force_of_impact',            label: 'impact °',     min: 0,   max: 20,  step: 0.5 },
+  { path: 'aim_lock_speed',             label: 'aim lock °',   min: 0,   max: 1,   step: 0.01 },
+  { path: 'vfx.recoil_up',              label: 'recoil up',    min: 0,   max: 30,  step: 0.1 },
+  { path: 'vfx.recoil_back',            label: 'recoil back',  min: 0,   max: 30,  step: 0.1 },
+  { path: 'vfx.bolt_recoil_back',       label: 'slide travel', min: 0,   max: 30,  step: 0.1 },
+  { path: 'vfx.muzzle_flash_extension', label: 'flash size',   min: 0,   max: 10,  step: 0.1 },
+  { path: 'vfx.sway',                   label: 'sway',         min: 0,   max: 5,   step: 0.05 },
+  { path: 'vfx.ejects_cartridges',      label: 'eject brass',  bool: true },
+  { path: 'vfx.gun_screen_pos.0',       label: 'gun x',        min: -40, max: 40,  step: 0.5 },
+  { path: 'vfx.gun_screen_pos.1',       label: 'gun y',        min: -40, max: 40,  step: 0.5 },
+  { path: 'vfx.gun_screen_pos.2',       label: 'gun z',        min: -40, max: 40,  step: 0.5 },
+  { path: 'vfx.gun_play.0',             label: 'play x',       min: 0,   max: 20,  step: 0.5 },
+  { path: 'vfx.gun_play.1',             label: 'play y',       min: 0,   max: 20,  step: 0.5 },
+  { path: 'vfx.gun_play.2',             label: 'play z',       min: 0,   max: 20,  step: 0.5 },
+];
+
+/** Re-point state.stats after an edit or A/B swap and refresh what depends on it. */
+function applyStats() {
+  const st = activeStats(state.key);
+  state.stats = st;
+  // mag ammo is a snapshot taken at weapon select; re-snapshot within the new cap
+  state.ammo = st.mag_size > 0
+    ? Math.min(state.ammo === Infinity ? st.mag_size : state.ammo, st.mag_size) : Infinity;
+  if (state.gunL) state.ammoL = st.mag_size > 0 ? Math.min(state.ammoL, st.mag_size) : 0;
+  // gun_screen_pos was baked into the holder's rest pose at build time; the
+  // per-frame sway/recoil recomputes from gunRest, so updating that is enough
+  const GE_CM = 0.01, P = window.__P;
+  const [gx, gy, gz] = st.vfx.gun_screen_pos;
+  if (state.gunRest) state.gunRest.pos.set(gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
+  if (state.gunRestL) state.gunRestL.pos.set(-gx * GE_CM * P.pos, gy * GE_CM * P.pos, gz * GE_CM * P.pos);
+  updateHud();
+  refreshEditor();
+}
+
+function toggleTuned() {
+  const m = MODS[state.key];
+  if (!m) return;                       // nothing edited on this weapon yet
+  m.on = !m.on;
+  applyStats();
+}
+
+const edRows = [];                      // live input refs for refresh-in-place
+function renderEditor() {
+  const el = document.getElementById('editor');
+  const btn = document.getElementById('edbtn');
+  if (!el || !btn) return;
+  btn.classList.toggle('sel', !!state.editorOpen);
+  el.style.display = state.editorOpen ? '' : 'none';
+  if (!state.editorOpen) return;
+  const key = state.key;
+  const m = MODS[key];
+  edRows.length = 0;
+  el.innerHTML = '';
+  const head = document.createElement('div');
+  head.className = 'edhead';
+  head.innerHTML = `<h3 style="flex:1">${DISPLAY[key] || key}</h3>`;
+  const ab = document.createElement('button');
+  ab.id = 'edab';
+  ab.onclick = toggleTuned;
+  const rs = document.createElement('button');
+  rs.textContent = 'reset';
+  rs.onclick = () => { delete MODS[key]; applyStats(); renderEditor(); };
+  head.append(ab, rs);
+  el.appendChild(head);
+  const stMod = m ? m.stats : WEAPONS[key];   // rows show the tune-in-progress
+  for (const f of ED_FIELDS) {
+    const orig = edGet(WEAPONS[key], f.path);
+    if (orig === undefined) continue;         // field absent on this weapon
+    const row = document.createElement('div');
+    row.className = 'edrow';
+    const lab = document.createElement('label');
+    lab.textContent = f.label;
+    lab.title = f.path;
+    row.appendChild(lab);
+    if (f.bool) {
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = !!edGet(stMod, f.path);
+      cb.onchange = () => onEdit(f, cb.checked);
+      row.appendChild(cb);
+      edRows.push({ f, row, cb });
+    } else {
+      let cb = null;
+      if (f.nullable) {
+        cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.title = 'off = semi-auto (null)';
+        row.appendChild(cb);
+      }
+      const rng = document.createElement('input');
+      rng.type = 'range';
+      rng.min = f.min; rng.max = f.max; rng.step = f.step;
+      const num = document.createElement('input');
+      num.type = 'number';
+      num.min = f.min; num.max = f.max; num.step = f.step;
+      const cur = edGet(stMod, f.path);
+      rng.value = num.value = cur ?? f.min;
+      if (cb) {
+        cb.checked = cur != null;
+        rng.disabled = num.disabled = cur == null;
+        cb.onchange = () => onEdit(f, cb.checked ? +rng.value : null);
+      }
+      rng.oninput = () => { num.value = rng.value; onEdit(f, +rng.value); };
+      num.onchange = () => { rng.value = num.value; onEdit(f, +num.value); };
+      row.append(rng, num);
+      edRows.push({ f, row, rng, num, cb });
+    }
+    el.appendChild(row);
+    // the two tick fields ARE the fire rate, in the ROM's 60 Hz-tick unit --
+    // show the resulting rounds/minute so the number means something
+    if (f.path === 'single_firing_rate_ticks') {
+      const rr = document.createElement('div');
+      rr.className = 'edrow';
+      rr.innerHTML = '<label>= rate</label><span id="edratev" style="color:#fff"></span>';
+      el.appendChild(rr);
+    }
+  }
+  const note = document.createElement('div');
+  note.className = 'ednote';
+  note.textContent = 'Values are the ROM’s own units. Gold = differs from stock. '
+    + '° = extracted but not used by this range sim yet. V swaps stock/tuned.';
+  el.appendChild(note);
+  refreshEditor();
+}
+
+/** Update highlights/toggle text without rebuilding rows (keeps slider focus). */
+function refreshEditor() {
+  const ab = document.getElementById('edab');
+  if (!ab) return;
+  const m = MODS[state.key];
+  ab.textContent = m && m.on ? 'TUNED' : 'STOCK';
+  ab.classList.toggle('on', !!(m && m.on));
+  const stMod = m ? m.stats : WEAPONS[state.key];
+  const rv = document.getElementById('edratev');
+  if (rv) {
+    const fi = fireInterval(stMod);
+    const fo = fireInterval(WEAPONS[state.key]);
+    rv.textContent = `${Math.round(60 / fi.t)} rpm (${fi.auto ? 'full-auto' : 'semi'})`
+      + (fi.t !== fo.t || fi.auto !== fo.auto ? ` · stock ${Math.round(60 / fo.t)}` : '');
+  }
+  for (const r of edRows) {
+    const orig = edGet(WEAPONS[state.key], r.f.path);
+    const cur = edGet(stMod, r.f.path);
+    r.row.classList.toggle('mod', cur !== orig);
+    if (r.f.bool) { if (document.activeElement !== r.cb) r.cb.checked = !!cur; continue; }
+    if (r.cb) {
+      r.cb.checked = cur != null;
+      r.rng.disabled = r.num.disabled = cur == null;
+    }
+    if (cur != null && document.activeElement !== r.num && document.activeElement !== r.rng)
+      r.rng.value = r.num.value = cur;
+  }
+}
+
+function onEdit(f, v) {
+  if (v !== null && typeof v === 'number' && !Number.isFinite(v)) return;
+  const m = modFor(state.key);
+  edSet(m.stats, f.path, v);
+  m.on = true;                          // editing means "let me feel it"
+  applyStats();
+}
+
+document.getElementById('edbtn').onclick = () => {
+  state.editorOpen = !state.editorOpen;
+  renderEditor();
+};
 
 // ---- firing ----
 const CLIPOUT = soundByName('GUN_CLIPOUT_SFX') || soundByName('GUN_CLIP_OUT_SFX');
@@ -1860,6 +2062,8 @@ function toggleHostile() {
   if (el) el.textContent = state.hostile ? 'RANGE IS HOT' : '';
 }
 document.addEventListener('keydown', e => {
+  // typing in the weapon editor's number fields must not fire game hotkeys
+  if (e.target && /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return;
   keys.add(e.code);
   if (e.code === 'Tab') { e.preventDefault(); cycle(e.shiftKey ? -1 : 1); }
   if (e.code === 'KeyM') toggleMusic();
@@ -1874,12 +2078,16 @@ document.addEventListener('keydown', e => {
     if (el) el.textContent = state.patrol ? 'PATROLS OUT' : '';
   }
   if (e.code === 'KeyR') reload();
+  if (e.code === 'KeyE') { state.editorOpen = !state.editorOpen; renderEditor(); }
+  if (e.code === 'KeyV') toggleTuned();
   if (e.code === 'Minus') master.gain.value = Math.max(0, master.gain.value - 0.05);
   if (e.code === 'Equal') master.gain.value = Math.min(1, master.gain.value + 0.05);
   if (e.code === 'BracketRight') cycle(1);
   if (e.code === 'BracketLeft') cycle(-1);
 });
 document.addEventListener('wheel', e => {
+  // scrolling the weapon editor panel must not switch weapons underneath it
+  if (e.target && e.target.closest && e.target.closest('#editor')) return;
   // while the sniper is zoomed the wheel drives its 6.1..60 degree zoom range
   // (camera_sniper_zoom_in/out); otherwise it switches weapons
   if (state.zooming && state.key === 'sniperrifle') {
