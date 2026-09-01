@@ -372,7 +372,12 @@ rediscovered:
   broadband noise for all 261 sounds). Also apply `ALSound.sampleVolume`
   (0-127) as a post-decode gain — sounds below max are authored expecting
   that attenuation and clip/overpower without it.
-- Music: 63-track `RareALSeqBankFile` at `0x419790`, 1172-compressed compressed-MIDI.
+- Music: 63-track `RareALSeqBankFile` at `0x419790`, 1172-compressed
+  compressed-MIDI, synthesized with the instrument `ALBankFile` at `0x3b4450`
+  (tbl at `0x3b87f0`). The instrument bank's ctl_end is 16-aligned too, so it
+  needs the same strict round-up as the sfx bank — the inclusive formula put
+  every instrument sample 16 bytes short (18% valid VADPCM frame headers vs
+  100% at the true offset).
 
 ## Known gaps
 

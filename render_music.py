@@ -80,7 +80,12 @@ class Bank:
         icount = s16v(ba)
         self.rate = u32(ba+4)
         ctl_end = ba + 12 + 4*icount
-        self.tbl = (ctl_end + 15) & ~15
+        # Strict round-up, not "round up unless aligned": ctl_end lands on a
+        # 16-byte boundary (same as the sfx bank in extract_sounds.py), so the
+        # old (ctl_end+15)&~15 returned it unchanged and every instrument
+        # sample decoded 16 bytes short -- 18% valid VADPCM frame headers
+        # (noise) versus 100% at the true tbl one block later.
+        self.tbl = ((ctl_end // 16) + 1) * 16
         self.insts = [ctl + u32(ba+12+4*i) for i in range(icount)]
         self.sample_cache = {}
 
