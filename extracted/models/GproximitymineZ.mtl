@@ -1,0 +1,12 @@
+newmtl tex_32_lit_sec
+map_Kd ../images/0032_BELL2.png
+
+newmtl tex_944_lit_sec
+map_Kd ../images/0944_944.png
+
+newmtl tex_944_lit_sec_ovl
+map_Kd ../images/0944_944.png
+
+newmtl tex_945_lit_sec
+map_Kd ../images/0945_945.png
+

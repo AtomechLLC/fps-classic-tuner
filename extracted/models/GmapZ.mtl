@@ -1,0 +1,12 @@
+newmtl tex_189_lit_ds_w11
+map_Kd ../images/0189_BUNKERPLAN_TL.png
+
+newmtl tex_190_lit_ds_w11_ovl
+map_Kd ../images/0190_BUNKERPLAN_TR.png
+
+newmtl tex_191_lit_ds_w11_ovl
+map_Kd ../images/0191_BUNKERPLAN_BL.png
+
+newmtl tex_192_lit_ds_w11_ovl
+map_Kd ../images/0192_BUNKERPLAN_BR.png
+

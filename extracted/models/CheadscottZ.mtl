@@ -1,0 +1,24 @@
+newmtl tex_1976_fl0_lit
+map_Kd ../images/1976_1976.png
+
+newmtl tex_1976_sw0_0_lit
+map_Kd ../images/1976_1976.png
+
+newmtl tex_1977_fl0_lit
+map_Kd ../images/1977_1977.png
+
+newmtl tex_1977_sw0_0_lit
+map_Kd ../images/1977_1977.png
+
+newmtl tex_1978_fl0_lit
+map_Kd ../images/1978_1978.png
+
+newmtl tex_1978_sw0_0_lit
+map_Kd ../images/1978_1978.png
+
+newmtl tex_1995_sw1_0_lit_ds
+map_Kd ../images/1995_1995.png
+
+newmtl tex_1996_sw1_0_lit_sec_ds
+map_Kd ../images/1996_1996.png
+

@@ -1,0 +1,36 @@
+newmtl tex_1725_lit
+map_Kd ../images/1725_1725.png
+
+newmtl tex_1725_lit_ds
+map_Kd ../images/1725_1725.png
+
+newmtl tex_1725_lit_sec_ds
+map_Kd ../images/1725_1725.png
+
+newmtl tex_2293_lit
+map_Kd ../images/2293_2293.png
+
+newmtl tex_27_lit
+map_Kd ../images/0027_BLACKGUNFRAME_L.png
+
+newmtl tex_27_lit_ovl
+map_Kd ../images/0027_BLACKGUNFRAME_L.png
+
+newmtl tex_28_lit
+map_Kd ../images/0028_BLACKGUNFRAME_R.png
+
+newmtl tex_765_lit
+map_Kd ../images/0765_765.png
+
+newmtl tex_774_lit
+map_Kd ../images/0774_774.png
+
+newmtl tex_884_fl0_ds_w11
+map_Kd ../images/0884_884.png
+
+newmtl tex_884_fl1_ds_w11
+map_Kd ../images/0884_884.png
+
+newmtl tex_886_lit_sec_ds
+map_Kd ../images/0886_886.png
+

@@ -1,0 +1,9 @@
+newmtl tex_1973_lit
+map_Kd ../images/1973_1973.png
+
+newmtl tex_1974_lit
+map_Kd ../images/1974_1974.png
+
+newmtl tex_1975_lit
+map_Kd ../images/1975_1975.png
+

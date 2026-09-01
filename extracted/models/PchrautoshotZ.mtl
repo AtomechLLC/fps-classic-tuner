@@ -1,0 +1,24 @@
+newmtl tex_1531_lit
+map_Kd ../images/1531_1531.png
+
+newmtl tex_873_lit_w11
+map_Kd ../images/0873_873.png
+
+newmtl tex_874_lit_ovl
+map_Kd ../images/0874_874.png
+
+newmtl tex_879_lit_w01
+map_Kd ../images/0879_879.png
+
+newmtl tex_881_lit
+map_Kd ../images/0881_881.png
+
+newmtl tex_881_lit_ovl
+map_Kd ../images/0881_881.png
+
+newmtl tex_883_lit_ovl
+map_Kd ../images/0883_883.png
+
+newmtl tex_887_lit_sec_ds_w11
+map_Kd ../images/0887_887.png
+

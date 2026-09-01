@@ -1,0 +1,9 @@
+newmtl tex_33_lit_ds
+map_Kd ../images/0033_AMMOCRATE1.png
+
+newmtl tex_37_lit_ds_w11_ovl
+map_Kd ../images/0037_CRATEROPE.png
+
+newmtl tex_39_lit_ds_w11_ovl
+map_Kd ../images/0039_AMMOTEXT765.png
+

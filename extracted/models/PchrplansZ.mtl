@@ -1,0 +1,15 @@
+newmtl tex_1014_lit_sec_ds_w11
+map_Kd ../images/1014_PAPERCLIP.png
+
+newmtl tex_1055_lit_ds
+map_Kd ../images/1055_1055.png
+
+newmtl tex_1059_lit_ds
+map_Kd ../images/1059_1059.png
+
+newmtl tex_411_lit_w11_ovl
+map_Kd ../images/0411_411.png
+
+newmtl tex_639_lit_ds_w11
+map_Kd ../images/0639_639.png
+

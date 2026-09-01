@@ -1,0 +1,9 @@
+newmtl tex_1729_lit_ds
+map_Kd ../images/1729_1729.png
+
+newmtl tex_1731_lit_ds_ovl
+map_Kd ../images/1731_1731.png
+
+newmtl tex_1732_lit_ds_ovl
+map_Kd ../images/1732_1732.png
+

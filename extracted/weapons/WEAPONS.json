@@ -1,0 +1,2534 @@
+{
+ "default_weaponstats": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 0.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "ONLY_1_HANDED"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "fist": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -50.0,
+    -33.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 2.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 1.0,
+   "noise_per_shot": 1.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_MENU",
+   "USE_HOLD_TIME",
+   "HAS_AMMO"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "knife": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    14.0,
+    -24.8,
+    -34.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 3.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 1.0,
+   "noise_per_shot": 1.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "throwknife": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    14.0,
+    -24.8,
+    -34.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "KNIFE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 3.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 1.0,
+   "noise_per_shot": 1.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 1.0,
+  "flags": [
+   "UNK_0001",
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "wppk": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67633920,
+   "recoil_back": 3.0,
+   "recoil_up": 10.0,
+   "bolt_recoil_back": 30.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 7,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 16,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x6b",
+  "damage": 1.0,
+  "inaccuracy": 1.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 1.0,
+   "loudness_max": 12.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B2_HEAVY_SFX",
+  "sound_file": "../sounds/107_GUN_B2_HEAVY_SFX.wav"
+ },
+ "wppksil": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67633920,
+   "recoil_back": 1.5,
+   "recoil_up": 5.0,
+   "bolt_recoil_back": 30.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 7,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 16,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x2e",
+  "damage": 1.0,
+  "inaccuracy": 3.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 5.0,
+   "noise_per_shot": 1.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_SILPPK_A_SFX",
+  "sound_file": "../sounds/046_GUN_SILPPK_A_SFX.wav"
+ },
+ "tt33": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67633920,
+   "recoil_back": 5.0,
+   "recoil_up": 10.0,
+   "bolt_recoil_back": 60.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 8,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 16,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x70",
+  "damage": 1.0,
+  "inaccuracy": 6.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 16.0,
+   "noise_per_shot": 3.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B8_ANOTHER_SFX",
+  "sound_file": "../sounds/112_GUN_B8_ANOTHER_SFX.wav"
+ },
+ "skorpion": {
+  "vfx": {
+   "muzzle_flash_extension": 2.0,
+   "gun_screen_pos": [
+    11.5,
+    -25.0,
+    -27.5
+   ],
+   "gun_play": [
+    3.0,
+    5.0,
+    10.0
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 6,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 20,
+  "auto_firing_rate_ticks": 3,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 11,
+  "sound_id": "0x6a",
+  "damage": 0.6,
+  "inaccuracy": 15.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.89,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B1_MGUN3_3_SFX",
+  "sound_file": "../sounds/106_GUN_B1_MGUN3_3_SFX.wav"
+ },
+ "ak47": {
+  "vfx": {
+   "muzzle_flash_extension": 2.0,
+   "gun_screen_pos": [
+    11.0,
+    -19.0,
+    -16.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67895302,
+   "recoil_back": 4.5,
+   "recoil_up": 2.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "RIFLE",
+  "mag_size": 30,
+  "auto_firing_rate_ticks": 3,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 4,
+  "sound_id": "0x6d",
+  "damage": 1.0,
+  "inaccuracy": 10.0,
+  "zoom_fov": 30.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.91,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 3.0,
+  "flags": [
+   "BURST_FIRE",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B4_BOLTACTION_SFX",
+  "sound_file": "../sounds/109_GUN_B4_BOLTACTION_SFX.wav"
+ },
+ "uzi": {
+  "vfx": {
+   "muzzle_flash_extension": 3.0,
+   "gun_screen_pos": [
+    11.0,
+    -24.5,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    8.0,
+    15.0
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 101842950,
+   "recoil_back": 4.0,
+   "recoil_up": 3.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 32,
+  "auto_firing_rate_ticks": 2,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 4,
+  "sound_id": "0x6e",
+  "damage": 1.0,
+  "inaccuracy": 9.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.88,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B5_WINC44_SFX",
+  "sound_file": "../sounds/110_GUN_B5_WINC44_SFX.wav"
+ },
+ "mp5k": {
+  "vfx": {
+   "muzzle_flash_extension": 2.0,
+   "gun_screen_pos": [
+    11.0,
+    -26.4,
+    -35.0
+   ],
+   "gun_play": [
+    3.0,
+    8.0,
+    15.0
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 101842950,
+   "recoil_back": 4.0,
+   "recoil_up": 3.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 30,
+  "auto_firing_rate_ticks": 3,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 4,
+  "sound_id": "0x75",
+  "damage": 1.0,
+  "inaccuracy": 7.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.89,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B13_M60AMMGUN_SFX",
+  "sound_file": "../sounds/117_GUN_B13_M60AMMGUN_SFX.wav"
+ },
+ "mp5ksil": {
+  "vfx": {
+   "muzzle_flash_extension": 2.0,
+   "gun_screen_pos": [
+    11.0,
+    -26.4,
+    -35.0
+   ],
+   "gun_play": [
+    3.0,
+    8.0,
+    15.0
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 101842950,
+   "recoil_back": 3.5,
+   "recoil_up": 2.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 30,
+  "auto_firing_rate_ticks": 3,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 4,
+  "sound_id": "0x2e",
+  "damage": 1.0,
+  "inaccuracy": 9.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.89,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 7.0,
+   "noise_per_shot": 1.2,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_SILPPK_A_SFX",
+  "sound_file": "../sounds/046_GUN_SILPPK_A_SFX.wav"
+ },
+ "spectre": {
+  "vfx": {
+   "muzzle_flash_extension": 2.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.9,
+    -35.0
+   ],
+   "gun_play": [
+    3.0,
+    8.0,
+    15.0
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67895302,
+   "recoil_back": 4.5,
+   "recoil_up": 2.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 50,
+  "auto_firing_rate_ticks": 3,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 4,
+  "sound_id": "0x6d",
+  "damage": 1.4,
+  "inaccuracy": 12.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.89,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B4_BOLTACTION_SFX",
+  "sound_file": "../sounds/109_GUN_B4_BOLTACTION_SFX.wav"
+ },
+ "m16": {
+  "vfx": {
+   "muzzle_flash_extension": 6.0,
+   "gun_screen_pos": [
+    11.0,
+    -19.2,
+    -21.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 101843464,
+   "recoil_back": 5.0,
+   "recoil_up": 2.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 0.5
+  },
+  "ammo_type": "RIFLE",
+  "mag_size": 30,
+  "auto_firing_rate_ticks": 2,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 2,
+  "sound_trigger_rate": 5,
+  "sound_id": "0x71",
+  "damage": 1.4,
+  "inaccuracy": 6.0,
+  "zoom_fov": 20.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.91,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 4.0,
+  "flags": [
+   "BURST_FIRE",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B9_CANNON_SFX",
+  "sound_file": "../sounds/113_GUN_B9_CANNON_SFX.wav"
+ },
+ "fnp90": {
+  "vfx": {
+   "muzzle_flash_extension": 4.0,
+   "gun_screen_pos": [
+    12.5,
+    -25.3,
+    -32.5
+   ],
+   "gun_play": [
+    3.0,
+    8.0,
+    15.0
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67633155,
+   "recoil_back": 3.5,
+   "recoil_up": 2.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 80,
+  "auto_firing_rate_ticks": 2,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 3,
+  "sound_trigger_rate": 2,
+  "sound_id": "0xfd",
+  "damage": 1.8,
+  "inaccuracy": 6.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.87,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 4.0,
+  "flags": [
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "FIRST_SHOT_ACCURACY",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B9_CANNON_SHORT_SFX",
+  "sound_file": "../sounds/253_GUN_B9_CANNON_SHORT_SFX.wav"
+ },
+ "shotgun": {
+  "vfx": {
+   "muzzle_flash_extension": 4.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.6,
+    -19.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 135399436,
+   "recoil_back": 9.0,
+   "recoil_up": 10.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "SHOTGUN",
+  "mag_size": 5,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 10,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x79",
+  "damage": 0.4,
+  "inaccuracy": 20.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 25.0,
+   "noise_per_shot": 4.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 5.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B17_RIFLE_SFX",
+  "sound_file": "../sounds/121_GUN_B17_RIFLE_SFX.wav"
+ },
+ "autoshot": {
+  "vfx": {
+   "muzzle_flash_extension": 4.0,
+   "gun_screen_pos": [
+    12.0,
+    -24.1,
+    -19.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 135399436,
+   "recoil_back": 4.5,
+   "recoil_up": 3.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "SHOTGUN",
+  "mag_size": 5,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 10,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x74",
+  "damage": 0.6,
+  "inaccuracy": 16.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 3.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 5.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B12_FULLAMRIFLE_SFX",
+  "sound_file": "../sounds/116_GUN_B12_FULLAMRIFLE_SFX.wav"
+ },
+ "sniperrifle": {
+  "vfx": {
+   "muzzle_flash_extension": 6.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.7,
+    -31.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 0.25
+  },
+  "ammo_type": "RIFLE",
+  "mag_size": 8,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 16,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x2e",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 15.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.91,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 7.0,
+   "noise_per_shot": 1.2,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "DISABLE_CROUCH",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_SILPPK_A_SFX",
+  "sound_file": "../sounds/046_GUN_SILPPK_A_SFX.wav"
+ },
+ "ruger": {
+  "vfx": {
+   "muzzle_flash_extension": 2.0,
+   "gun_screen_pos": [
+    12.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 135266559,
+   "recoil_back": 12.0,
+   "recoil_up": 35.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "MAGNUM",
+  "mag_size": 6,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 20,
+  "penetration_objects": 10,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x6f",
+  "damage": 2.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.86,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 3.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 6.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_RIFLE7BIG_1_SFX",
+  "sound_file": "../sounds/111_GUN_RIFLE7BIG_1_SFX.wav"
+ },
+ "goldengun": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 67633407,
+   "recoil_back": 5.0,
+   "recoil_up": 10.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "GGUN",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x75",
+  "damage": 100.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 1.0,
+   "loudness_max": 9.0,
+   "noise_per_shot": 1.5,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B13_M60AMMGUN_SFX",
+  "sound_file": "../sounds/117_GUN_B13_M60AMMGUN_SFX.wav"
+ },
+ "silverwppk": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67633920,
+   "recoil_back": 3.0,
+   "recoil_up": 10.0,
+   "bolt_recoil_back": 30.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 7,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 16,
+  "penetration_objects": 10,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x6b",
+  "damage": 2.0,
+  "inaccuracy": 1.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 1.0,
+   "loudness_max": 12.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B2_HEAVY_SFX",
+  "sound_file": "../sounds/107_GUN_B2_HEAVY_SFX.wav"
+ },
+ "goldwppk": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -20.8,
+    -33.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": true,
+   "recoil_speed": 67633920,
+   "recoil_back": 3.0,
+   "recoil_up": 10.0,
+   "bolt_recoil_back": 30.0,
+   "sway": 1.0
+  },
+  "ammo_type": "9MM",
+  "mag_size": 7,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 16,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x6b",
+  "damage": 100.0,
+  "inaccuracy": 1.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 1.0,
+   "loudness_max": 12.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "UNK_0020",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_B2_HEAVY_SFX",
+  "sound_file": "../sounds/107_GUN_B2_HEAVY_SFX.wav"
+ },
+ "laser": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -19.5,
+    -28.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 100664838,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 2,
+  "sound_trigger_rate": 0,
+  "sound_id": "0xe4",
+  "damage": 2.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.89,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 16.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 2.0,
+  "flags": [
+   "UNK_0001",
+   "HAS_AUTO_AIM",
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "LASER_GUN_SFX",
+  "sound_file": "../sounds/228_LASER_GUN_SFX.wav"
+ },
+ "watchlaser": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    -2.0,
+    -21.5,
+    -19.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "WATCH_LASER",
+  "mag_size": 1000,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 2.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.89,
+  "ai_noise": {
+   "loudness_min": 1.0,
+   "loudness_max": 4.0,
+   "noise_per_shot": 0.2,
+   "decay_linear_time": 1.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "AMMO_CLIP_LIMIT",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "grenadelaunch": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    9.5,
+    -18.0,
+    -18.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 135266559,
+   "recoil_back": 10.5,
+   "recoil_up": 15.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "GRENADEROUND",
+  "mag_size": 6,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 20,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0xc",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.92,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON",
+   "USE_HOLD_TIME",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "GUN_TANK2BIGBIG_1_SFX",
+  "sound_file": "../sounds/012_GUN_TANK2BIGBIG_1_SFX.wav"
+ },
+ "rocketlaunch": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    10.5,
+    -22.2,
+    -14.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 0.5
+  },
+  "ammo_type": "ROCKETS",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 20,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.92,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 25.0,
+   "noise_per_shot": 10.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "USE_HOLD_TIME",
+   "CAN_DUAL_WIELD"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "grenade": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -41.8,
+    -33.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "GRENADE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 2.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "USE_HOLD_TIME",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "timedmine": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "TIMEDMINE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 2.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "USE_HOLD_TIME",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "proximitymine": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "PROXMINE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 2.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "USE_HOLD_TIME",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "remotemine": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "REMOTEMINE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 2.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "USE_HOLD_TIME",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "trigger": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    -2.0,
+    -21.5,
+    -19.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": -1,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "SHOW_FIRST_PERSON"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "taser": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    16.0,
+    -16.7,
+    -22.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x64",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 10.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "USE_HOLD_TIME",
+   "AMMO_CLIP_LIMIT",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "GUN_TASER_SFX",
+  "sound_file": "../sounds/100_GUN_TASER_SFX.wav"
+ },
+ "tank": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    8.0,
+    -19.2,
+    -11.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 2013296895,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "TANK",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 20,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0xb",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.92,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 25.0,
+   "noise_per_shot": 10.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HOLD_AS_GUN",
+   "MIRROR_DUAL",
+   "HIDE_FIRST_PERSON_HAND",
+   "HIDE_FIRST_PERSON_MENU",
+   "PLAYER_STAT_HIT",
+   "USE_HOLD_TIME",
+   "HAS_AMMO"
+  ],
+  "sound_name": "GUN_TANK2BIG_1_SFX",
+  "sound_file": "../sounds/011_GUN_TANK2BIG_1_SFX.wav"
+ },
+ "bombcase": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "BOMBCASE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 2.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "plastique": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 0,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "PLASTIQUE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 6,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 2.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "MIRROR_DUAL",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "USE_HOLD_TIME",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "flarepistol": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    9.5,
+    -18.0,
+    -18.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 135266559,
+   "recoil_back": 10.5,
+   "recoil_up": 15.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "FLARE",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 20,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0xc",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.92,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON"
+  ],
+  "sound_name": "GUN_TANK2BIGBIG_1_SFX",
+  "sound_file": "../sounds/012_GUN_TANK2BIGBIG_1_SFX.wav"
+ },
+ "pitongun": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    9.5,
+    -18.0,
+    -18.5
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 135266559,
+   "recoil_back": 10.5,
+   "recoil_up": 15.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "PITON",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 20,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0xc",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.92,
+  "ai_noise": {
+   "loudness_min": 2.0,
+   "loudness_max": 20.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "UNK_0001",
+   "CLICKY",
+   "UNK_0020",
+   "UNK_0040",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "HOLD_AS_GUN",
+   "SHOW_FIRST_PERSON"
+  ],
+  "sound_name": "GUN_TANK2BIGBIG_1_SFX",
+  "sound_file": "../sounds/012_GUN_TANK2BIGBIG_1_SFX.wav"
+ },
+ "bug": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "BUG",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "microcamera": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -21.0,
+    -37.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "MICRO_CAMERA",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "watchmagnetattract": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -41.8,
+    -33.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "WATCH_MAGNET",
+  "mag_size": 10,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": -1,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 1.0,
+   "decay_linear_time": 1.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "AMMO_CLIP_LIMIT",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "goldeneyekey": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -41.8,
+    -33.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "GEKEY",
+  "mag_size": 1,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "HIDE_AMMO_DISPLAY",
+   "NO_CLIP_RELOADS"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "camera": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -41.8,
+    -33.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": -1,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0xf4",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 20.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 1.0,
+   "decay_linear_time": 1.0,
+   "decay_scaled_time": 1.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "SHOW_FIRST_PERSON",
+   "HIDE_FIRST_PERSON_HAND",
+   "DISABLE_CROUCH"
+  ],
+  "sound_name": "CAMERA_CLICK_SFX",
+  "sound_file": "../sounds/244_CAMERA_CLICK_SFX.wav"
+ },
+ "Csuit_lf_handz": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "ONLY_1_HANDED"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "joypad": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "NONE",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "ONLY_1_HANDED"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "null1": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "ROCKETS",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "ONLY_1_HANDED"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "null2": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "GRENADEROUND",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.9,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "CLICKY",
+   "ONLY_1_HANDED"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ },
+ "token": {
+  "vfx": {
+   "muzzle_flash_extension": 1.0,
+   "gun_screen_pos": [
+    11.0,
+    -41.8,
+    -33.0
+   ],
+   "gun_play": [
+    3.0,
+    3.0,
+    8.5
+   ],
+   "ejects_cartridges": false,
+   "recoil_speed": 255,
+   "recoil_back": 0.0,
+   "recoil_up": 0.0,
+   "bolt_recoil_back": 0.0,
+   "sway": 1.0
+  },
+  "ammo_type": "TOKEN",
+  "mag_size": 0,
+  "auto_firing_rate_ticks": null,
+  "single_firing_rate_ticks": 0,
+  "penetration_objects": 1,
+  "sound_trigger_rate": 0,
+  "sound_id": "0x0",
+  "damage": 1.0,
+  "inaccuracy": 0.0,
+  "zoom_fov": 0.0,
+  "crosshair_speed": 0.8,
+  "aim_lock_speed": 0.85,
+  "ai_noise": {
+   "loudness_min": 0.0,
+   "loudness_max": 0.0,
+   "noise_per_shot": 2.0,
+   "decay_linear_time": 2.0,
+   "decay_scaled_time": 4.0
+  },
+  "force_of_impact": 0.0,
+  "flags": [
+   "SINGLE_USE_RELOAD",
+   "DUAL_WIELD_ALTERNATING_FIRE",
+   "ONLY_1_HANDED",
+   "HIDE_FIRST_PERSON_HAND",
+   "HIDE_AMMO_DISPLAY"
+  ],
+  "sound_name": "NOTHING_SFX",
+  "sound_file": "../sounds/000_NOTHING_SFX.wav"
+ }
+}

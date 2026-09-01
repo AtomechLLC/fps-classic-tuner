@@ -1,0 +1,57 @@
+newmtl tex_1632_lit_w01
+map_Kd ../images/1632_1632.png
+
+newmtl tex_1633_lit_w01
+map_Kd ../images/1633_1633.png
+
+newmtl tex_1787_lit
+map_Kd ../images/1787_1787.png
+
+newmtl tex_1984_lit
+map_Kd ../images/1984_1984.png
+
+newmtl tex_1985_lit_w11
+map_Kd ../images/1985_1985.png
+
+newmtl tex_1986_lit
+map_Kd ../images/1986_1986.png
+
+newmtl tex_1987_lit
+map_Kd ../images/1987_1987.png
+
+newmtl tex_1987_lit_ds
+map_Kd ../images/1987_1987.png
+
+newmtl tex_1988_lit_w01
+map_Kd ../images/1988_1988.png
+
+newmtl tex_1989_lit_w01
+map_Kd ../images/1989_1989.png
+
+newmtl tex_1990_lit
+map_Kd ../images/1990_1990.png
+
+newmtl tex_1991_lit
+map_Kd ../images/1991_1991.png
+
+newmtl tex_1992_lit
+map_Kd ../images/1992_1992.png
+
+newmtl tex_1993_lit
+map_Kd ../images/1993_1993.png
+
+newmtl tex_1994_lit
+map_Kd ../images/1994_1994.png
+
+newmtl tex_2340_lit
+map_Kd ../images/2340_2340.png
+
+newmtl tex_2340_lit_ovl
+map_Kd ../images/2340_2340.png
+
+newmtl tex_2341_lit
+map_Kd ../images/2341_2341.png
+
+newmtl tex_2341_lit_ovl
+map_Kd ../images/2341_2341.png
+

@@ -1,0 +1,4885 @@
+[
+ {
+  "id": 0,
+  "name": "NOTHING_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 11656,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 933830,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "000_NOTHING_SFX.wav",
+  "seconds": 0.94
+ },
+ {
+  "id": 1,
+  "name": "ROCKET_LAUNCH_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10170,
+  "envelope": {
+   "attack_us": 215696,
+   "decay_us": 604258,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "file": "001_ROCKET_LAUNCH_SFX.wav",
+  "seconds": 0.82
+ },
+ {
+  "id": 2,
+  "name": "GLASS_SHATTERING_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 5356,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 396049,
+   "release_us": 138451,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "002_GLASS_SHATTERING_SFX.wav",
+  "seconds": 0.432
+ },
+ {
+  "id": 3,
+  "name": "KNIFE_HIT_WALL_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 142640,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "003_KNIFE_HIT_WALL_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 4,
+  "name": "GRENADE_THROW_SFX",
+  "pan": 64,
+  "volume": 60,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 142640,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "004_GRENADE_THROW_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 5,
+  "name": "GRENADE_THROW_QUIET_SFX",
+  "pan": 64,
+  "volume": 25,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 142640,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "005_GRENADE_THROW_QUIET_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 6,
+  "name": "GRENADE_THROW_FAINT_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 5500,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 440766,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "006_GRENADE_THROW_FAINT_SFX.wav",
+  "seconds": 0.443
+ },
+ {
+  "id": 7,
+  "name": "TRAIN_SLIDE_DOOR_SLIDE_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 1044,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 81673,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 40,
+  "file": "007_TRAIN_SLIDE_DOOR_SLIDE_SFX.wav",
+  "seconds": 0.084
+ },
+ {
+  "id": 8,
+  "name": "TRAIN_RAILS_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 622,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 48068,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 40,
+  "file": "008_TRAIN_RAILS_SFX.wav",
+  "seconds": 0.05
+ },
+ {
+  "id": 9,
+  "name": "TRAIN_RAILS2_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 1512,
+  "envelope": {
+   "attack_us": 133933,
+   "decay_us": 306065,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 0
+  },
+  "keybase": 36,
+  "loop": {
+   "start": 1265,
+   "end": 2669,
+   "count": -1
+  },
+  "file": "009_TRAIN_RAILS2_SFX.wav",
+  "seconds": 0.122
+ },
+ {
+  "id": 10,
+  "name": "WATCH_INTERFERENCE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 11520,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1137093,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 51,
+  "file": "010_WATCH_INTERFERENCE_SFX.wav",
+  "seconds": 0.929
+ },
+ {
+  "id": 11,
+  "name": "GUN_TANK2BIG_1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10738,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 863396,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 57,
+  "file": "011_GUN_TANK2BIG_1_SFX.wav",
+  "seconds": 0.866
+ },
+ {
+  "id": 12,
+  "name": "GUN_TANK2BIGBIG_1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2520,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 203811,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "012_GUN_TANK2BIGBIG_1_SFX.wav",
+  "seconds": 0.203
+ },
+ {
+  "id": 13,
+  "name": "GET_HIT_GIRL1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 1018,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 79904,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "013_GET_HIT_GIRL1_SFX.wav",
+  "seconds": 0.082
+ },
+ {
+  "id": 14,
+  "name": "GET_HIT_GIRL2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2494,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 203811,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "014_GET_HIT_GIRL2_SFX.wav",
+  "seconds": 0.201
+ },
+ {
+  "id": 15,
+  "name": "GET_HIT_GIRL3_SFX",
+  "pan": 64,
+  "volume": 65,
+  "type": "adpcm",
+  "bytes": 2512,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 201040,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "015_GET_HIT_GIRL3_SFX.wav",
+  "seconds": 0.202
+ },
+ {
+  "id": 16,
+  "name": "BEEP_SFX",
+  "pan": 64,
+  "volume": 45,
+  "type": "adpcm",
+  "bytes": 2512,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 201040,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "016_BEEP_SFX.wav",
+  "seconds": 0.202
+ },
+ {
+  "id": 17,
+  "name": "BEEP_QUIET_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 766,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 43079,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "017_BEEP_QUIET_SFX.wav",
+  "seconds": 0.062
+ },
+ {
+  "id": 18,
+  "name": "OPTION_CLICK2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10792,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 867433,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "018_OPTION_CLICK2_SFX.wav",
+  "seconds": 0.87
+ },
+ {
+  "id": 19,
+  "name": "RICO_12_GBU_A_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6670,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 535369,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "019_RICO_12_GBU_A_SFX.wav",
+  "seconds": 0.538
+ },
+ {
+  "id": 20,
+  "name": "RICO_12_GBU_B_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10792,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 867433,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "020_RICO_12_GBU_B_SFX.wav",
+  "seconds": 0.87
+ },
+ {
+  "id": 21,
+  "name": "RICO_12_GBU_C_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10792,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 867433,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "021_RICO_12_GBU_C_SFX.wav",
+  "seconds": 0.87
+ },
+ {
+  "id": 22,
+  "name": "RICO_12_GBU_D_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6778,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "022_RICO_12_GBU_D_SFX.wav",
+  "seconds": 0.546
+ },
+ {
+  "id": 23,
+  "name": "RICO_6_TAJ_A_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6778,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "023_RICO_6_TAJ_A_SFX.wav",
+  "seconds": 0.546
+ },
+ {
+  "id": 24,
+  "name": "RICO_6_TAJ_B_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6778,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "024_RICO_6_TAJ_B_SFX.wav",
+  "seconds": 0.546
+ },
+ {
+  "id": 25,
+  "name": "RICO_6_TAJ_C_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6778,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "025_RICO_6_TAJ_C_SFX.wav",
+  "seconds": 0.546
+ },
+ {
+  "id": 26,
+  "name": "RICO_6_TAJ_D_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6714,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "026_RICO_6_TAJ_D_SFX.wav",
+  "seconds": 0.541
+ },
+ {
+  "id": 27,
+  "name": "RICO_8_AFDM_A_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6714,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "027_RICO_8_AFDM_A_SFX.wav",
+  "seconds": 0.541
+ },
+ {
+  "id": 28,
+  "name": "RICO_8_AFDM_B_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6714,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "028_RICO_8_AFDM_B_SFX.wav",
+  "seconds": 0.541
+ },
+ {
+  "id": 29,
+  "name": "RICO_8_AFDM_C_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6714,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "029_RICO_8_AFDM_C_SFX.wav",
+  "seconds": 0.541
+ },
+ {
+  "id": 30,
+  "name": "RICO_8_AFDM_D_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5230,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 460448,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "030_RICO_8_AFDM_D_SFX.wav",
+  "seconds": 0.422
+ },
+ {
+  "id": 31,
+  "name": "RICO_4_A_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5230,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 460448,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "031_RICO_4_A_SFX.wav",
+  "seconds": 0.422
+ },
+ {
+  "id": 32,
+  "name": "RICO_4_B_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5230,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 460448,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "032_RICO_4_B_SFX.wav",
+  "seconds": 0.422
+ },
+ {
+  "id": 33,
+  "name": "RICO_4_C_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5230,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 460448,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "033_RICO_4_C_SFX.wav",
+  "seconds": 0.422
+ },
+ {
+  "id": 34,
+  "name": "RICO_4_D_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5760,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 522789,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "034_RICO_4_D_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 35,
+  "name": "RICO_5_A_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5760,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 522789,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "035_RICO_5_A_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 36,
+  "name": "RICO_5_B_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5760,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 522789,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "036_RICO_5_B_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 37,
+  "name": "RICO_5_C_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5760,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 522789,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "037_RICO_5_C_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 38,
+  "name": "RICO_5_D_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6858,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 582081,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "038_RICO_5_D_SFX.wav",
+  "seconds": 0.553
+ },
+ {
+  "id": 39,
+  "name": "RICO_6_HBBA_A_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6858,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 582081,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "039_RICO_6_HBBA_A_SFX.wav",
+  "seconds": 0.553
+ },
+ {
+  "id": 40,
+  "name": "RICO_6_HBBA_B_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6858,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 582081,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "040_RICO_6_HBBA_B_SFX.wav",
+  "seconds": 0.553
+ },
+ {
+  "id": 41,
+  "name": "RICO_6_HBBA_C_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6210,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 498498,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "041_RICO_6_HBBA_C_SFX.wav",
+  "seconds": 0.501
+ },
+ {
+  "id": 42,
+  "name": "RICO_6_HBBA_D_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2620,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 208707,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "042_RICO_6_HBBA_D_SFX.wav",
+  "seconds": 0.211
+ },
+ {
+  "id": 43,
+  "name": "OPTION_CHOOSE_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 227480,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "043_OPTION_CHOOSE_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 44,
+  "name": "UNKNOWN1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2260,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 239863,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "044_UNKNOWN1_SFX.wav",
+  "seconds": 0.182
+ },
+ {
+  "id": 45,
+  "name": "DROP_GUN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 1836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 145961,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "045_DROP_GUN_SFX.wav",
+  "seconds": 0.148
+ },
+ {
+  "id": 46,
+  "name": "GUN_SILPPK_A_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 2242,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 180272,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "046_GUN_SILPPK_A_SFX.wav",
+  "seconds": 0.181
+ },
+ {
+  "id": 47,
+  "name": "PUNCH1_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 1800,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 145079,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "047_PUNCH1_SFX.wav",
+  "seconds": 0.145
+ },
+ {
+  "id": 48,
+  "name": "PUNCH2_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 1882,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 152380,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "048_PUNCH2_SFX.wav",
+  "seconds": 0.152
+ },
+ {
+  "id": 49,
+  "name": "PUNCH3_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 5806,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 487557,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "049_PUNCH3_SFX.wav",
+  "seconds": 0.468
+ },
+ {
+  "id": 50,
+  "name": "GUN_RIFLECOCK_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 910,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 72061,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 40,
+  "file": "050_GUN_RIFLECOCK_SFX.wav",
+  "seconds": 0.073
+ },
+ {
+  "id": 51,
+  "name": "TRAIN_CLUTTER3_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 802,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 62353,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "051_TRAIN_CLUTTER3_SFX.wav",
+  "seconds": 0.065
+ },
+ {
+  "id": 52,
+  "name": "TRAIN_CLUTTER3B_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 910,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 72061,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 39,
+  "file": "052_TRAIN_CLUTTER3B_SFX.wav",
+  "seconds": 0.073
+ },
+ {
+  "id": 53,
+  "name": "TRAIN_CLUTTER3C_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 5598,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 449292,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 44,
+  "file": "053_TRAIN_CLUTTER3C_SFX.wav",
+  "seconds": 0.451
+ },
+ {
+  "id": 54,
+  "name": "EVIL_LAUGH_SFX",
+  "pan": 74,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5598,
+  "envelope": {
+   "attack_us": 144785,
+   "decay_us": 449292,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 44,
+  "file": "054_EVIL_LAUGH_SFX.wav",
+  "seconds": 0.451
+ },
+ {
+  "id": 55,
+  "name": "EVIL_LAUGH_QUIET_SFX",
+  "pan": 44,
+  "volume": 60,
+  "type": "adpcm",
+  "bytes": 5598,
+  "envelope": {
+   "attack_us": 144785,
+   "decay_us": 449292,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 44,
+  "file": "055_EVIL_LAUGH_QUIET_SFX.wav",
+  "seconds": 0.451
+ },
+ {
+  "id": 56,
+  "name": "EVIL_LAUGH_FAINT_SFX",
+  "pan": 84,
+  "volume": 30,
+  "type": "adpcm",
+  "bytes": 5598,
+  "envelope": {
+   "attack_us": 144785,
+   "decay_us": 449292,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 44,
+  "file": "056_EVIL_LAUGH_FAINT_SFX.wav",
+  "seconds": 0.451
+ },
+ {
+  "id": 57,
+  "name": "EVIL_LAUGH_HUSH_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 3502,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 26,
+   "end": 6208,
+   "count": -1
+  },
+  "file": "057_EVIL_LAUGH_HUSH_SFX.wav",
+  "seconds": 0.282
+ },
+ {
+  "id": 58,
+  "name": "HELI_RUN_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 8290,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 267,
+   "end": 14720,
+   "count": -1
+  },
+  "file": "058_HELI_RUN_SFX.wav",
+  "seconds": 0.668
+ },
+ {
+  "id": 59,
+  "name": "HELI_FLY_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 4266,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 475,
+   "end": 7568,
+   "count": -1
+  },
+  "file": "059_HELI_FLY_SFX.wav",
+  "seconds": 0.344
+ },
+ {
+  "id": 60,
+  "name": "ENGINE_ROOM_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 7542,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 605619,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "060_ENGINE_ROOM_SFX.wav",
+  "seconds": 0.608
+ },
+ {
+  "id": 61,
+  "name": "TRAIN_STOP_STILL_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 6786,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 144,
+   "end": 12048,
+   "count": -1
+  },
+  "file": "061_TRAIN_STOP_STILL_SFX.wav",
+  "seconds": 0.547
+ },
+ {
+  "id": 62,
+  "name": "TANK_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 8074,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 648521,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "062_TANK_SFX.wav",
+  "seconds": 0.651
+ },
+ {
+  "id": 63,
+  "name": "TRAIN_STOP_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 2142,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 399179,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "loop": {
+   "start": 383,
+   "end": 3790,
+   "count": -1
+  },
+  "file": "063_TRAIN_STOP_SFX.wav",
+  "seconds": 0.173
+ },
+ {
+  "id": 64,
+  "name": "TRAIN_GO_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3304,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 108,
+   "end": 5849,
+   "count": -1
+  },
+  "file": "064_TRAIN_GO_SFX.wav",
+  "seconds": 0.266
+ },
+ {
+  "id": 65,
+  "name": "TRUCK_RUN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3934,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 314825,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "065_TRUCK_RUN_SFX.wav",
+  "seconds": 0.317
+ },
+ {
+  "id": 66,
+  "name": "TRUCK_START_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3304,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 108,
+   "end": 5849,
+   "count": -1
+  },
+  "file": "066_TRUCK_START_SFX.wav",
+  "seconds": 0.266
+ },
+ {
+  "id": 67,
+  "name": "TRUCK_ENGINE_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 5932,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 474889,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "067_TRUCK_ENGINE_SFX.wav",
+  "seconds": 0.478
+ },
+ {
+  "id": 68,
+  "name": "BOND_GET_HIT1_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 774,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 59723,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 45,
+  "file": "068_BOND_GET_HIT1_SFX.wav",
+  "seconds": 0.062
+ },
+ {
+  "id": 69,
+  "name": "HIT_BULLET_FLESH_SFX",
+  "pan": 64,
+  "volume": 117,
+  "type": "adpcm",
+  "bytes": 3438,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 275097,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "069_HIT_BULLET_FLESH_SFX.wav",
+  "seconds": 0.277
+ },
+ {
+  "id": 70,
+  "name": "HIT_BULLET_GLASS_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 10170,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 819954,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "file": "070_HIT_BULLET_GLASS_SFX.wav",
+  "seconds": 0.82
+ },
+ {
+  "id": 71,
+  "name": "HIT_GLASS_SMASH_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2080,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 180539,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "071_HIT_GLASS_SMASH_SFX.wav",
+  "seconds": 0.168
+ },
+ {
+  "id": 72,
+  "name": "HIT_BULLET_METAL_A_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 2098,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 167024,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "072_HIT_BULLET_METAL_A_SFX.wav",
+  "seconds": 0.169
+ },
+ {
+  "id": 73,
+  "name": "HIT_BULLET_METAL_B_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 1576,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 124031,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "073_HIT_BULLET_METAL_B_SFX.wav",
+  "seconds": 0.127
+ },
+ {
+  "id": 74,
+  "name": "HIT_BULLET_SNOW_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 2970,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 244439,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "074_HIT_BULLET_SNOW_SFX.wav",
+  "seconds": 0.239
+ },
+ {
+  "id": 75,
+  "name": "HIT_BULLET_WOOD_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 2394,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 230182,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "075_HIT_BULLET_WOOD_SFX.wav",
+  "seconds": 0.193
+ },
+ {
+  "id": 76,
+  "name": "HIT_BULLET_WATER_SFX",
+  "pan": 104,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 5112,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 448022,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "076_HIT_BULLET_WATER_SFX.wav",
+  "seconds": 0.412
+ },
+ {
+  "id": 77,
+  "name": "PAPER_TURN_SFX",
+  "pan": 24,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 5112,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 448022,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "077_PAPER_TURN_SFX.wav",
+  "seconds": 0.412
+ },
+ {
+  "id": 78,
+  "name": "PAPER_TURN_2_SFX",
+  "pan": 64,
+  "volume": 60,
+  "type": "adpcm",
+  "bytes": 4158,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 146955,
+   "release_us": 43420,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "078_PAPER_TURN_2_SFX.wav",
+  "seconds": 0.335
+ },
+ {
+  "id": 79,
+  "name": "COPY_FILE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 4122,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 329791,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "079_COPY_FILE_SFX.wav",
+  "seconds": 0.332
+ },
+ {
+  "id": 80,
+  "name": "RADIO_MESSAGE_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 2304,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 183578,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "080_RADIO_MESSAGE_SFX.wav",
+  "seconds": 0.186
+ },
+ {
+  "id": 81,
+  "name": "ARMOUR_COLLECT_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 5860,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 469649,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 50,
+  "file": "081_ARMOUR_COLLECT_SFX.wav",
+  "seconds": 0.472
+ },
+ {
+  "id": 82,
+  "name": "OBJ_REGEN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 1090,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 293138,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 60,
+  "loop": {
+   "start": 0,
+   "end": 1919,
+   "count": -1
+  },
+  "file": "082_OBJ_REGEN_SFX.wav",
+  "seconds": 0.088
+ },
+ {
+  "id": 83,
+  "name": "DOOR_DECODER_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 1738,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 138181,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "083_DOOR_DECODER_SFX.wav",
+  "seconds": 0.14
+ },
+ {
+  "id": 84,
+  "name": "GIRL_GET_HIT1_SFX",
+  "pan": 123,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 1450,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1001948,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "loop": {
+   "start": 7,
+   "end": 2554,
+   "count": -1
+  },
+  "file": "084_GIRL_GET_HIT1_SFX.wav",
+  "seconds": 0.117
+ },
+ {
+  "id": 85,
+  "name": "CONSOLE_OFF_SFX",
+  "pan": 4,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 1450,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1001948,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "loop": {
+   "start": 7,
+   "end": 2554,
+   "count": -1
+  },
+  "file": "085_CONSOLE_OFF_SFX.wav",
+  "seconds": 0.117
+ },
+ {
+  "id": 86,
+  "name": "CONSOLE_OFF2_SFX",
+  "pan": 123,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 1450,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 475744,
+   "release_us": 1056376,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 38,
+  "loop": {
+   "start": 7,
+   "end": 2554,
+   "count": -1
+  },
+  "file": "086_CONSOLE_OFF2_SFX.wav",
+  "seconds": 0.117
+ },
+ {
+  "id": 87,
+  "name": "CONSOLE_ON2_SFX",
+  "pan": 4,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 1450,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 475744,
+   "release_us": 1056376,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 38,
+  "loop": {
+   "start": 7,
+   "end": 2554,
+   "count": -1
+  },
+  "file": "087_CONSOLE_ON2_SFX.wav",
+  "seconds": 0.117
+ },
+ {
+  "id": 88,
+  "name": "CONSOLE_ON3_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2674,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 214965,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "088_CONSOLE_ON3_SFX.wav",
+  "seconds": 0.216
+ },
+ {
+  "id": 89,
+  "name": "EMPTY_GUN_FIRE_SFX",
+  "pan": 64,
+  "volume": 45,
+  "type": "adpcm",
+  "bytes": 2422,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 193557,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "089_EMPTY_GUN_FIRE_SFX.wav",
+  "seconds": 0.195
+ },
+ {
+  "id": 90,
+  "name": "SHELL_CASE_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 3376,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 269746,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "090_SHELL_CASE_SFX.wav",
+  "seconds": 0.272
+ },
+ {
+  "id": 91,
+  "name": "RICO_LASER1_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 4716,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 377682,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "091_RICO_LASER1_SFX.wav",
+  "seconds": 0.38
+ },
+ {
+  "id": 92,
+  "name": "RICO_LASER2_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 4716,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 377682,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "092_RICO_LASER2_SFX.wav",
+  "seconds": 0.38
+ },
+ {
+  "id": 93,
+  "name": "RICO_LASER3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 1000,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 78136,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "093_RICO_LASER3_SFX.wav",
+  "seconds": 0.081
+ },
+ {
+  "id": 94,
+  "name": "RADIO_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 227480,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "094_RADIO_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 95,
+  "name": "KNIFE_THROW1_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 227480,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 51,
+  "file": "095_KNIFE_THROW1_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 96,
+  "name": "KNIFE_THROW2_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2836,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 227480,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "096_KNIFE_THROW2_SFX.wav",
+  "seconds": 0.229
+ },
+ {
+  "id": 97,
+  "name": "KNIFE_THROW3_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 1378,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 109650,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "097_KNIFE_THROW3_SFX.wav",
+  "seconds": 0.111
+ },
+ {
+  "id": 98,
+  "name": "COUGH_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 1378,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 109650,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "098_COUGH_SFX.wav",
+  "seconds": 0.111
+ },
+ {
+  "id": 99,
+  "name": "COUGH2_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 6246,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 798605,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "loop": {
+   "start": 8682,
+   "end": 11076,
+   "count": -1
+  },
+  "file": "099_COUGH2_SFX.wav",
+  "seconds": 0.504
+ },
+ {
+  "id": 100,
+  "name": "GUN_TASER_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 6246,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "loop": {
+   "start": 8682,
+   "end": 11076,
+   "count": -1
+  },
+  "file": "100_GUN_TASER_SFX.wav",
+  "seconds": 0.504
+ },
+ {
+  "id": 101,
+  "name": "GUN_TASER_LOOP_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2808,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 51,
+  "loop": {
+   "start": 708,
+   "end": 4974,
+   "count": -1
+  },
+  "file": "101_GUN_TASER_LOOP_SFX.wav",
+  "seconds": 0.226
+ },
+ {
+  "id": 102,
+  "name": "GAS_HISS_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3070,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 244245,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 50,
+  "file": "102_GAS_HISS_SFX.wav",
+  "seconds": 0.247
+ },
+ {
+  "id": 103,
+  "name": "UNKNOWN2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2700,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 89655,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 40,
+  "file": "103_UNKNOWN2_SFX.wav",
+  "seconds": 0.218
+ },
+ {
+  "id": 104,
+  "name": "UNKNOWN3_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 1882,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 247683,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "104_UNKNOWN3_SFX.wav",
+  "seconds": 0.152
+ },
+ {
+  "id": 105,
+  "name": "PUNCHING_AIR_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 4168,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 388748,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "105_PUNCHING_AIR_SFX.wav",
+  "seconds": 0.336
+ },
+ {
+  "id": 106,
+  "name": "GUN_B1_MGUN3_3_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 6940,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 562625,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "106_GUN_B1_MGUN3_3_SFX.wav",
+  "seconds": 0.559
+ },
+ {
+  "id": 107,
+  "name": "GUN_B2_HEAVY_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3114,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 405800,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "107_GUN_B2_HEAVY_SFX.wav",
+  "seconds": 0.251
+ },
+ {
+  "id": 108,
+  "name": "GUN_UNKNOWN_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3286,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 262625,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "108_GUN_UNKNOWN_SFX.wav",
+  "seconds": 0.265
+ },
+ {
+  "id": 109,
+  "name": "GUN_B4_BOLTACTION_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 8244,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 663217,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "109_GUN_B4_BOLTACTION_SFX.wav",
+  "seconds": 0.665
+ },
+ {
+  "id": 110,
+  "name": "GUN_B5_WINC44_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10486,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 842897,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "110_GUN_B5_WINC44_SFX.wav",
+  "seconds": 0.845
+ },
+ {
+  "id": 111,
+  "name": "GUN_RIFLE7BIG_1_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 8496,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 682671,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "111_GUN_RIFLE7BIG_1_SFX.wav",
+  "seconds": 0.685
+ },
+ {
+  "id": 112,
+  "name": "GUN_B8_ANOTHER_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 4294,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 344442,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "112_GUN_B8_ANOTHER_SFX.wav",
+  "seconds": 0.346
+ },
+ {
+  "id": 113,
+  "name": "GUN_B9_CANNON_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 10738,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 863396,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "113_GUN_B9_CANNON_SFX.wav",
+  "seconds": 0.866
+ },
+ {
+  "id": 114,
+  "name": "GUN_GRENADE_LAUNCHER_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 11574,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1265029,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "114_GUN_GRENADE_LAUNCHER_SFX.wav",
+  "seconds": 0.933
+ },
+ {
+  "id": 115,
+  "name": "GUN_UNKNOWN2_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 10990,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1078000,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "115_GUN_UNKNOWN2_SFX.wav",
+  "seconds": 0.886
+ },
+ {
+  "id": 116,
+  "name": "GUN_B12_FULLAMRIFLE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 9612,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 772285,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "116_GUN_B12_FULLAMRIFLE_SFX.wav",
+  "seconds": 0.775
+ },
+ {
+  "id": 117,
+  "name": "GUN_B13_M60AMMGUN_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 4852,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 388748,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "117_GUN_B13_M60AMMGUN_SFX.wav",
+  "seconds": 0.391
+ },
+ {
+  "id": 118,
+  "name": "GUN_M60AMMGUN_3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6426,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 515823,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "118_GUN_M60AMMGUN_3_SFX.wav",
+  "seconds": 0.518
+ },
+ {
+  "id": 119,
+  "name": "GUN_UNKNOWN3_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 6084,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 488294,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "119_GUN_UNKNOWN3_SFX.wav",
+  "seconds": 0.491
+ },
+ {
+  "id": 120,
+  "name": "HIT_METAL_OBJECT1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 11944,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 960267,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "120_HIT_METAL_OBJECT1_SFX.wav",
+  "seconds": 0.963
+ },
+ {
+  "id": 121,
+  "name": "GUN_B17_RIFLE_SFX",
+  "pan": 64,
+  "volume": 45,
+  "type": "adpcm",
+  "bytes": 2466,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 176208,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "121_GUN_B17_RIFLE_SFX.wav",
+  "seconds": 0.199
+ },
+ {
+  "id": 122,
+  "name": "CART_SPENT_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2196,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 174870,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "122_CART_SPENT_SFX.wav",
+  "seconds": 0.177
+ },
+ {
+  "id": 123,
+  "name": "BODY_FALL_C1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2196,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 174870,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "123_BODY_FALL_C1_SFX.wav",
+  "seconds": 0.177
+ },
+ {
+  "id": 124,
+  "name": "BODY_FALL_C2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2196,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 174870,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "124_BODY_FALL_C2_SFX.wav",
+  "seconds": 0.177
+ },
+ {
+  "id": 125,
+  "name": "BODY_FALL_C3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2134,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 169428,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "125_BODY_FALL_C3_SFX.wav",
+  "seconds": 0.172
+ },
+ {
+  "id": 126,
+  "name": "BODY_FALL_D1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2134,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 169428,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "126_BODY_FALL_D1_SFX.wav",
+  "seconds": 0.172
+ },
+ {
+  "id": 127,
+  "name": "BODY_FALL_D2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2134,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 169428,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 50,
+  "file": "127_BODY_FALL_D2_SFX.wav",
+  "seconds": 0.172
+ },
+ {
+  "id": 128,
+  "name": "BODY_FALL_D3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2134,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 169428,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "128_BODY_FALL_D3_SFX.wav",
+  "seconds": 0.172
+ },
+ {
+  "id": 129,
+  "name": "BODY_FALL_D4_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2700,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 215687,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "129_BODY_FALL_D4_SFX.wav",
+  "seconds": 0.218
+ },
+ {
+  "id": 130,
+  "name": "BODY_FALL_E1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2700,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 215687,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "file": "130_BODY_FALL_E1_SFX.wav",
+  "seconds": 0.218
+ },
+ {
+  "id": 131,
+  "name": "BODY_FALL_E2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2700,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 215687,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "131_BODY_FALL_E2_SFX.wav",
+  "seconds": 0.218
+ },
+ {
+  "id": 132,
+  "name": "BODY_FALL_E3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6102,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 489428,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "132_BODY_FALL_E3_SFX.wav",
+  "seconds": 0.492
+ },
+ {
+  "id": 133,
+  "name": "BODY_ROLLOVER_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 874,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 75777,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "133_BODY_ROLLOVER_SFX.wav",
+  "seconds": 0.07
+ },
+ {
+  "id": 134,
+  "name": "GET_HIT_MALE0_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 810,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 63079,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "134_GET_HIT_MALE0_SFX.wav",
+  "seconds": 0.065
+ },
+ {
+  "id": 135,
+  "name": "GET_HIT_MALE1_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1180,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 94784,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "135_GET_HIT_MALE1_SFX.wav",
+  "seconds": 0.095
+ },
+ {
+  "id": 136,
+  "name": "GET_HIT_MALE2_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1414,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 117913,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "136_GET_HIT_MALE2_SFX.wav",
+  "seconds": 0.114
+ },
+ {
+  "id": 137,
+  "name": "GET_HIT_MALE3_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2970,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 253238,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "137_GET_HIT_MALE3_SFX.wav",
+  "seconds": 0.239
+ },
+ {
+  "id": 138,
+  "name": "GET_HIT_MALE4_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1332,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 117913,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "138_GET_HIT_MALE4_SFX.wav",
+  "seconds": 0.107
+ },
+ {
+  "id": 139,
+  "name": "GET_HIT_MALE5_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1216,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 117913,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "139_GET_HIT_MALE5_SFX.wav",
+  "seconds": 0.098
+ },
+ {
+  "id": 140,
+  "name": "GET_HIT_MALE6_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1414,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 117913,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "140_GET_HIT_MALE6_SFX.wav",
+  "seconds": 0.114
+ },
+ {
+  "id": 141,
+  "name": "GET_HIT_MALE7_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2584,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 221791,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "141_GET_HIT_MALE7_SFX.wav",
+  "seconds": 0.208
+ },
+ {
+  "id": 142,
+  "name": "GET_HIT_MALE8_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2376,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 229546,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "142_GET_HIT_MALE8_SFX.wav",
+  "seconds": 0.192
+ },
+ {
+  "id": 143,
+  "name": "GET_HIT_MALE9_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2736,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 229546,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "143_GET_HIT_MALE9_SFX.wav",
+  "seconds": 0.221
+ },
+ {
+  "id": 144,
+  "name": "GET_HIT_MALE10_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2296,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 199428,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "144_GET_HIT_MALE10_SFX.wav",
+  "seconds": 0.185
+ },
+ {
+  "id": 145,
+  "name": "GET_HIT_MALE11_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 3160,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 289619,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "145_GET_HIT_MALE11_SFX.wav",
+  "seconds": 0.255
+ },
+ {
+  "id": 146,
+  "name": "GET_HIT_MALE12_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2530,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 225619,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "146_GET_HIT_MALE12_SFX.wav",
+  "seconds": 0.204
+ },
+ {
+  "id": 147,
+  "name": "GET_HIT_MALE13_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1620,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 140725,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "147_GET_HIT_MALE13_SFX.wav",
+  "seconds": 0.131
+ },
+ {
+  "id": 148,
+  "name": "GET_HIT_MALE14_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2332,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 200725,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "148_GET_HIT_MALE14_SFX.wav",
+  "seconds": 0.188
+ },
+ {
+  "id": 149,
+  "name": "GET_HIT_MALE15_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1494,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 125891,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "149_GET_HIT_MALE15_SFX.wav",
+  "seconds": 0.12
+ },
+ {
+  "id": 150,
+  "name": "GET_HIT_MALE16_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1468,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 225619,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "150_GET_HIT_MALE16_SFX.wav",
+  "seconds": 0.118
+ },
+ {
+  "id": 151,
+  "name": "GET_HIT_MALE17_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1476,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 133333,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "151_GET_HIT_MALE17_SFX.wav",
+  "seconds": 0.119
+ },
+ {
+  "id": 152,
+  "name": "GET_HIT_MALE18_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1350,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 121904,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "152_GET_HIT_MALE18_SFX.wav",
+  "seconds": 0.109
+ },
+ {
+  "id": 153,
+  "name": "GET_HIT_MALE19_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1648,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 149566,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "153_GET_HIT_MALE19_SFX.wav",
+  "seconds": 0.133
+ },
+ {
+  "id": 154,
+  "name": "GET_HIT_MALE20_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1926,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 179149,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "154_GET_HIT_MALE20_SFX.wav",
+  "seconds": 0.155
+ },
+ {
+  "id": 155,
+  "name": "GET_HIT_MALE21_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2656,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 239455,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "155_GET_HIT_MALE21_SFX.wav",
+  "seconds": 0.214
+ },
+ {
+  "id": 156,
+  "name": "GET_HIT_MALE22_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 1944,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 179149,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "156_GET_HIT_MALE22_SFX.wav",
+  "seconds": 0.157
+ },
+ {
+  "id": 157,
+  "name": "GET_HIT_MALE23_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 2026,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 179149,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "157_GET_HIT_MALE23_SFX.wav",
+  "seconds": 0.163
+ },
+ {
+  "id": 158,
+  "name": "GET_HIT_MALE24_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 640,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 51473,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "158_GET_HIT_MALE24_SFX.wav",
+  "seconds": 0.052
+ },
+ {
+  "id": 159,
+  "name": "CAMERA_BEEP1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2620,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 229546,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "159_CAMERA_BEEP1_SFX.wav",
+  "seconds": 0.211
+ },
+ {
+  "id": 160,
+  "name": "BING_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 2746,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 43,
+  "loop": {
+   "start": 0,
+   "end": 4859,
+   "count": -1
+  },
+  "file": "160_BING_SFX.wav",
+  "seconds": 0.221
+ },
+ {
+  "id": 161,
+  "name": "ALARM1_SFX",
+  "pan": 64,
+  "volume": 64,
+  "type": "adpcm",
+  "bytes": 2998,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "loop": {
+   "start": 357,
+   "end": 5306,
+   "count": -1
+  },
+  "file": "161_ALARM1_SFX.wav",
+  "seconds": 0.242
+ },
+ {
+  "id": 162,
+  "name": "ALARM2_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 4240,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 239801,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 43,
+  "loop": {
+   "start": 225,
+   "end": 7512,
+   "count": -1
+  },
+  "file": "162_ALARM2_SFX.wav",
+  "seconds": 0.342
+ },
+ {
+  "id": 163,
+  "name": "ALARM3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6778,
+  "envelope": {
+   "attack_us": 225533,
+   "decay_us": 614099,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "163_ALARM3_SFX.wav",
+  "seconds": 0.546
+ },
+ {
+  "id": 164,
+  "name": "RICO_EAR_WHISTLE1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5760,
+  "envelope": {
+   "attack_us": 182758,
+   "decay_us": 522789,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "164_RICO_EAR_WHISTLE1_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 165,
+  "name": "RICO_EAR_WHISTLE2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3078,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 270294,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 57,
+  "file": "165_RICO_EAR_WHISTLE2_SFX.wav",
+  "seconds": 0.248
+ },
+ {
+  "id": 166,
+  "name": "RICO_EAR_WHISTLE3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2394,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 227800,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "166_RICO_EAR_WHISTLE3_SFX.wav",
+  "seconds": 0.193
+ },
+ {
+  "id": 167,
+  "name": "RICO_EAR_WHISTLE4_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 5446,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 438639,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "167_RICO_EAR_WHISTLE4_SFX.wav",
+  "seconds": 0.439
+ },
+ {
+  "id": 168,
+  "name": "RICO_EAR_WHISTLE5_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 14716,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 468523,
+   "release_us": 738267,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "loop": {
+   "start": 16026,
+   "end": 26137,
+   "count": -1
+  },
+  "file": "168_RICO_EAR_WHISTLE5_SFX.wav",
+  "seconds": 1.186
+ },
+ {
+  "id": 169,
+  "name": "EXPLOSION_2A_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 14716,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1023662,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "loop": {
+   "start": 16026,
+   "end": 26137,
+   "count": -1
+  },
+  "file": "169_EXPLOSION_2A_SFX.wav",
+  "seconds": 1.186
+ },
+ {
+  "id": 170,
+  "name": "EXPLOSION_2B_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 12466,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 587911,
+   "release_us": 806924,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "170_EXPLOSION_2B_SFX.wav",
+  "seconds": 1.005
+ },
+ {
+  "id": 171,
+  "name": "EXPLOSION_3_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 15876,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 888730,
+   "release_us": 757741,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "loop": {
+   "start": 20014,
+   "end": 28206,
+   "count": -1
+  },
+  "file": "171_EXPLOSION_3_SFX.wav",
+  "seconds": 1.28
+ },
+ {
+  "id": 172,
+  "name": "EXPLOSION_4A_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 15876,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 888730,
+   "release_us": 757741,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 45,
+  "loop": {
+   "start": 20014,
+   "end": 28206,
+   "count": -1
+  },
+  "file": "172_EXPLOSION_4A_SFX.wav",
+  "seconds": 1.28
+ },
+ {
+  "id": 173,
+  "name": "EXPLOSION_4B_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 5058,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 405573,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "173_EXPLOSION_4B_SFX.wav",
+  "seconds": 0.408
+ },
+ {
+  "id": 174,
+  "name": "EXPLOSION_5A_SFX",
+  "pan": 64,
+  "volume": 95,
+  "type": "adpcm",
+  "bytes": 6040,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 484666,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "174_EXPLOSION_5A_SFX.wav",
+  "seconds": 0.487
+ },
+ {
+  "id": 175,
+  "name": "EXPLOSION_5B_SFX",
+  "pan": 64,
+  "volume": 65,
+  "type": "adpcm",
+  "bytes": 6040,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 484666,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "file": "175_EXPLOSION_5B_SFX.wav",
+  "seconds": 0.487
+ },
+ {
+  "id": 176,
+  "name": "EXPLOSION_5C_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 15292,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1230563,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "176_EXPLOSION_5C_SFX.wav",
+  "seconds": 1.233
+ },
+ {
+  "id": 177,
+  "name": "EXPLOSION_6_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 15292,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1230563,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 44,
+  "file": "177_EXPLOSION_6_SFX.wav",
+  "seconds": 1.233
+ },
+ {
+  "id": 178,
+  "name": "EXPLOSION_7_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 15292,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1230563,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 50,
+  "file": "178_EXPLOSION_7_SFX.wav",
+  "seconds": 1.233
+ },
+ {
+  "id": 179,
+  "name": "EXPLOSION_8_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 12466,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1004852,
+   "release_us": 757741,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "179_EXPLOSION_8_SFX.wav",
+  "seconds": 1.005
+ },
+ {
+  "id": 180,
+  "name": "EXPLOSION_9_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 12466,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1004852,
+   "release_us": 757741,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 43,
+  "file": "180_EXPLOSION_9_SFX.wav",
+  "seconds": 1.005
+ },
+ {
+  "id": 181,
+  "name": "EXPLOSION_1B_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 12466,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1004852,
+   "release_us": 757741,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "181_EXPLOSION_1B_SFX.wav",
+  "seconds": 1.005
+ },
+ {
+  "id": 182,
+  "name": "EXPLOSION_1C_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 9054,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 729387,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 47,
+  "file": "182_EXPLOSION_1C_SFX.wav",
+  "seconds": 0.73
+ },
+ {
+  "id": 183,
+  "name": "CRUSHED_YELL_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 4168,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 333782,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "183_CRUSHED_YELL_SFX.wav",
+  "seconds": 0.336
+ },
+ {
+  "id": 184,
+  "name": "KEY_SEQUENCE_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3114,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 249929,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "184_KEY_SEQUENCE_SFX.wav",
+  "seconds": 0.251
+ },
+ {
+  "id": 185,
+  "name": "HIT_BULLET_DIRT2_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 1432,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 112965,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "185_HIT_BULLET_DIRT2_SFX.wav",
+  "seconds": 0.115
+ },
+ {
+  "id": 186,
+  "name": "ALARM_SWITCH_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3816,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 306619,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "186_ALARM_SWITCH_SFX.wav",
+  "seconds": 0.308
+ },
+ {
+  "id": 187,
+  "name": "DOOR_WOOD_CLOSE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3754,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 306619,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "187_DOOR_WOOD_CLOSE_SFX.wav",
+  "seconds": 0.303
+ },
+ {
+  "id": 188,
+  "name": "DOOR_WOOD_OPEN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2512,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 201040,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "188_DOOR_WOOD_OPEN_SFX.wav",
+  "seconds": 0.202
+ },
+ {
+  "id": 189,
+  "name": "ATOMIC_BOMB_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 4186,
+  "envelope": {
+   "attack_us": 175824,
+   "decay_us": 160545,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "189_ATOMIC_BOMB_SFX.wav",
+  "seconds": 0.337
+ },
+ {
+  "id": 190,
+  "name": "KEY_ANALYSER2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 7318,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 587251,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "190_KEY_ANALYSER2_SFX.wav",
+  "seconds": 0.59
+ },
+ {
+  "id": 191,
+  "name": "DOOR_WOOD_SLIDE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 1054,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 82807,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "191_DOOR_WOOD_SLIDE_SFX.wav",
+  "seconds": 0.085
+ },
+ {
+  "id": 192,
+  "name": "TRAIN_SLIDE_DOOR_CATCH_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 2808,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 708,
+   "end": 4974,
+   "count": -1
+  },
+  "file": "192_TRAIN_SLIDE_DOOR_CATCH_SFX.wav",
+  "seconds": 0.226
+ },
+ {
+  "id": 193,
+  "name": "GAS_LEAK_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5994,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 6560,
+   "end": 10640,
+   "count": -1
+  },
+  "file": "193_GAS_LEAK_SFX.wav",
+  "seconds": 0.483
+ },
+ {
+  "id": 194,
+  "name": "DOOR_SHUTTER_OPEN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5832,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 467795,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "file": "194_DOOR_SHUTTER_OPEN_SFX.wav",
+  "seconds": 0.47
+ },
+ {
+  "id": 195,
+  "name": "DOOR_SHUTTER_CLOSE_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 4752,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 380857,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "195_DOOR_SHUTTER_CLOSE_SFX.wav",
+  "seconds": 0.383
+ },
+ {
+  "id": 196,
+  "name": "DOOR_METAL_OPEN_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3996,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 321809,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "196_DOOR_METAL_OPEN_SFX.wav",
+  "seconds": 0.322
+ },
+ {
+  "id": 197,
+  "name": "DOOR_METAL_CLOSE_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 3888,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 311061,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 40,
+  "file": "197_DOOR_METAL_CLOSE_SFX.wav",
+  "seconds": 0.313
+ },
+ {
+  "id": 198,
+  "name": "CONSOLE_ON_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 5310,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 425619,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "198_CONSOLE_ON_SFX.wav",
+  "seconds": 0.428
+ },
+ {
+  "id": 199,
+  "name": "DOOR_METAL_CLOSE2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2034,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 161310,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "199_DOOR_METAL_CLOSE2_SFX.wav",
+  "seconds": 0.164
+ },
+ {
+  "id": 200,
+  "name": "DOOR_METAL_OPEN3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2502,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 199179,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "200_DOOR_METAL_OPEN3_SFX.wav",
+  "seconds": 0.202
+ },
+ {
+  "id": 201,
+  "name": "DOOR_METAL_CLOSE3_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3888,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 311061,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "201_DOOR_METAL_CLOSE3_SFX.wav",
+  "seconds": 0.313
+ },
+ {
+  "id": 202,
+  "name": "METAL_SLIDE_OPEN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 4086,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 326979,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "202_METAL_SLIDE_OPEN_SFX.wav",
+  "seconds": 0.329
+ },
+ {
+  "id": 203,
+  "name": "METAL_SLIDE_CLOSE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 4356,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "loop": {
+   "start": 2471,
+   "end": 7719,
+   "count": -1
+  },
+  "file": "203_METAL_SLIDE_CLOSE_SFX.wav",
+  "seconds": 0.351
+ },
+ {
+  "id": 204,
+  "name": "METAL_SLIDE_LOOP_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 1332,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 112197,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "204_METAL_SLIDE_LOOP_SFX.wav",
+  "seconds": 0.107
+ },
+ {
+  "id": 205,
+  "name": "UNKNOWN4_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 1162,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 112197,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "205_UNKNOWN4_SFX.wav",
+  "seconds": 0.094
+ },
+ {
+  "id": 206,
+  "name": "UNKNOWN5_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 1206,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 112197,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "206_UNKNOWN5_SFX.wav",
+  "seconds": 0.097
+ },
+ {
+  "id": 207,
+  "name": "UNKNOWN6_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3348,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 267387,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "207_UNKNOWN6_SFX.wav",
+  "seconds": 0.27
+ },
+ {
+  "id": 208,
+  "name": "HIT_BULLET_STONE1_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3348,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 267387,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "208_HIT_BULLET_STONE1_SFX.wav",
+  "seconds": 0.27
+ },
+ {
+  "id": 209,
+  "name": "HIT_BULLET_STONE2_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 820,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 63759,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "209_HIT_BULLET_STONE2_SFX.wav",
+  "seconds": 0.066
+ },
+ {
+  "id": 210,
+  "name": "DOOR_SMART_CATCH1_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 5752,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 461038,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "210_DOOR_SMART_CATCH1_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 211,
+  "name": "DOOR_SMART_SLIDE1_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3168,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 202537,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "211_DOOR_SMART_SLIDE1_SFX.wav",
+  "seconds": 0.255
+ },
+ {
+  "id": 212,
+  "name": "HIT_BULLET_TILE_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 8758,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 703714,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 52,
+  "file": "212_HIT_BULLET_TILE_SFX.wav",
+  "seconds": 0.706
+ },
+ {
+  "id": 213,
+  "name": "TANK_CRUSH_MAN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3888,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 311061,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 46,
+  "file": "213_TANK_CRUSH_MAN_SFX.wav",
+  "seconds": 0.313
+ },
+ {
+  "id": 214,
+  "name": "HEAVY_SLIDE_OPEN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 4086,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 326979,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 46,
+  "file": "214_HEAVY_SLIDE_OPEN_SFX.wav",
+  "seconds": 0.329
+ },
+ {
+  "id": 215,
+  "name": "HEAVY_SLIDE_CLOSE_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 5320,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 239801,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 46,
+   "end": 9440,
+   "count": -1
+  },
+  "file": "215_HEAVY_SLIDE_CLOSE_SFX.wav",
+  "seconds": 0.429
+ },
+ {
+  "id": 216,
+  "name": "HEAVY_SINGLE_LOOP_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 2970,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 287387,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "216_HEAVY_SINGLE_LOOP_SFX.wav",
+  "seconds": 0.239
+ },
+ {
+  "id": 217,
+  "name": "HIT_BULLET_WOOD2_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 6616,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 8185,
+   "end": 11732,
+   "count": -1
+  },
+  "file": "217_HIT_BULLET_WOOD2_SFX.wav",
+  "seconds": 0.533
+ },
+ {
+  "id": 218,
+  "name": "DOOR_HYDRAL_CLOSE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3772,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 301718,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "218_DOOR_HYDRAL_CLOSE_SFX.wav",
+  "seconds": 0.304
+ },
+ {
+  "id": 219,
+  "name": "DOOR_HYDRAL_OPEN_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3276,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 249929,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "219_DOOR_HYDRAL_OPEN_SFX.wav",
+  "seconds": 0.264
+ },
+ {
+  "id": 220,
+  "name": "HIT_BULLET_DIRT1_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 6084,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 488294,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "220_HIT_BULLET_DIRT1_SFX.wav",
+  "seconds": 0.491
+ },
+ {
+  "id": 221,
+  "name": "HIT_METAL_OBJECT2_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 1432,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 112965,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "221_HIT_METAL_OBJECT2_SFX.wav",
+  "seconds": 0.115
+ },
+ {
+  "id": 222,
+  "name": "DOOR_LOCK_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 1044,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 81673,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "222_DOOR_LOCK_SFX.wav",
+  "seconds": 0.084
+ },
+ {
+  "id": 223,
+  "name": "TRAIN_CLUTTER2_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3394,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 287387,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "223_TRAIN_CLUTTER2_SFX.wav",
+  "seconds": 0.274
+ },
+ {
+  "id": 224,
+  "name": "HIT_BULLET_MUD3_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 9918,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 46,
+  "loop": {
+   "start": 5309,
+   "end": 17610,
+   "count": -1
+  },
+  "file": "224_HIT_BULLET_MUD3_SFX.wav",
+  "seconds": 0.8
+ },
+ {
+  "id": 225,
+  "name": "DOOR_SLIDE_STONE_OPEN_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 4960,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 468748,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "225_DOOR_SLIDE_STONE_OPEN_SFX.wav",
+  "seconds": 0.4
+ },
+ {
+  "id": 226,
+  "name": "DOOR_SLIDE_STONE_CLOSE_SFX",
+  "pan": 64,
+  "volume": 60,
+  "type": "adpcm",
+  "bytes": 4158,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 333603,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "226_DOOR_SLIDE_STONE_CLOSE_SFX.wav",
+  "seconds": 0.335
+ },
+ {
+  "id": 227,
+  "name": "DATA_DOWNLOAD_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 3006,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 240176,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "227_DATA_DOWNLOAD_SFX.wav",
+  "seconds": 0.242
+ },
+ {
+  "id": 228,
+  "name": "LASER_GUN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 640,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 51473,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "228_LASER_GUN_SFX.wav",
+  "seconds": 0.052
+ },
+ {
+  "id": 229,
+  "name": "KEYCARD_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 1918,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 152380,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "229_KEYCARD_SFX.wav",
+  "seconds": 0.155
+ },
+ {
+  "id": 230,
+  "name": "HIT_BULLET_MUD2_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3592,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 287387,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "230_HIT_BULLET_MUD2_SFX.wav",
+  "seconds": 0.29
+ },
+ {
+  "id": 231,
+  "name": "HIT_BULLET_MUD1_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2152,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 184394,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "231_HIT_BULLET_MUD1_SFX.wav",
+  "seconds": 0.173
+ },
+ {
+  "id": 232,
+  "name": "PICKUP_GUN_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3384,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 326979,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "232_PICKUP_GUN_SFX.wav",
+  "seconds": 0.273
+ },
+ {
+  "id": 233,
+  "name": "PICKUP_KNIFE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 2152,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 184394,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 53,
+  "file": "233_PICKUP_KNIFE_SFX.wav",
+  "seconds": 0.173
+ },
+ {
+  "id": 234,
+  "name": "PICKUP_AMMO_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3438,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 274961,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 60,
+  "file": "234_PICKUP_AMMO_SFX.wav",
+  "seconds": 0.277
+ },
+ {
+  "id": 235,
+  "name": "PICKUP_MINE_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 5914,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 528044,
+   "release_us": 142859,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 2210,
+   "end": 10496,
+   "count": -1
+  },
+  "file": "235_PICKUP_MINE_SFX.wav",
+  "seconds": 0.477
+ },
+ {
+  "id": 236,
+  "name": "WATCH_STATIC_SFX",
+  "pan": 64,
+  "volume": 45,
+  "type": "adpcm",
+  "bytes": 3988,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 321809,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "236_WATCH_STATIC_SFX.wav",
+  "seconds": 0.321
+ },
+ {
+  "id": 237,
+  "name": "WATCH_ON_SFX",
+  "pan": 64,
+  "volume": 45,
+  "type": "adpcm",
+  "bytes": 3906,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 323539,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 51,
+  "file": "237_WATCH_ON_SFX.wav",
+  "seconds": 0.315
+ },
+ {
+  "id": 238,
+  "name": "WATCH_OFF_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2080,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 180539,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "238_WATCH_OFF_SFX.wav",
+  "seconds": 0.168
+ },
+ {
+  "id": 239,
+  "name": "HIT_BULLET_METAL_A3_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 2268,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 167024,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "239_HIT_BULLET_METAL_A3_SFX.wav",
+  "seconds": 0.183
+ },
+ {
+  "id": 240,
+  "name": "HIT_BULLET_METAL_A4_SFX",
+  "pan": 64,
+  "volume": 120,
+  "type": "adpcm",
+  "bytes": 1638,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 130655,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "240_HIT_BULLET_METAL_A4_SFX.wav",
+  "seconds": 0.132
+ },
+ {
+  "id": 241,
+  "name": "ATTACH_MINE_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 3916,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 314825,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "241_ATTACH_MINE_SFX.wav",
+  "seconds": 0.316
+ },
+ {
+  "id": 242,
+  "name": "PICKUP_LASER_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 1548,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 123399,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "242_PICKUP_LASER_SFX.wav",
+  "seconds": 0.125
+ },
+ {
+  "id": 243,
+  "name": "WATCH_DETONATE_MINE_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 3484,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 278181,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "file": "243_WATCH_DETONATE_MINE_SFX.wav",
+  "seconds": 0.281
+ },
+ {
+  "id": 244,
+  "name": "CAMERA_CLICK_SFX",
+  "pan": 64,
+  "volume": 90,
+  "type": "adpcm",
+  "bytes": 4186,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 336369,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "244_CAMERA_CLICK_SFX.wav",
+  "seconds": 0.337
+ },
+ {
+  "id": 245,
+  "name": "KEY_ANALYSER_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 3736,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 239801,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "loop": {
+   "start": 38,
+   "end": 6624,
+   "count": -1
+  },
+  "file": "245_KEY_ANALYSER_SFX.wav",
+  "seconds": 0.301
+ },
+ {
+  "id": 246,
+  "name": "MAGNETIC_HUM_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 2548,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 203260,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "246_MAGNETIC_HUM_SFX.wav",
+  "seconds": 0.205
+ },
+ {
+  "id": 247,
+  "name": "BOMB_DEFUSE_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 18352,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 1642081,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 42,
+  "file": "247_BOMB_DEFUSE_SFX.wav",
+  "seconds": 1.48
+ },
+ {
+  "id": 248,
+  "name": "BI_PLANE_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 910,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 72061,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "248_BI_PLANE_SFX.wav",
+  "seconds": 0.073
+ },
+ {
+  "id": 249,
+  "name": "TRAIN_CLUTTER_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 802,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 62353,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "249_TRAIN_CLUTTER_SFX.wav",
+  "seconds": 0.065
+ },
+ {
+  "id": 250,
+  "name": "TRAIN_CLUTTERB_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 622,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 48068,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "250_TRAIN_CLUTTERB_SFX.wav",
+  "seconds": 0.05
+ },
+ {
+  "id": 251,
+  "name": "TRAIN_CLUTTERC_SFX",
+  "pan": 64,
+  "volume": 70,
+  "type": "adpcm",
+  "bytes": 1044,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 81673,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 41,
+  "file": "251_TRAIN_CLUTTERC_SFX.wav",
+  "seconds": 0.084
+ },
+ {
+  "id": 252,
+  "name": "TRAIN_CLUTTERD_SFX",
+  "pan": 64,
+  "volume": 110,
+  "type": "adpcm",
+  "bytes": 910,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 71879,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "252_TRAIN_CLUTTERD_SFX.wav",
+  "seconds": 0.073
+ },
+ {
+  "id": 253,
+  "name": "GUN_B9_CANNON_SHORT_SFX",
+  "pan": 64,
+  "volume": 80,
+  "type": "adpcm",
+  "bytes": 4456,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 245623,
+   "release_us": 273963,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 67,
+  "loop": {
+   "start": 5588,
+   "end": 7895,
+   "count": -1
+  },
+  "file": "253_GUN_B9_CANNON_SHORT_SFX.wav",
+  "seconds": 0.359
+ },
+ {
+  "id": 254,
+  "name": "UNKNOWN_QUIET_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 6868,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": -1,
+   "release_us": 2000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "loop": {
+   "start": 5318,
+   "end": 12190,
+   "count": -1
+  },
+  "file": "254_UNKNOWN_QUIET_SFX.wav",
+  "seconds": 0.554
+ },
+ {
+  "id": 255,
+  "name": "CAMERA_ZOOM_LOOP_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 5760,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 464036,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 54,
+  "file": "255_CAMERA_ZOOM_LOOP_SFX.wav",
+  "seconds": 0.464
+ },
+ {
+  "id": 256,
+  "name": "CAMERA_ZOOM_STOP_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 3222,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 258138,
+   "release_us": 1000,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 48,
+  "file": "256_CAMERA_ZOOM_STOP_SFX.wav",
+  "seconds": 0.26
+ },
+ {
+  "id": 257,
+  "name": "SNEEZE_SFX",
+  "pan": 64,
+  "volume": 100,
+  "type": "adpcm",
+  "bytes": 12168,
+  "envelope": {
+   "attack_us": 598430,
+   "decay_us": 152075,
+   "release_us": 1055692,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 55,
+  "loop": {
+   "start": 17749,
+   "end": 21604,
+   "count": -1
+  },
+  "file": "257_SNEEZE_SFX.wav",
+  "seconds": 0.981
+ },
+ {
+  "id": 258,
+  "name": "RARELOGO_SFX",
+  "pan": 64,
+  "volume": 60,
+  "type": "adpcm",
+  "bytes": 12168,
+  "envelope": {
+   "attack_us": 598430,
+   "decay_us": 152075,
+   "release_us": 1055692,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 56,
+  "loop": {
+   "start": 17749,
+   "end": 21604,
+   "count": -1
+  },
+  "file": "258_RARELOGO_SFX.wav",
+  "seconds": 0.981
+ },
+ {
+  "id": 259,
+  "name": "RARELOGO_QUIET_SFX",
+  "pan": 64,
+  "volume": 30,
+  "type": "adpcm",
+  "bytes": 12168,
+  "envelope": {
+   "attack_us": 598430,
+   "decay_us": 152075,
+   "release_us": 1055692,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 57,
+  "loop": {
+   "start": 17749,
+   "end": 21604,
+   "count": -1
+  },
+  "file": "259_RARELOGO_QUIET_SFX.wav",
+  "seconds": 0.981
+ },
+ {
+  "id": 260,
+  "name": "RARELOGO_FAINT_SFX",
+  "pan": 64,
+  "volume": 127,
+  "type": "adpcm",
+  "bytes": 6274,
+  "envelope": {
+   "attack_us": 0,
+   "decay_us": 341570,
+   "release_us": 469845,
+   "attack_vol": 127,
+   "decay_vol": 127
+  },
+  "keybase": 44,
+  "loop": {
+   "start": 9393,
+   "end": 11122,
+   "count": -1
+  },
+  "file": "260_RARELOGO_FAINT_SFX.wav",
+  "seconds": 0.506
+ }
+]

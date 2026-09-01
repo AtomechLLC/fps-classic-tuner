@@ -1,0 +1,30 @@
+newmtl tex_1871_lit_w10
+map_Kd ../images/1871_1871.png
+
+newmtl tex_1872_lit
+map_Kd ../images/1872_1872.png
+
+newmtl tex_1873_lit
+map_Kd ../images/1873_1873.png
+
+newmtl tex_1878_lit
+map_Kd ../images/1878_1878.png
+
+newmtl tex_1879_lit_w01
+map_Kd ../images/1879_1879.png
+
+newmtl tex_1880_lit_w01
+map_Kd ../images/1880_1880.png
+
+newmtl tex_1882_lit_w10
+map_Kd ../images/1882_1882.png
+
+newmtl tex_1897_lit
+map_Kd ../images/1897_1897.png
+
+newmtl tex_1899_lit
+map_Kd ../images/1899_1899.png
+
+newmtl tex_1900_lit
+map_Kd ../images/1900_1900.png
+

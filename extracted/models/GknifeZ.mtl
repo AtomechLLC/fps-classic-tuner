@@ -1,0 +1,72 @@
+newmtl tex_1793_sw0_0_lit_ds_w11
+map_Kd ../images/1793_1793.png
+
+newmtl tex_1794_sw0_0_lit_ds_w11
+map_Kd ../images/1794_1794.png
+
+newmtl tex_1794_sw3_0_lit_ds_w11
+map_Kd ../images/1794_1794.png
+
+newmtl tex_1795_sw1_0_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw1_2_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw2_0_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw2_1_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw3_0_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1796_sw0_0_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw1_0_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw1_1_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw1_1_lit_ds_w11_ovl
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw2_1_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1797_sw0_0_lit_ds_w11
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1797_sw1_2_lit_ds_w11
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1797_sw3_0_lit_ds_w11
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1798_sw0_0_lit_ds_w11
+map_Kd ../images/1798_1798.png
+
+newmtl tex_1798_sw0_0_lit_ds_w11_ovl
+map_Kd ../images/1798_1798.png
+
+newmtl tex_1798_sw1_2_lit_ds_w11
+map_Kd ../images/1798_1798.png
+
+newmtl tex_1798_sw1_2_lit_ds_w11_ovl
+map_Kd ../images/1798_1798.png
+
+newmtl tex_661_lit_env_ds
+map_Kd ../images/0661_661.png
+
+newmtl tex_766_lit_ds
+map_Kd ../images/0766_766.png
+
+newmtl tex_766_lit_ds_ovl
+map_Kd ../images/0766_766.png
+
+newmtl tex_776_lit_env_ds
+map_Kd ../images/0776_776.png
+

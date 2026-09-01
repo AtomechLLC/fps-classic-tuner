@@ -1,0 +1,51 @@
+newmtl tex_1609_lit
+map_Kd ../images/1609_1609.png
+
+newmtl tex_1613_lit_w11
+map_Kd ../images/1613_1613.png
+
+newmtl tex_1616_lit_w11
+map_Kd ../images/1616_1616.png
+
+newmtl tex_1619_lit_w11
+map_Kd ../images/1619_1619.png
+
+newmtl tex_1622_lit_w11
+map_Kd ../images/1622_1622.png
+
+newmtl tex_2011_lit_w01
+map_Kd ../images/2011_2011.png
+
+newmtl tex_2012_lit_w01
+map_Kd ../images/2012_2012.png
+
+newmtl tex_2013_lit_w11
+map_Kd ../images/2013_2013.png
+
+newmtl tex_2016_lit_w01
+map_Kd ../images/2016_2016.png
+
+newmtl tex_2017_lit_w11
+map_Kd ../images/2017_2017.png
+
+newmtl tex_2018_lit_w11
+map_Kd ../images/2018_2018.png
+
+newmtl tex_2019_lit_w11
+map_Kd ../images/2019_2019.png
+
+newmtl tex_2020_lit_w01
+map_Kd ../images/2020_2020.png
+
+newmtl tex_2021_lit_w11
+map_Kd ../images/2021_2021.png
+
+newmtl tex_2022_lit_w01
+map_Kd ../images/2022_2022.png
+
+newmtl tex_2023_lit_w11
+map_Kd ../images/2023_2023.png
+
+newmtl tex_2024_lit_w11
+map_Kd ../images/2024_2024.png
+

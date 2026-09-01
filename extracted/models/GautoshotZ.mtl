@@ -1,0 +1,120 @@
+newmtl tex_1217_sw1_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw10_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw11_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw13_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw13_0_lit_w11_ovl
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw14_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw2_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw2_0_lit_w11_ovl
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw4_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw5_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw7_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw8_0_lit_w11
+map_Kd ../images/1217_1217.png
+
+newmtl tex_1217_sw8_0_lit_w11_ovl
+map_Kd ../images/1217_1217.png
+
+newmtl tex_2141_fl0_ds_w11
+map_Kd ../images/2141_2141.png
+
+newmtl tex_2141_fl1_ds_w11
+map_Kd ../images/2141_2141.png
+
+newmtl tex_2142_fl0_ds_w11_ovl
+map_Kd ../images/2142_2142.png
+
+newmtl tex_2142_fl1_ds_w11_ovl
+map_Kd ../images/2142_2142.png
+
+newmtl tex_2143_fl0_ds_w11_ovl
+map_Kd ../images/2143_2143.png
+
+newmtl tex_2143_fl1_ds_w11_ovl
+map_Kd ../images/2143_2143.png
+
+newmtl tex_2144_fl0_ds_w11_ovl
+map_Kd ../images/2144_2144.png
+
+newmtl tex_2144_fl1_ds_w11_ovl
+map_Kd ../images/2144_2144.png
+
+newmtl tex_232_sw11_0_lit_sec
+map_Kd ../images/0232_232.png
+
+newmtl tex_232_sw14_0_lit_sec
+map_Kd ../images/0232_232.png
+
+newmtl tex_232_sw2_0_lit_sec
+map_Kd ../images/0232_232.png
+
+newmtl tex_232_sw5_0_lit_sec
+map_Kd ../images/0232_232.png
+
+newmtl tex_232_sw8_0_lit_sec
+map_Kd ../images/0232_232.png
+
+newmtl tex_74_lit_w01_ovl
+map_Kd ../images/0074_74.png
+
+newmtl tex_75_lit
+map_Kd ../images/0075_75.png
+
+newmtl tex_75_lit_ovl
+map_Kd ../images/0075_75.png
+
+newmtl tex_76_lit_w01
+map_Kd ../images/0076_76.png
+
+newmtl tex_77_lit
+map_Kd ../images/0077_GAZ_SIDE.png
+
+newmtl tex_77_lit_ovl
+map_Kd ../images/0077_GAZ_SIDE.png
+
+newmtl tex_78_lit_w01
+map_Kd ../images/0078_78.png
+
+newmtl tex_79_lit
+map_Kd ../images/0079_79.png
+
+newmtl tex_80_lit_w01
+map_Kd ../images/0080_GAZ_DOOR.png
+
+newmtl tex_80_lit_w01_ovl
+map_Kd ../images/0080_GAZ_DOOR.png
+
+newmtl tex_82_lit
+map_Kd ../images/0082_82.png
+
+newmtl tex_83_lit
+map_Kd ../images/0083_83.png
+
+newmtl tex_83_lit_ovl
+map_Kd ../images/0083_83.png
+
+newmtl tex_84_lit
+map_Kd ../images/0084_84.png
+

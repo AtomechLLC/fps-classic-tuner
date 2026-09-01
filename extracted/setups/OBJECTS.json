@@ -1,0 +1,1686 @@
+{
+ "props": {
+  "PROP_ALARM1": {
+   "file": "Palarm1Z",
+   "scale": 0.1
+  },
+  "PROP_ALARM2": {
+   "file": "Palarm2Z",
+   "scale": 0.1
+  },
+  "PROP_EXPLOSIONBIT": {
+   "file": "PexplosionbitZ",
+   "scale": 0.1
+  },
+  "PROP_AMMO_CRATE1": {
+   "file": "Pammo_crate1Z",
+   "scale": 0.1
+  },
+  "PROP_AMMO_CRATE2": {
+   "file": "Pammo_crate2Z",
+   "scale": 0.1
+  },
+  "PROP_AMMO_CRATE3": {
+   "file": "Pammo_crate3Z",
+   "scale": 0.1
+  },
+  "PROP_AMMO_CRATE4": {
+   "file": "Pammo_crate4Z",
+   "scale": 0.1
+  },
+  "PROP_AMMO_CRATE5": {
+   "file": "Pammo_crate5Z",
+   "scale": 0.1
+  },
+  "PROP_BIN1": {
+   "file": "Pbin1Z",
+   "scale": 0.1
+  },
+  "PROP_BLOTTER1": {
+   "file": "Pblotter1Z",
+   "scale": 0.1
+  },
+  "PROP_BOOK1": {
+   "file": "Pbook1Z",
+   "scale": 0.1
+  },
+  "PROP_BOOKSHELF1": {
+   "file": "Pbookshelf1Z",
+   "scale": 0.1
+  },
+  "PROP_BRIDGE_CONSOLE1A": {
+   "file": "Pbridge_console1aZ",
+   "scale": 0.1
+  },
+  "PROP_BRIDGE_CONSOLE1B": {
+   "file": "Pbridge_console1bZ",
+   "scale": 0.1
+  },
+  "PROP_BRIDGE_CONSOLE2A": {
+   "file": "Pbridge_console2aZ",
+   "scale": 0.1
+  },
+  "PROP_BRIDGE_CONSOLE2B": {
+   "file": "Pbridge_console2bZ",
+   "scale": 0.1
+  },
+  "PROP_BRIDGE_CONSOLE3A": {
+   "file": "Pbridge_console3aZ",
+   "scale": 0.1
+  },
+  "PROP_BRIDGE_CONSOLE3B": {
+   "file": "Pbridge_console3bZ",
+   "scale": 0.1
+  },
+  "PROP_CARD_BOX1": {
+   "file": "Pcard_box1Z",
+   "scale": 0.1
+  },
+  "PROP_CARD_BOX2": {
+   "file": "Pcard_box2Z",
+   "scale": 0.1
+  },
+  "PROP_CARD_BOX3": {
+   "file": "Pcard_box3Z",
+   "scale": 0.1
+  },
+  "PROP_CARD_BOX4_LG": {
+   "file": "Pcard_box4_lgZ",
+   "scale": 0.1
+  },
+  "PROP_CARD_BOX5_LG": {
+   "file": "Pcard_box5_lgZ",
+   "scale": 0.1
+  },
+  "PROP_CARD_BOX6_LG": {
+   "file": "Pcard_box6_lgZ",
+   "scale": 0.1
+  },
+  "PROP_CCTV": {
+   "file": "PcctvZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE1": {
+   "file": "Pconsole1Z",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE2": {
+   "file": "Pconsole2Z",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE3": {
+   "file": "Pconsole3Z",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEVA": {
+   "file": "Pconsole_sevaZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEVB": {
+   "file": "Pconsole_sevbZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEVC": {
+   "file": "Pconsole_sevcZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEVD": {
+   "file": "Pconsole_sevdZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEV2A": {
+   "file": "Pconsole_sev2aZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEV2B": {
+   "file": "Pconsole_sev2bZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEV2C": {
+   "file": "Pconsole_sev2cZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEV2D": {
+   "file": "Pconsole_sev2dZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEV_GEA": {
+   "file": "Pconsole_sev_GEaZ",
+   "scale": 0.1
+  },
+  "PROP_CONSOLE_SEV_GEB": {
+   "file": "Pconsole_sev_GEbZ",
+   "scale": 0.1
+  },
+  "PROP_DESK1": {
+   "file": "Pdesk1Z",
+   "scale": 0.1
+  },
+  "PROP_DESK2": {
+   "file": "Pdesk2Z",
+   "scale": 0.1
+  },
+  "PROP_DESK_LAMP2": {
+   "file": "Pdesk_lamp2Z",
+   "scale": 0.1
+  },
+  "PROP_DISC_READER": {
+   "file": "Pdisc_readerZ",
+   "scale": 0.1
+  },
+  "PROP_DISK_DRIVE1": {
+   "file": "Pdisk_drive1Z",
+   "scale": 0.1
+  },
+  "PROP_FILING_CABINET1": {
+   "file": "Pfiling_cabinet1Z",
+   "scale": 0.1
+  },
+  "PROP_JERRY_CAN1": {
+   "file": "Pjerry_can1Z",
+   "scale": 0.1
+  },
+  "PROP_KEYBOARD1": {
+   "file": "Pkeyboard1Z",
+   "scale": 0.1
+  },
+  "PROP_KIT_UNITS1": {
+   "file": "Pkit_units1Z",
+   "scale": 0.1
+  },
+  "PROP_LETTER_TRAY1": {
+   "file": "Pletter_tray1Z",
+   "scale": 0.1
+  },
+  "PROP_MAINFRAME1": {
+   "file": "Pmainframe1Z",
+   "scale": 0.1
+  },
+  "PROP_MAINFRAME2": {
+   "file": "Pmainframe2Z",
+   "scale": 0.1
+  },
+  "PROP_METAL_CHAIR1": {
+   "file": "Pmetal_chair1Z",
+   "scale": 0.1
+  },
+  "PROP_METAL_CRATE1": {
+   "file": "Pmetal_crate1Z",
+   "scale": 0.1
+  },
+  "PROP_METAL_CRATE2": {
+   "file": "Pmetal_crate2Z",
+   "scale": 0.1
+  },
+  "PROP_METAL_CRATE3": {
+   "file": "Pmetal_crate3Z",
+   "scale": 0.1
+  },
+  "PROP_METAL_CRATE4": {
+   "file": "Pmetal_crate4Z",
+   "scale": 0.1
+  },
+  "PROP_MISSILE_RACK": {
+   "file": "Pmissile_rackZ",
+   "scale": 0.1
+  },
+  "PROP_MISSILE_RACK2": {
+   "file": "Pmissile_rack2Z",
+   "scale": 0.1
+  },
+  "PROP_OIL_DRUM1": {
+   "file": "Poil_drum1Z",
+   "scale": 0.1
+  },
+  "PROP_OIL_DRUM2": {
+   "file": "Poil_drum2Z",
+   "scale": 0.1
+  },
+  "PROP_OIL_DRUM3": {
+   "file": "Poil_drum3Z",
+   "scale": 0.1
+  },
+  "PROP_OIL_DRUM5": {
+   "file": "Poil_drum5Z",
+   "scale": 0.1
+  },
+  "PROP_OIL_DRUM6": {
+   "file": "Poil_drum6Z",
+   "scale": 0.1
+  },
+  "PROP_OIL_DRUM7": {
+   "file": "Poil_drum7Z",
+   "scale": 0.1
+  },
+  "PROP_PADLOCK": {
+   "file": "PpadlockZ",
+   "scale": 0.1
+  },
+  "PROP_PHONE1": {
+   "file": "Pphone1Z",
+   "scale": 0.1
+  },
+  "PROP_RADIO_UNIT1": {
+   "file": "Pradio_unit1Z",
+   "scale": 0.1
+  },
+  "PROP_RADIO_UNIT2": {
+   "file": "Pradio_unit2Z",
+   "scale": 0.1
+  },
+  "PROP_RADIO_UNIT3": {
+   "file": "Pradio_unit3Z",
+   "scale": 0.1
+  },
+  "PROP_RADIO_UNIT4": {
+   "file": "Pradio_unit4Z",
+   "scale": 0.1
+  },
+  "PROP_SAT1_REFLECT": {
+   "file": "Psat1_reflectZ",
+   "scale": 0.1
+  },
+  "PROP_SATDISH": {
+   "file": "PsatdishZ",
+   "scale": 0.1
+  },
+  "PROP_SATBOX": {
+   "file": "PsatboxZ",
+   "scale": 0.1
+  },
+  "PROP_STOOL1": {
+   "file": "Pstool1Z",
+   "scale": 0.1
+  },
+  "PROP_SWIVEL_CHAIR1": {
+   "file": "Pswivel_chair1Z",
+   "scale": 0.1
+  },
+  "PROP_TORPEDO_RACK": {
+   "file": "Ptorpedo_rackZ",
+   "scale": 0.1
+  },
+  "PROP_TV1": {
+   "file": "Ptv1Z",
+   "scale": 0.1
+  },
+  "PROP_TV_HOLDER": {
+   "file": "Ptv_holderZ",
+   "scale": 0.1
+  },
+  "PROP_TVSCREEN": {
+   "file": "PtvscreenZ",
+   "scale": 0.1
+  },
+  "PROP_TV4SCREEN": {
+   "file": "Ptv4screenZ",
+   "scale": 0.1
+  },
+  "PROP_WOOD_LG_CRATE1": {
+   "file": "Pwood_lg_crate1Z",
+   "scale": 0.1
+  },
+  "PROP_WOOD_LG_CRATE2": {
+   "file": "Pwood_lg_crate2Z",
+   "scale": 0.1
+  },
+  "PROP_WOOD_MD_CRATE3": {
+   "file": "Pwood_md_crate3Z",
+   "scale": 0.1
+  },
+  "PROP_WOOD_SM_CRATE4": {
+   "file": "Pwood_sm_crate4Z",
+   "scale": 0.1
+  },
+  "PROP_WOOD_SM_CRATE5": {
+   "file": "Pwood_sm_crate5Z",
+   "scale": 0.1
+  },
+  "PROP_WOOD_SM_CRATE6": {
+   "file": "Pwood_sm_crate6Z",
+   "scale": 0.1
+  },
+  "PROP_WOODEN_TABLE1": {
+   "file": "Pwooden_table1Z",
+   "scale": 0.1
+  },
+  "PROP_SWIPE_CARD2": {
+   "file": "Pswipe_card2Z",
+   "scale": 0.1
+  },
+  "PROP_BORG_CRATE": {
+   "file": "Pborg_crateZ",
+   "scale": 0.1
+  },
+  "PROP_BOXES4X4": {
+   "file": "Pboxes4x4Z",
+   "scale": 0.1
+  },
+  "PROP_BOXES3X4": {
+   "file": "Pboxes3x4Z",
+   "scale": 0.1
+  },
+  "PROP_BOXES2X4": {
+   "file": "Pboxes2x4Z",
+   "scale": 0.1
+  },
+  "PROP_SEC_PANEL": {
+   "file": "Psec_panelZ",
+   "scale": 0.1
+  },
+  "PROP_ICBM_NOSE": {
+   "file": "PICBM_noseZ",
+   "scale": 0.1
+  },
+  "PROP_ICBM": {
+   "file": "PICBMZ",
+   "scale": 0.1
+  },
+  "PROP_TUNING_CONSOLE1": {
+   "file": "Ptuning_console1Z",
+   "scale": 0.1
+  },
+  "PROP_DESK_ARECIBO1": {
+   "file": "Pdesk_arecibo1Z",
+   "scale": 0.1
+  },
+  "PROP_LOCKER3": {
+   "file": "Plocker3Z",
+   "scale": 0.1
+  },
+  "PROP_LOCKER4": {
+   "file": "Plocker4Z",
+   "scale": 0.1
+  },
+  "PROP_ROOFGUN": {
+   "file": "ProofgunZ",
+   "scale": 0.1
+  },
+  "PROP_DEST_ENGINE": {
+   "file": "Pdest_engineZ",
+   "scale": 0.1
+  },
+  "PROP_DEST_EXOCET": {
+   "file": "Pdest_exocetZ",
+   "scale": 0.1
+  },
+  "PROP_DEST_GUN": {
+   "file": "Pdest_gunZ",
+   "scale": 0.1
+  },
+  "PROP_DEST_HARPOON": {
+   "file": "Pdest_harpoonZ",
+   "scale": 0.1
+  },
+  "PROP_DEST_SEAWOLF": {
+   "file": "Pdest_seawolfZ",
+   "scale": 0.1
+  },
+  "PROP_WINDOW": {
+   "file": "PwindowZ",
+   "scale": 0.1
+  },
+  "PROP_WINDOW_LIB_LG1": {
+   "file": "Pwindow_lib_lg1Z",
+   "scale": 0.1
+  },
+  "PROP_WINDOW_LIB_SM1": {
+   "file": "Pwindow_lib_sm1Z",
+   "scale": 0.1
+  },
+  "PROP_WINDOW_COR11": {
+   "file": "Pwindow_cor11Z",
+   "scale": 0.1
+  },
+  "PROP_JUNGLE3_TREE": {
+   "file": "Pjungle3_treeZ",
+   "scale": 0.1
+  },
+  "PROP_PALM": {
+   "file": "PpalmZ",
+   "scale": 0.1
+  },
+  "PROP_PALMTREE": {
+   "file": "PpalmtreeZ",
+   "scale": 0.1
+  },
+  "PROP_PLANT2B": {
+   "file": "Pplant2bZ",
+   "scale": 0.1
+  },
+  "PROP_LABBENCH": {
+   "file": "PlabbenchZ",
+   "scale": 0.1
+  },
+  "PROP_GASBARREL": {
+   "file": "PgasbarrelZ",
+   "scale": 0.1
+  },
+  "PROP_GASBARRELS": {
+   "file": "PgasbarrelsZ",
+   "scale": 0.1
+  },
+  "PROP_BODYARMOUR": {
+   "file": "PbodyarmourZ",
+   "scale": 0.1
+  },
+  "PROP_BODYARMOURVEST": {
+   "file": "PbodyarmourvestZ",
+   "scale": 0.1
+  },
+  "PROP_GASTANK": {
+   "file": "PgastankZ",
+   "scale": 0.1
+  },
+  "PROP_GLASSWARE1": {
+   "file": "Pglassware1Z",
+   "scale": 0.1
+  },
+  "PROP_HATCHBOLT": {
+   "file": "PhatchboltZ",
+   "scale": 0.1
+  },
+  "PROP_BRAKEUNIT": {
+   "file": "PbrakeunitZ",
+   "scale": 0.1
+  },
+  "PROP_AK47MAG": {
+   "file": "Pak47magZ",
+   "scale": 0.1
+  },
+  "PROP_M16MAG": {
+   "file": "Pm16magZ",
+   "scale": 0.1
+  },
+  "PROP_MP5KMAG": {
+   "file": "Pmp5kmagZ",
+   "scale": 0.1
+  },
+  "PROP_SKORPIONMAG": {
+   "file": "PskorpionmagZ",
+   "scale": 0.1
+  },
+  "PROP_SPECTREMAG": {
+   "file": "PspectremagZ",
+   "scale": 0.1
+  },
+  "PROP_UZIMAG": {
+   "file": "PuzimagZ",
+   "scale": 0.1
+  },
+  "PROP_SILENCER": {
+   "file": "PsilencerZ",
+   "scale": 0.1
+  },
+  "PROP_CHREXTINGUISHER": {
+   "file": "PchrextinguisherZ",
+   "scale": 0.1
+  },
+  "PROP_BOXCARTRIDGES": {
+   "file": "PboxcartridgesZ",
+   "scale": 0.1
+  },
+  "PROP_FNP90MAG": {
+   "file": "Pfnp90magZ",
+   "scale": 0.1
+  },
+  "PROP_GOLDENSHELLS": {
+   "file": "PgoldenshellsZ",
+   "scale": 0.1
+  },
+  "PROP_MAGNUMSHELLS": {
+   "file": "PmagnumshellsZ",
+   "scale": 0.1
+  },
+  "PROP_WPPKMAG": {
+   "file": "PwppkmagZ",
+   "scale": 0.1
+  },
+  "PROP_TT33MAG": {
+   "file": "Ptt33magZ",
+   "scale": 0.1
+  },
+  "PROP_SEV_DOOR": {
+   "file": "Psev_doorZ",
+   "scale": 1.0
+  },
+  "PROP_SEV_DOOR3": {
+   "file": "Psev_door3Z",
+   "scale": 1.0
+  },
+  "PROP_SEV_DOOR3_WIND": {
+   "file": "Psev_door3_windZ",
+   "scale": 1.0
+  },
+  "PROP_SEV_DOOR4_WIND": {
+   "file": "Psev_door4_windZ",
+   "scale": 1.0
+  },
+  "PROP_SEV_TRISLIDE": {
+   "file": "Psev_trislideZ",
+   "scale": 1.0
+  },
+  "PROP_SEV_DOOR_V1": {
+   "file": "Psev_door_v1Z",
+   "scale": 1.0
+  },
+  "PROP_STEEL_DOOR1": {
+   "file": "Psteel_door1Z",
+   "scale": 1.0
+  },
+  "PROP_STEEL_DOOR2": {
+   "file": "Psteel_door2Z",
+   "scale": 1.0
+  },
+  "PROP_STEEL_DOOR3": {
+   "file": "Psteel_door3Z",
+   "scale": 1.0
+  },
+  "PROP_SILO_LIFT_DOOR": {
+   "file": "Psilo_lift_doorZ",
+   "scale": 1.0
+  },
+  "PROP_STEEL_DOOR2B": {
+   "file": "Psteel_door2bZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_ROLLER1": {
+   "file": "Pdoor_roller1Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_ROLLER2": {
+   "file": "Pdoor_roller2Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_ROLLER3": {
+   "file": "Pdoor_roller3Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_ROLLER4": {
+   "file": "Pdoor_roller4Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_ST_AREC1": {
+   "file": "Pdoor_st_arec1Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_ST_AREC2": {
+   "file": "Pdoor_st_arec2Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_DEST1": {
+   "file": "Pdoor_dest1Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_DEST2": {
+   "file": "Pdoor_dest2Z",
+   "scale": 1.0
+  },
+  "PROP_GAS_PLANT_SW_DO1": {
+   "file": "Pgas_plant_sw_do1Z",
+   "scale": 1.0
+  },
+  "PROP_GAS_PLANT_SW2_DO1": {
+   "file": "Pgas_plant_sw2_do1Z",
+   "scale": 1.0
+  },
+  "PROP_GAS_PLANT_SW3_DO1": {
+   "file": "Pgas_plant_sw3_do1Z",
+   "scale": 1.0
+  },
+  "PROP_GAS_PLANT_SW4_DO1": {
+   "file": "Pgas_plant_sw4_do1Z",
+   "scale": 1.0
+  },
+  "PROP_GAS_PLANT_MET1_DO1": {
+   "file": "Pgas_plant_met1_do1Z",
+   "scale": 1.0
+  },
+  "PROP_GAS_PLANT_WC_CUB1": {
+   "file": "Pgas_plant_wc_cub1Z",
+   "scale": 1.0
+  },
+  "PROP_GASPLANT_CLEAR_DOOR": {
+   "file": "Pgasplant_clear_doorZ",
+   "scale": 1.0
+  },
+  "PROP_TRAIN_DOOR": {
+   "file": "Ptrain_doorZ",
+   "scale": 1.0
+  },
+  "PROP_TRAIN_DOOR2": {
+   "file": "Ptrain_door2Z",
+   "scale": 1.0
+  },
+  "PROP_TRAIN_DOOR3": {
+   "file": "Ptrain_door3Z",
+   "scale": 1.0
+  },
+  "PROP_DOOR_EYELID": {
+   "file": "Pdoor_eyelidZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_IRIS": {
+   "file": "Pdoor_irisZ",
+   "scale": 1.0
+  },
+  "PROP_SEVDOORWOOD": {
+   "file": "PsevdoorwoodZ",
+   "scale": 1.0
+  },
+  "PROP_SEVDOORWIND": {
+   "file": "PsevdoorwindZ",
+   "scale": 1.0
+  },
+  "PROP_SEVDOORNOWIND": {
+   "file": "PsevdoornowindZ",
+   "scale": 1.0
+  },
+  "PROP_SEVDOORMETSLIDE": {
+   "file": "PsevdoormetslideZ",
+   "scale": 1.0
+  },
+  "PROP_CRYPTDOOR1A": {
+   "file": "Pcryptdoor1aZ",
+   "scale": 1.0
+  },
+  "PROP_CRYPTDOOR1B": {
+   "file": "Pcryptdoor1bZ",
+   "scale": 1.0
+  },
+  "PROP_CRYPTDOOR2A": {
+   "file": "Pcryptdoor2aZ",
+   "scale": 1.0
+  },
+  "PROP_CRYPTDOOR2B": {
+   "file": "Pcryptdoor2bZ",
+   "scale": 1.0
+  },
+  "PROP_CRYPTDOOR3": {
+   "file": "Pcryptdoor3Z",
+   "scale": 1.0
+  },
+  "PROP_CRYPTDOOR4": {
+   "file": "Pcryptdoor4Z",
+   "scale": 1.0
+  },
+  "PROP_VERTDOOR": {
+   "file": "PvertdoorZ",
+   "scale": 1.0
+  },
+  "PROP_HATCHDOOR": {
+   "file": "PhatchdoorZ",
+   "scale": 1.0
+  },
+  "PROP_DAMGATEDOOR": {
+   "file": "PdamgatedoorZ",
+   "scale": 1.0
+  },
+  "PROP_DAMTUNDOOR": {
+   "file": "PdamtundoorZ",
+   "scale": 1.0
+  },
+  "PROP_DAMCHAINDOOR": {
+   "file": "PdamchaindoorZ",
+   "scale": 1.0
+  },
+  "PROP_SILOTOPDOOR": {
+   "file": "PsilotopdoorZ",
+   "scale": 1.0
+  },
+  "PROP_DOORPRISON1": {
+   "file": "Pdoorprison1Z",
+   "scale": 1.0
+  },
+  "PROP_DOORSTATGATE": {
+   "file": "PdoorstatgateZ",
+   "scale": 1.0
+  },
+  "PROP_CHRKALASH": {
+   "file": "PchrkalashZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGRENADELAUNCH": {
+   "file": "PchrgrenadelaunchZ",
+   "scale": 0.1
+  },
+  "PROP_CHRKNIFE": {
+   "file": "PchrknifeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRLASER": {
+   "file": "PchrlaserZ",
+   "scale": 0.1
+  },
+  "PROP_CHRM16": {
+   "file": "Pchrm16Z",
+   "scale": 0.1
+  },
+  "PROP_CHRMP5K": {
+   "file": "Pchrmp5kZ",
+   "scale": 0.1
+  },
+  "PROP_CHRRUGER": {
+   "file": "PchrrugerZ",
+   "scale": 0.1
+  },
+  "PROP_CHRWPPK": {
+   "file": "PchrwppkZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSHOTGUN": {
+   "file": "PchrshotgunZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSKORPION": {
+   "file": "PchrskorpionZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSPECTRE": {
+   "file": "PchrspectreZ",
+   "scale": 0.1
+  },
+  "PROP_CHRUZI": {
+   "file": "PchruziZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGRENADE": {
+   "file": "PchrgrenadeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRFNP90": {
+   "file": "Pchrfnp90Z",
+   "scale": 0.1
+  },
+  "PROP_CHRBRIEFCASE": {
+   "file": "PchrbriefcaseZ",
+   "scale": 0.1
+  },
+  "PROP_CHRREMOTEMINE": {
+   "file": "PchrremotemineZ",
+   "scale": 0.1
+  },
+  "PROP_CHRPROXIMITYMINE": {
+   "file": "PchrproximitymineZ",
+   "scale": 0.1
+  },
+  "PROP_CHRTIMEDMINE": {
+   "file": "PchrtimedmineZ",
+   "scale": 0.1
+  },
+  "PROP_CHRROCKET": {
+   "file": "PchrrocketZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGRENADEROUND": {
+   "file": "PchrgrenaderoundZ",
+   "scale": 0.1
+  },
+  "PROP_CHRWPPKSIL": {
+   "file": "PchrwppksilZ",
+   "scale": 0.1
+  },
+  "PROP_CHRTT33": {
+   "file": "Pchrtt33Z",
+   "scale": 0.1
+  },
+  "PROP_CHRMP5KSIL": {
+   "file": "Pchrmp5ksilZ",
+   "scale": 0.1
+  },
+  "PROP_CHRAUTOSHOT": {
+   "file": "PchrautoshotZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGOLDEN": {
+   "file": "PchrgoldenZ",
+   "scale": 0.1
+  },
+  "PROP_CHRTHROWKNIFE": {
+   "file": "PchrthrowknifeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSNIPERRIFLE": {
+   "file": "PchrsniperrifleZ",
+   "scale": 0.1
+  },
+  "PROP_CHRROCKETLAUNCH": {
+   "file": "PchrrocketlaunchZ",
+   "scale": 0.1
+  },
+  "PROP_HATFURRY": {
+   "file": "PhatfurryZ",
+   "scale": 0.1
+  },
+  "PROP_HATFURRYBROWN": {
+   "file": "PhatfurrybrownZ",
+   "scale": 0.1
+  },
+  "PROP_HATFURRYBLACK": {
+   "file": "PhatfurryblackZ",
+   "scale": 0.1
+  },
+  "PROP_HATTBIRD": {
+   "file": "PhattbirdZ",
+   "scale": 0.1
+  },
+  "PROP_HATTBIRDBROWN": {
+   "file": "PhattbirdbrownZ",
+   "scale": 0.1
+  },
+  "PROP_HATHELMET": {
+   "file": "PhathelmetZ",
+   "scale": 0.1
+  },
+  "PROP_HATHELMETGREY": {
+   "file": "PhathelmetgreyZ",
+   "scale": 0.1
+  },
+  "PROP_HATMOON": {
+   "file": "PhatmoonZ",
+   "scale": 0.1
+  },
+  "PROP_HATBERET": {
+   "file": "PhatberetZ",
+   "scale": 0.1
+  },
+  "PROP_HATBERETBLUE": {
+   "file": "PhatberetblueZ",
+   "scale": 0.1
+  },
+  "PROP_HATBERETRED": {
+   "file": "PhatberetredZ",
+   "scale": 0.1
+  },
+  "PROP_HATPEAKED": {
+   "file": "PhatpeakedZ",
+   "scale": 0.1
+  },
+  "PROP_CHRWRISTDART": {
+   "file": "PchrwristdartZ",
+   "scale": 0.1
+  },
+  "PROP_CHREXPLOSIVEPEN": {
+   "file": "PchrexplosivepenZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBOMBCASE": {
+   "file": "PchrbombcaseZ",
+   "scale": 0.1
+  },
+  "PROP_CHRFLAREPISTOL": {
+   "file": "PchrflarepistolZ",
+   "scale": 0.1
+  },
+  "PROP_CHRPITONGUN": {
+   "file": "PchrpitongunZ",
+   "scale": 0.1
+  },
+  "PROP_CHRFINGERGUN": {
+   "file": "PchrfingergunZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSILVERWPPK": {
+   "file": "PchrsilverwppkZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGOLDWPPK": {
+   "file": "PchrgoldwppkZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDYNAMITE": {
+   "file": "PchrdynamiteZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBUNGEE": {
+   "file": "PchrbungeeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDOORDECODER": {
+   "file": "PchrdoordecoderZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBOMBDEFUSER": {
+   "file": "PchrbombdefuserZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBUGDETECTOR": {
+   "file": "PchrbugdetectorZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSAFECRACKERCASE": {
+   "file": "PchrsafecrackercaseZ",
+   "scale": 0.1
+  },
+  "PROP_CHRCAMERA": {
+   "file": "PchrcameraZ",
+   "scale": 0.1
+  },
+  "PROP_CHRLOCKEXPLODER": {
+   "file": "PchrlockexploderZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDOOREXPLODER": {
+   "file": "PchrdoorexploderZ",
+   "scale": 0.1
+  },
+  "PROP_CHRKEYANALYSERCASE": {
+   "file": "PchrkeyanalysercaseZ",
+   "scale": 0.1
+  },
+  "PROP_CHRWEAPONCASE": {
+   "file": "PchrweaponcaseZ",
+   "scale": 0.1
+  },
+  "PROP_CHRKEYYALE": {
+   "file": "PchrkeyyaleZ",
+   "scale": 0.1
+  },
+  "PROP_CHRKEYBOLT": {
+   "file": "PchrkeyboltZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBUG": {
+   "file": "PchrbugZ",
+   "scale": 0.1
+  },
+  "PROP_CHRMICROCAMERA": {
+   "file": "PchrmicrocameraZ",
+   "scale": 0.1
+  },
+  "PROP_FLOPPY": {
+   "file": "PfloppyZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGOLDENEYEKEY": {
+   "file": "PchrgoldeneyekeyZ",
+   "scale": 0.1
+  },
+  "PROP_CHRPOLARIZEDGLASSES": {
+   "file": "PchrpolarizedglassesZ",
+   "scale": 0.1
+  },
+  "PROP_CHRCREDITCARD": {
+   "file": "PchrcreditcardZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDARKGLASSES": {
+   "file": "PchrdarkglassesZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGASKEYRING": {
+   "file": "PchrgaskeyringZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDATATHIEF": {
+   "file": "PchrdatathiefZ",
+   "scale": 0.1
+  },
+  "PROP_SAFE": {
+   "file": "PsafeZ",
+   "scale": 0.1
+  },
+  "PROP_BOMB": {
+   "file": "PbombZ",
+   "scale": 0.1
+  },
+  "PROP_CHRPLANS": {
+   "file": "PchrplansZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSPYFILE": {
+   "file": "PchrspyfileZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBLUEPRINTS": {
+   "file": "PchrblueprintsZ",
+   "scale": 0.1
+  },
+  "PROP_CHRCIRCUITBOARD": {
+   "file": "PchrcircuitboardZ",
+   "scale": 0.1
+  },
+  "PROP_CHRMAP": {
+   "file": "PchrmapZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSPOOLTAPE": {
+   "file": "PchrspooltapeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRAUDIOTAPE": {
+   "file": "PchraudiotapeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRMICROFILM": {
+   "file": "PchrmicrofilmZ",
+   "scale": 0.1
+  },
+  "PROP_CHRMICROCODE": {
+   "file": "PchrmicrocodeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRLECTRE": {
+   "file": "PchrlectreZ",
+   "scale": 0.1
+  },
+  "PROP_CHRMONEY": {
+   "file": "PchrmoneyZ",
+   "scale": 0.1
+  },
+  "PROP_CHRGOLDBAR": {
+   "file": "PchrgoldbarZ",
+   "scale": 0.1
+  },
+  "PROP_CHRHEROIN": {
+   "file": "PchrheroinZ",
+   "scale": 0.1
+  },
+  "PROP_CHRCLIPBOARD": {
+   "file": "PchrclipboardZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDOSSIERRED": {
+   "file": "PchrdossierredZ",
+   "scale": 0.1
+  },
+  "PROP_CHRSTAFFLIST": {
+   "file": "PchrstafflistZ",
+   "scale": 0.1
+  },
+  "PROP_CHRDATTAPE": {
+   "file": "PchrdattapeZ",
+   "scale": 0.1
+  },
+  "PROP_CHRPLASTIQUE": {
+   "file": "PchrplastiqueZ",
+   "scale": 0.1
+  },
+  "PROP_CHRBLACKBOX": {
+   "file": "PchrblackboxZ",
+   "scale": 0.1
+  },
+  "PROP_CHRVIDEOTAPE": {
+   "file": "PchrvideotapeZ",
+   "scale": 0.1
+  },
+  "PROP_NINTENDOLOGO": {
+   "file": "PnintendologoZ",
+   "scale": 0.1
+  },
+  "PROP_GOLDENEYELOGO": {
+   "file": "PgoldeneyelogoZ",
+   "scale": 0.1
+  },
+  "PROP_WALLETBOND": {
+   "file": "PwalletbondZ",
+   "scale": 0.1
+  },
+  "PROP_MILTRUCK": {
+   "file": "PmiltruckZ",
+   "scale": 0.1
+  },
+  "PROP_JEEP": {
+   "file": "PjeepZ",
+   "scale": 0.1
+  },
+  "PROP_ARTIC": {
+   "file": "ParticZ",
+   "scale": 0.1
+  },
+  "PROP_HELICOPTER": {
+   "file": "PhelicopterZ",
+   "scale": 0.1
+  },
+  "PROP_TIGER": {
+   "file": "PtigerZ",
+   "scale": 0.1
+  },
+  "PROP_MILCOPTER": {
+   "file": "PmilcopterZ",
+   "scale": 0.1
+  },
+  "PROP_HIND": {
+   "file": "PhindZ",
+   "scale": 0.1
+  },
+  "PROP_ARTICTRAILER": {
+   "file": "PartictrailerZ",
+   "scale": 0.1
+  },
+  "PROP_MOTORBIKE": {
+   "file": "PmotorbikeZ",
+   "scale": 0.1
+  },
+  "PROP_TANK": {
+   "file": "PtankZ",
+   "scale": 0.1
+  },
+  "PROP_APC": {
+   "file": "PapcZ",
+   "scale": 0.1
+  },
+  "PROP_SPEEDBOAT": {
+   "file": "PspeedboatZ",
+   "scale": 0.1
+  },
+  "PROP_PLANE": {
+   "file": "PplaneZ",
+   "scale": 0.1
+  },
+  "PROP_GUN_RUNWAY1": {
+   "file": "Pgun_runway1Z",
+   "scale": 0.1
+  },
+  "PROP_SAFEDOOR": {
+   "file": "PsafedoorZ",
+   "scale": 1.0
+  },
+  "PROP_KEY_HOLDER": {
+   "file": "Pkey_holderZ",
+   "scale": 1.0
+  },
+  "PROP_HATCHSEVX": {
+   "file": "PhatchsevxZ",
+   "scale": 1.0
+  },
+  "PROP_SEVDISH": {
+   "file": "PsevdishZ",
+   "scale": 1.0
+  },
+  "PROP_ARCHSECDOOR1": {
+   "file": "Parchsecdoor1Z",
+   "scale": 1.0
+  },
+  "PROP_ARCHSECDOOR2": {
+   "file": "Parchsecdoor2Z",
+   "scale": 1.0
+  },
+  "PROP_GROUNDGUN": {
+   "file": "PgroundgunZ",
+   "scale": 0.1
+  },
+  "PROP_TRAINEXTDOOR": {
+   "file": "PtrainextdoorZ",
+   "scale": 1.0
+  },
+  "PROP_CARBMW": {
+   "file": "PcarbmwZ",
+   "scale": 0.1
+  },
+  "PROP_CARESCORT": {
+   "file": "PcarescortZ",
+   "scale": 0.1
+  },
+  "PROP_CARGOLF": {
+   "file": "PcargolfZ",
+   "scale": 0.1
+  },
+  "PROP_CARWEIRD": {
+   "file": "PcarweirdZ",
+   "scale": 0.1
+  },
+  "PROP_CARZIL": {
+   "file": "PcarzilZ",
+   "scale": 0.1
+  },
+  "PROP_SHUTTLE_DOOR_L": {
+   "file": "Pshuttle_door_lZ",
+   "scale": 1.0
+  },
+  "PROP_SHUTTLE_DOOR_R": {
+   "file": "Pshuttle_door_rZ",
+   "scale": 1.0
+  },
+  "PROP_DEPOT_GATE_ENTRY": {
+   "file": "Pdepot_gate_entryZ",
+   "scale": 0.1
+  },
+  "PROP_DEPOT_DOOR_STEEL": {
+   "file": "Pdepot_door_steelZ",
+   "scale": 0.1
+  },
+  "PROP_GLASSWARE2": {
+   "file": "Pglassware2Z",
+   "scale": 0.1
+  },
+  "PROP_GLASSWARE3": {
+   "file": "Pglassware3Z",
+   "scale": 0.1
+  },
+  "PROP_GLASSWARE4": {
+   "file": "Pglassware4Z",
+   "scale": 0.1
+  },
+  "PROP_LANDMINE": {
+   "file": "PlandmineZ",
+   "scale": 0.1
+  },
+  "PROP_PLANT1": {
+   "file": "Pplant1Z",
+   "scale": 0.1
+  },
+  "PROP_PLANT11": {
+   "file": "Pplant11Z",
+   "scale": 0.1
+  },
+  "PROP_PLANT2": {
+   "file": "Pplant2Z",
+   "scale": 0.1
+  },
+  "PROP_PLANT3": {
+   "file": "Pplant3Z",
+   "scale": 0.1
+  },
+  "PROP_JUNGLE5_TREE": {
+   "file": "Pjungle5_treeZ",
+   "scale": 0.1
+  },
+  "PROP_LEGALPAGE": {
+   "file": "PlegalpageZ",
+   "scale": 0.1
+  },
+  "PROP_ST_PETE_ROOM_1I": {
+   "file": "Pst_pete_room_1iZ",
+   "scale": 0.1
+  },
+  "PROP_ST_PETE_ROOM_2I": {
+   "file": "Pst_pete_room_2iZ",
+   "scale": 0.1
+  },
+  "PROP_ST_PETE_ROOM_3T": {
+   "file": "Pst_pete_room_3tZ",
+   "scale": 0.1
+  },
+  "PROP_ST_PETE_ROOM_5C": {
+   "file": "Pst_pete_room_5cZ",
+   "scale": 0.1
+  },
+  "PROP_ST_PETE_ROOM_6C": {
+   "file": "Pst_pete_room_6cZ",
+   "scale": 0.1
+  },
+  "PROP_DOOR_ROLLERTRAIN": {
+   "file": "Pdoor_rollertrainZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_WIN": {
+   "file": "Pdoor_winZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_AZTEC": {
+   "file": "Pdoor_aztecZ",
+   "scale": 1.0
+  },
+  "PROP_SHUTTLE": {
+   "file": "PshuttleZ",
+   "scale": 0.1
+  },
+  "PROP_DOOR_AZT_DESK": {
+   "file": "Pdoor_azt_deskZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_AZT_DESK_TOP": {
+   "file": "Pdoor_azt_desk_topZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_AZT_CHAIR": {
+   "file": "Pdoor_azt_chairZ",
+   "scale": 1.0
+  },
+  "PROP_DOOR_MF": {
+   "file": "Pdoor_mfZ",
+   "scale": 1.0
+  },
+  "PROP_FLAG": {
+   "file": "PflagZ",
+   "scale": 0.1
+  },
+  "PROP_BARRICADE": {
+   "file": "PbarricadeZ",
+   "scale": 0.1
+  },
+  "PROP_MODEMBOX": {
+   "file": "PmodemboxZ",
+   "scale": 0.1
+  },
+  "PROP_DOORPANEL": {
+   "file": "PdoorpanelZ",
+   "scale": 0.1
+  },
+  "PROP_DOORCONSOLE": {
+   "file": "PdoorconsoleZ",
+   "scale": 0.1
+  },
+  "PROP_CHRTESTTUBE": {
+   "file": "PchrtesttubeZ",
+   "scale": 0.1
+  },
+  "PROP_BOLLARD": {
+   "file": "PbollardZ",
+   "scale": 0.1
+  }
+ },
+ "bodies": {
+  "BODY_Jungle_Commando": {
+   "file": "CcamguardZ",
+   "scale": 1.0
+  },
+  "BODY_St_Petersburg_Guard": {
+   "file": "CgreyguardZ",
+   "scale": 1.0
+  },
+  "BODY_Russian_Soldier": {
+   "file": "ColiveguardZ",
+   "scale": 1.0
+  },
+  "BODY_Russian_Infantry": {
+   "file": "CrusguardZ",
+   "scale": 1.0
+  },
+  "BODY_Janus_Special_Forces": {
+   "file": "CtrevguardZ",
+   "scale": 1.0
+  },
+  "BODY_Brosnan_Tuxedo": {
+   "file": "CdjbondZ",
+   "scale": 1.0
+  },
+  "BODY_Boris": {
+   "file": "CborisZ",
+   "scale": 1.0
+  },
+  "BODY_Ourumov": {
+   "file": "CorumovZ",
+   "scale": 1.0
+  },
+  "BODY_Trevelyan_Janus": {
+   "file": "CtrevelyanZ",
+   "scale": 1.0
+  },
+  "BODY_Trevelyan_006": {
+   "file": "CboilertrevZ",
+   "scale": 1.0
+  },
+  "BODY_Valentin_": {
+   "file": "CvalentinZ",
+   "scale": 1.0
+  },
+  "BODY_Xenia": {
+   "file": "CxeniaZ",
+   "scale": 1.0
+  },
+  "BODY_Baron_Samedi": {
+   "file": "CbaronsamediZ",
+   "scale": 1.0
+  },
+  "BODY_Jaws": {
+   "file": "CjawsZ",
+   "scale": 1.0
+  },
+  "BODY_Mayday": {
+   "file": "CmaydayZ",
+   "scale": 1.0
+  },
+  "BODY_Oddjob": {
+   "file": "CoddjobZ",
+   "scale": 1.0
+  },
+  "BODY_Natalya_Skirt": {
+   "file": "CnatalyaZ",
+   "scale": 1.0
+  },
+  "BODY_Janus_Marine": {
+   "file": "CarmourguardZ",
+   "scale": 1.0
+  },
+  "BODY_Russian_Commandant": {
+   "file": "CcommguardZ",
+   "scale": 1.0
+  },
+  "BODY_Siberian_Guard_1_Mishkin": {
+   "file": "CgreatguardZ",
+   "scale": 1.0
+  },
+  "BODY_Naval_Officer": {
+   "file": "CnavyguardZ",
+   "scale": 1.0
+  },
+  "BODY_Siberian_Special_Forces": {
+   "file": "CsnowguardZ",
+   "scale": 1.0
+  },
+  "BODY_Special_Operations_Uniform": {
+   "file": "CboilerbondZ",
+   "scale": 1.0
+  },
+  "BODY_Formal_Wear": {
+   "file": "CsuitbondZ",
+   "scale": 1.0
+  },
+  "BODY_Jungle_Fatigues": {
+   "file": "CtimberbondZ",
+   "scale": 1.0
+  },
+  "BODY_Parka": {
+   "file": "CsnowbondZ",
+   "scale": 1.0
+  },
+  "BODY_Unused_Female": {
+   "file": "CbluewomanZ",
+   "scale": 1.0
+  },
+  "BODY_Rosika": {
+   "file": "CfattechwomanZ",
+   "scale": 1.0
+  },
+  "BODY_Scientist_2_Female": {
+   "file": "CtechwomanZ",
+   "scale": 1.0
+  },
+  "BODY_Civilian_1_Female": {
+   "file": "CjeanwomanZ",
+   "scale": 1.0
+  },
+  "BODY_Unused_Male_1": {
+   "file": "CgreymanZ",
+   "scale": 1.0
+  },
+  "BODY_Unused_Male_2": {
+   "file": "CbluemanZ",
+   "scale": 1.0
+  },
+  "BODY_Civilian_4": {
+   "file": "CredmanZ",
+   "scale": 1.0
+  },
+  "BODY_Civilian_2": {
+   "file": "CcardimanZ",
+   "scale": 1.0
+  },
+  "BODY_Civilian_3": {
+   "file": "CcheckmanZ",
+   "scale": 1.0
+  },
+  "BODY_Scientist_1_Male": {
+   "file": "CtechmanZ",
+   "scale": 1.0
+  },
+  "BODY_Helicopter_Pilot": {
+   "file": "CpilotZ",
+   "scale": 1.0
+  },
+  "BODY_Siberian_Guard_2": {
+   "file": "Cgreatguard2Z",
+   "scale": 1.0
+  },
+  "BODY_Arctic_Commando": {
+   "file": "CbluecamguardZ",
+   "scale": 1.0
+  },
+  "BODY_Moonraker_Elite_1_Male": {
+   "file": "CmoonguardZ",
+   "scale": 1.0
+  },
+  "BODY_Moonraker_Elite_2_Female": {
+   "file": "CmoonfemaleZ",
+   "scale": 1.0
+  },
+  "BODY_Left_Suit_Hand_Floating_Arm": {
+   "file": "Csuit_lf_handZ",
+   "scale": 0.1
+  },
+  "BODY_Male_Karl": {
+   "file": "CheadkarlZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Alan": {
+   "file": "CheadalanZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Pete": {
+   "file": "CheadpeteZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Martin": {
+   "file": "CheadmartinZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Mark": {
+   "file": "CheadmarkZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Duncan": {
+   "file": "CheadduncanZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Shaun": {
+   "file": "CheadshaunZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Dwayne": {
+   "file": "CheaddwayneZ",
+   "scale": 1.0
+  },
+  "BODY_Male_B": {
+   "file": "CheadbZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Dave_Dr_Doak": {
+   "file": "CheaddaveZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Grant": {
+   "file": "CheadgrantZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Des": {
+   "file": "CheaddesZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Chris": {
+   "file": "CheadchrisZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Lee": {
+   "file": "CheadleeZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Neil": {
+   "file": "CheadneilZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Jim": {
+   "file": "CheadjimZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Robin": {
+   "file": "CheadrobinZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Steve_H": {
+   "file": "CheadstevehZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Terrorist": {
+   "file": "CheadbalaclavaZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Biker": {
+   "file": "CheadbikeZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Graeme": {
+   "file": "CheadgrahamZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Steve_Ellis": {
+   "file": "CheadsteveeZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Joel": {
+   "file": "CheadjoelZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Scott": {
+   "file": "CheadscottZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Joe_Altered": {
+   "file": "CheadjoeZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Ken": {
+   "file": "CheadkenZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Joe": {
+   "file": "Cheadjoe2Z",
+   "scale": 1.0
+  },
+  "BODY_Male_Mishkin": {
+   "file": "CheadmishkinZ",
+   "scale": 1.0
+  },
+  "BODY_Female_Sally": {
+   "file": "CheadsallyZ",
+   "scale": 1.0
+  },
+  "BODY_Female_Marion_Rosika": {
+   "file": "CheadmarionZ",
+   "scale": 1.0
+  },
+  "BODY_Female_Mandy": {
+   "file": "CheadmandyZ",
+   "scale": 1.0
+  },
+  "BODY_Female_Vivien": {
+   "file": "CheadvivienZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Pierce_Bond_1": {
+   "file": "CheadbrosnanboilerZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Pierce_Bond_2": {
+   "file": "CheadbrosnansuitZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Pierce_Bond_3": {
+   "file": "CheadbrosnantimberZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Pierce_Bond_Parka": {
+   "file": "CheadbrosnansnowZ",
+   "scale": 1.0
+  },
+  "BODY_Male_Pierce_Bond_Tuxedo": {
+   "file": "CheadbrosnanZ",
+   "scale": 1.0
+  },
+  "BODY_Natalya_Jungle_Fatigues": {
+   "file": "CspicebondZ",
+   "scale": 0.94999999
+  }
+ }
+}

@@ -1,0 +1,102 @@
+newmtl tex_1608_sw3_0_lit_ds
+map_Kd ../images/1608_1608.png
+
+newmtl tex_1608_lit_ds
+map_Kd ../images/1608_1608.png
+
+newmtl tex_1608_lit_ds_ovl
+map_Kd ../images/1608_1608.png
+
+newmtl tex_1793_sw9_0_lit_ds_w11
+map_Kd ../images/1793_1793.png
+
+newmtl tex_1794_sw4_0_lit_ds_w11
+map_Kd ../images/1794_1794.png
+
+newmtl tex_1794_sw7_0_lit_ds_w11
+map_Kd ../images/1794_1794.png
+
+newmtl tex_1794_sw9_0_lit_ds_w11
+map_Kd ../images/1794_1794.png
+
+newmtl tex_1795_sw2_0_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw4_0_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw5_1_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1795_sw6_0_lit_ds_w11
+map_Kd ../images/1795_1795.png
+
+newmtl tex_1796_sw2_0_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw5_0_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw5_1_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1796_sw9_0_lit_ds_w11
+map_Kd ../images/1796_1796.png
+
+newmtl tex_1797_sw6_0_lit_ds_w11
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1797_sw7_0_lit_ds_w11
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1797_sw7_0_lit_ds_w11_ovl
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1797_sw9_0_lit_ds_w11
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1797_sw9_0_lit_ds_w11_ovl
+map_Kd ../images/1797_1797.png
+
+newmtl tex_1798_sw6_0_lit_ds_w11
+map_Kd ../images/1798_1798.png
+
+newmtl tex_1798_sw9_0_lit_ds_w11
+map_Kd ../images/1798_1798.png
+
+newmtl tex_2157_fl0_ds_w11
+map_Kd ../images/2157_2157.png
+
+newmtl tex_2157_fl1_ds_w11
+map_Kd ../images/2157_2157.png
+
+newmtl tex_2158_fl0_ds_w11_ovl
+map_Kd ../images/2158_2158.png
+
+newmtl tex_2158_fl1_ds_w11_ovl
+map_Kd ../images/2158_2158.png
+
+newmtl tex_2159_fl0_ds_w11_ovl
+map_Kd ../images/2159_2159.png
+
+newmtl tex_2159_fl1_ds_w11_ovl
+map_Kd ../images/2159_2159.png
+
+newmtl tex_2160_fl0_ds_w11_ovl
+map_Kd ../images/2160_2160.png
+
+newmtl tex_2160_fl1_ds_w11_ovl
+map_Kd ../images/2160_2160.png
+
+newmtl tex_26_sw0_0_lit_ds
+map_Kd ../images/0026_BARRELSPECULAR.png
+
+newmtl tex_26_sw1_0_lit_ds
+map_Kd ../images/0026_BARRELSPECULAR.png
+
+newmtl tex_26_sw3_0_lit_ds
+map_Kd ../images/0026_BARRELSPECULAR.png
+
+newmtl tex_26_lit_ds
+map_Kd ../images/0026_BARRELSPECULAR.png
+

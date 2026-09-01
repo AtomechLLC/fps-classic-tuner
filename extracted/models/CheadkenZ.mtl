@@ -1,0 +1,21 @@
+newmtl tex_1995_sw1_0_lit_ds
+map_Kd ../images/1995_1995.png
+
+newmtl tex_1996_sw1_0_lit_sec_ds
+map_Kd ../images/1996_1996.png
+
+newmtl tex_2504_fl0_lit
+map_Kd ../images/2504_2504.png
+
+newmtl tex_2504_sw0_0_lit
+map_Kd ../images/2504_2504.png
+
+newmtl tex_2505_fl0_lit
+map_Kd ../images/2505_2505.png
+
+newmtl tex_2505_sw0_0_lit
+map_Kd ../images/2505_2505.png
+
+newmtl tex_2680_sw0_0_lit
+map_Kd ../images/2680_2680.png
+

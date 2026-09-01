@@ -1,0 +1,42 @@
+newmtl tex_12_lit_ovl
+map_Kd ../images/0012_7SEG_DASH.png
+
+newmtl tex_13_lit_ovl
+map_Kd ../images/0013_7SEG_0.png
+
+newmtl tex_14_lit_w01_ovl
+map_Kd ../images/0014_7SEG_3.png
+
+newmtl tex_1410_lit
+map_Kd ../images/1410_1410.png
+
+newmtl tex_1411_lit_sec_ovl
+map_Kd ../images/1411_1411.png
+
+newmtl tex_1416_lit_w11
+map_Kd ../images/1416_1416.png
+
+newmtl tex_1416_lit_w11_ovl
+map_Kd ../images/1416_1416.png
+
+newmtl tex_1417_lit
+map_Kd ../images/1417_1417.png
+
+newmtl tex_15_lit_ovl
+map_Kd ../images/0015_7SEG_5.png
+
+newmtl tex_1514_lit_sec
+map_Kd ../images/1514_1514.png
+
+newmtl tex_1514_lit_sec_ovl
+map_Kd ../images/1514_1514.png
+
+newmtl tex_16_lit_ovl
+map_Kd ../images/0016_7SEG_8.png
+
+newmtl tex_193_lit_sec_ds_w11
+map_Kd ../images/0193_193.png
+
+newmtl tex_837_lit
+map_Kd ../images/0837_MONITOR_KEYBOARDKEY.png
+

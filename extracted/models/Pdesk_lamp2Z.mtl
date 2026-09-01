@@ -1,0 +1,12 @@
+newmtl tex_254_lit_ds
+map_Kd ../images/0254_PANEL_LAMP.png
+
+newmtl tex_460_lit_sec_ds_w11
+map_Kd ../images/0460_460.png
+
+newmtl tex_463_lit_ds_w11
+map_Kd ../images/0463_463.png
+
+newmtl tex_464_lit_ds_w11
+map_Kd ../images/0464_464.png
+

@@ -1,0 +1,36 @@
+newmtl tex_1671_lit
+map_Kd ../images/1671_1671.png
+
+newmtl tex_2114_fl0_ds_w11
+map_Kd ../images/2114_2114.png
+
+newmtl tex_2115_fl0_ds_w11_ovl
+map_Kd ../images/2115_2115.png
+
+newmtl tex_2116_fl0_ds_w11_ovl
+map_Kd ../images/2116_2116.png
+
+newmtl tex_2117_fl0_ds_w11_ovl
+map_Kd ../images/2117_2117.png
+
+newmtl tex_26_lit
+map_Kd ../images/0026_BARRELSPECULAR.png
+
+newmtl tex_26_lit_ds
+map_Kd ../images/0026_BARRELSPECULAR.png
+
+newmtl tex_27_lit
+map_Kd ../images/0027_BLACKGUNFRAME_L.png
+
+newmtl tex_27_lit_ovl
+map_Kd ../images/0027_BLACKGUNFRAME_L.png
+
+newmtl tex_28_lit_ovl
+map_Kd ../images/0028_BLACKGUNFRAME_R.png
+
+newmtl tex_638_lit
+map_Kd ../images/0638_638.png
+
+newmtl tex_884_fl1_ds_w11
+map_Kd ../images/0884_884.png
+

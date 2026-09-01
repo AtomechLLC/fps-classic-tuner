@@ -1,0 +1,117 @@
+newmtl tex_1032_lit_w11
+map_Kd ../images/1032_1032.png
+
+newmtl tex_1033_lit_w11_ovl
+map_Kd ../images/1033_1033.png
+
+newmtl tex_1034_lit_w11_ovl
+map_Kd ../images/1034_1034.png
+
+newmtl tex_1035_lit_w11_ovl
+map_Kd ../images/1035_1035.png
+
+newmtl tex_1036_lit_w11
+map_Kd ../images/1036_1036.png
+
+newmtl tex_1037_lit_w11_ovl
+map_Kd ../images/1037_1037.png
+
+newmtl tex_1038_lit_w11_ovl
+map_Kd ../images/1038_1038.png
+
+newmtl tex_1039_lit_w11_ovl
+map_Kd ../images/1039_1039.png
+
+newmtl tex_1040_lit
+map_Kd ../images/1040_1040.png
+
+newmtl tex_1041_lit_ds_ovl
+map_Kd ../images/1041_1041.png
+
+newmtl tex_1042_lit
+map_Kd ../images/1042_1042.png
+
+newmtl tex_1042_lit_ds
+map_Kd ../images/1042_1042.png
+
+newmtl tex_1043_lit
+map_Kd ../images/1043_1043.png
+
+newmtl tex_1043_lit_ds
+map_Kd ../images/1043_1043.png
+
+newmtl tex_1044_lit
+map_Kd ../images/1044_1044.png
+
+newmtl tex_1044_lit_ovl
+map_Kd ../images/1044_1044.png
+
+newmtl tex_1046_lit
+map_Kd ../images/1046_1046.png
+
+newmtl tex_1046_lit_ovl
+map_Kd ../images/1046_1046.png
+
+newmtl tex_1047_lit_sec
+map_Kd ../images/1047_1047.png
+
+newmtl tex_1047_lit_sec_ds
+map_Kd ../images/1047_1047.png
+
+newmtl tex_1089_lit_w11
+map_Kd ../images/1089_1089.png
+
+newmtl tex_1514_lit
+map_Kd ../images/1514_1514.png
+
+newmtl tex_1514_lit_ovl
+map_Kd ../images/1514_1514.png
+
+newmtl tex_1536_lit
+map_Kd ../images/1536_1536.png
+
+newmtl tex_1540_lit
+map_Kd ../images/1540_1540.png
+
+newmtl tex_198_lit
+map_Kd ../images/0198_198.png
+
+newmtl tex_198_lit_ovl
+map_Kd ../images/0198_198.png
+
+newmtl tex_227_lit
+map_Kd ../images/0227_227.png
+
+newmtl tex_227_lit_ovl
+map_Kd ../images/0227_227.png
+
+newmtl tex_2346_lit
+map_Kd ../images/2346_2346.png
+
+newmtl tex_2346_lit_ovl
+map_Kd ../images/2346_2346.png
+
+newmtl tex_407_lit_env
+map_Kd ../images/0407_407.png
+
+newmtl tex_407_lit_env_ds_ovl
+map_Kd ../images/0407_407.png
+
+newmtl tex_408_lit_env_sec_ds
+map_Kd ../images/0408_408.png
+
+newmtl tex_408_lit_env_sec_ds_ovl
+map_Kd ../images/0408_408.png
+
+newmtl tex_930_lit_sec
+map_Kd ../images/0930_930.png
+
+newmtl tex_933_lit
+map_Kd ../images/0933_933.png
+
+newmtl tex_934_lit_ovl
+map_Kd ../images/0934_934.png
+
+newmtl tex_939_lit
+map_Kd ../images/0939_939.png
+

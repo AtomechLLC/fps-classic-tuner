@@ -1,0 +1,15 @@
+newmtl tex_1426_lit_ds
+map_Kd ../images/1426_1426.png
+
+newmtl tex_226_lit_ds_ovl
+map_Kd ../images/0226_226.png
+
+newmtl tex_229_lit_ds_ovl
+map_Kd ../images/0229_229.png
+
+newmtl tex_579_lit_ds
+map_Kd ../images/0579_579.png
+
+newmtl tex_8_lit_ds_ovl
+map_Kd ../images/0008_VERTICALSTRIPES_yELLOW.png
+

@@ -1,0 +1,12 @@
+newmtl tex_1910_lit
+map_Kd ../images/1910_1910.png
+
+newmtl tex_1910_lit_ovl
+map_Kd ../images/1910_1910.png
+
+newmtl tex_1911_lit
+map_Kd ../images/1911_1911.png
+
+newmtl tex_247_lit
+map_Kd ../images/0247_247.png
+

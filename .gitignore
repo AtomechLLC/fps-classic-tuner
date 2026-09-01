@@ -11,8 +11,13 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
-# Derived/extracted ROM contents
-extracted/
+# Extracted demonstration assets (models/, images/, sounds/, ...) ARE
+# tracked so the gallery runs from a clone. Two exceptions stay out:
+# raw unpacked ROM segments (the ROM's own innards, already caught by
+# *.bin above) and the third-party cover mp3s in music/ (other artists'
+# works, not ROM-derived; the ROM-rendered track02.wav is tracked).
+extracted/files/
+extracted/music/*.mp3
 
 # Python cache
 __pycache__/

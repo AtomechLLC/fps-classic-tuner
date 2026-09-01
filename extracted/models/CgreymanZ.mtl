@@ -1,0 +1,51 @@
+newmtl tex_1609_lit
+map_Kd ../images/1609_1609.png
+
+newmtl tex_1613_lit_w11
+map_Kd ../images/1613_1613.png
+
+newmtl tex_1616_lit_w11
+map_Kd ../images/1616_1616.png
+
+newmtl tex_1619_lit_w11
+map_Kd ../images/1619_1619.png
+
+newmtl tex_1622_lit_w11
+map_Kd ../images/1622_1622.png
+
+newmtl tex_1713_lit
+map_Kd ../images/1713_1713.png
+
+newmtl tex_1713_lit_ovl
+map_Kd ../images/1713_1713.png
+
+newmtl tex_1714_lit
+map_Kd ../images/1714_1714.png
+
+newmtl tex_1715_lit
+map_Kd ../images/1715_1715.png
+
+newmtl tex_1718_lit_w11
+map_Kd ../images/1718_1718.png
+
+newmtl tex_1842_lit_w01
+map_Kd ../images/1842_1842.png
+
+newmtl tex_1843_lit_w01
+map_Kd ../images/1843_1843.png
+
+newmtl tex_1981_lit_w01
+map_Kd ../images/1981_1981.png
+
+newmtl tex_1981_lit_w01_ovl
+map_Kd ../images/1981_1981.png
+
+newmtl tex_1982_lit_w01
+map_Kd ../images/1982_1982.png
+
+newmtl tex_1982_lit_w01_ovl
+map_Kd ../images/1982_1982.png
+
+newmtl tex_2033_lit_w10
+map_Kd ../images/2033_2033.png
+

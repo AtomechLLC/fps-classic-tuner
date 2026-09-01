@@ -1,0 +1,51 @@
+newmtl tex_1384_lit
+map_Kd ../images/1384_1384.png
+
+newmtl tex_1447_lit
+map_Kd ../images/1447_1447.png
+
+newmtl tex_1513_lit_sec
+map_Kd ../images/1513_1513.png
+
+newmtl tex_173_lit
+map_Kd ../images/0173_173.png
+
+newmtl tex_234_lit
+map_Kd ../images/0234_234.png
+
+newmtl tex_299_lit
+map_Kd ../images/0299_299.png
+
+newmtl tex_55_lit_sec
+map_Kd ../images/0055_WHEELSIDE_SM.png
+
+newmtl tex_655_lit_env_ds_w11
+map_Kd ../images/0655_655.png
+
+newmtl tex_668_lit_ovl
+map_Kd ../images/0668_668.png
+
+newmtl tex_811_lit
+map_Kd ../images/0811_811.png
+
+newmtl tex_812_lit_ovl
+map_Kd ../images/0812_812.png
+
+newmtl tex_813_lit_ovl
+map_Kd ../images/0813_813.png
+
+newmtl tex_814_lit
+map_Kd ../images/0814_814.png
+
+newmtl tex_815_lit
+map_Kd ../images/0815_815.png
+
+newmtl tex_815_lit_ds
+map_Kd ../images/0815_815.png
+
+newmtl tex_816_lit_sec_ds
+map_Kd ../images/0816_816.png
+
+newmtl tex_824_lit
+map_Kd ../images/0824_824.png
+

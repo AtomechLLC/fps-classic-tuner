@@ -1,0 +1,12 @@
+newmtl tex_2277_lit_ds
+map_Kd ../images/2277_2277.png
+
+newmtl tex_2486_lit_sec_ds
+map_Kd ../images/2486_2486.png
+
+newmtl tex_2496_lit_sec_ds_w11
+map_Kd ../images/2496_2496.png
+
+newmtl tex_2497_lit_sec_ds
+map_Kd ../images/2497_2497.png
+

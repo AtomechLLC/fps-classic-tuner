@@ -1,0 +1,54 @@
+newmtl tex_1411_lit_sec_ovl
+map_Kd ../images/1411_1411.png
+
+newmtl tex_1514_lit_sec_ovl
+map_Kd ../images/1514_1514.png
+
+newmtl tex_1514_lit_sec_ds
+map_Kd ../images/1514_1514.png
+
+newmtl tex_170_lit
+map_Kd ../images/0170_170.png
+
+newmtl tex_171_lit
+map_Kd ../images/0171_171.png
+
+newmtl tex_171_lit_ovl
+map_Kd ../images/0171_171.png
+
+newmtl tex_172_lit_ovl
+map_Kd ../images/0172_172.png
+
+newmtl tex_834_lit_sec_ds_w11
+map_Kd ../images/0834_834.png
+
+newmtl tex_837_lit_ovl
+map_Kd ../images/0837_MONITOR_KEYBOARDKEY.png
+
+newmtl tex_987_lit_sec_w11_ovl
+map_Kd ../images/0987_987.png
+
+newmtl tex_988_lit_sec_ovl
+map_Kd ../images/0988_988.png
+
+newmtl tex_989_lit_sec_w11_ovl
+map_Kd ../images/0989_989.png
+
+newmtl tex_990_lit_sec_w11_ovl
+map_Kd ../images/0990_990.png
+
+newmtl tex_992_lit_sec_w11_ovl
+map_Kd ../images/0992_992.png
+
+newmtl tex_993_lit_sec_w11_ovl
+map_Kd ../images/0993_993.png
+
+newmtl tex_994_lit_sec_w11_ovl
+map_Kd ../images/0994_994.png
+
+newmtl tex_995_lit_sec_w11_ovl
+map_Kd ../images/0995_995.png
+
+newmtl tex_996_lit_sec_w11_ovl
+map_Kd ../images/0996_996.png
+

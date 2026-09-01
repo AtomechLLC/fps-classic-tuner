@@ -1,0 +1,120 @@
+{
+ "blob": 2681216,
+ "entries": 1198784,
+ "animations": {
+  "idle": {
+   "frames": 163,
+   "values": 45,
+   "loop": false,
+   "file": "idle.json"
+  },
+  "idle_unarmed": {
+   "frames": 48,
+   "values": 45,
+   "loop": false,
+   "file": "idle_unarmed.json"
+  },
+  "fire_standing": {
+   "frames": 106,
+   "values": 45,
+   "loop": false,
+   "file": "fire_standing.json"
+  },
+  "fire_standing_fast": {
+   "frames": 81,
+   "values": 45,
+   "loop": false,
+   "file": "fire_standing_fast.json"
+  },
+  "fire_hip": {
+   "frames": 90,
+   "values": 45,
+   "loop": false,
+   "file": "fire_hip.json"
+  },
+  "fire_standing_one_handed_weapon": {
+   "frames": 185,
+   "values": 45,
+   "loop": false,
+   "file": "fire_standing_one_handed_weapon.json"
+  },
+  "walking": {
+   "frames": 37,
+   "values": 45,
+   "loop": true,
+   "file": "walking.json"
+  },
+  "walking_unarmed": {
+   "frames": 35,
+   "values": 45,
+   "loop": true,
+   "file": "walking_unarmed.json"
+  },
+  "walking_female": {
+   "frames": 31,
+   "values": 45,
+   "loop": true,
+   "file": "walking_female.json"
+  },
+  "hit_left_shoulder": {
+   "frames": 56,
+   "values": 45,
+   "loop": false,
+   "file": "hit_left_shoulder.json"
+  },
+  "hit_right_shoulder": {
+   "frames": 93,
+   "values": 45,
+   "loop": false,
+   "file": "hit_right_shoulder.json"
+  },
+  "hit_left_arm": {
+   "frames": 74,
+   "values": 45,
+   "loop": false,
+   "file": "hit_left_arm.json"
+  },
+  "hit_right_arm": {
+   "frames": 74,
+   "values": 45,
+   "loop": false,
+   "file": "hit_right_arm.json"
+  },
+  "death_forward_face_down": {
+   "frames": 89,
+   "values": 45,
+   "loop": false,
+   "file": "death_forward_face_down.json"
+  },
+  "death_backward_fall_face_up1": {
+   "frames": 69,
+   "values": 45,
+   "loop": false,
+   "file": "death_backward_fall_face_up1.json"
+  },
+  "death_backward_spin_face_down_right": {
+   "frames": 64,
+   "values": 45,
+   "loop": false,
+   "file": "death_backward_spin_face_down_right.json"
+  },
+  "death_fetal_position_left": {
+   "frames": 88,
+   "values": 45,
+   "loop": false,
+   "file": "death_fetal_position_left.json"
+  },
+  "death_head": {
+   "frames": 245,
+   "values": 45,
+   "loop": false,
+   "file": "death_head.json"
+  },
+  "death_neck": {
+   "frames": 410,
+   "values": 45,
+   "loop": false,
+   "file": "death_neck.json"
+  }
+ }
+}

@@ -1,0 +1,9 @@
+newmtl tex_917_lit_sec_ds_w10
+map_Kd ../images/0917_917.png
+
+newmtl tex_918_lit_ds_w10
+map_Kd ../images/0918_918.png
+
+newmtl tex_918_lit_ds_w10_ovl
+map_Kd ../images/0918_918.png
+

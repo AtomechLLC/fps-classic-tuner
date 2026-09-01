@@ -1,0 +1,15 @@
+newmtl tex_184_lit_ds
+map_Kd ../images/0184_184.png
+
+newmtl tex_185_lit_ds
+map_Kd ../images/0185_BOOK_SPINE.png
+
+newmtl tex_661_lit
+map_Kd ../images/0661_661.png
+
+newmtl tex_661_lit_ovl
+map_Kd ../images/0661_661.png
+
+newmtl tex_766_lit
+map_Kd ../images/0766_766.png
+

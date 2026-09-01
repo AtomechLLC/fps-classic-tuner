@@ -1,0 +1,3575 @@
+{
+ "guard_max_damage": 4.0,
+ "skeletons": {
+  "guard": {
+   "joints": [
+    {
+     "type": 1025,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 18
+    },
+    {
+     "type": 2,
+     "mtxA": 18,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 21,
+     "mtxB": 24
+    },
+    {
+     "type": 2,
+     "mtxA": 24,
+     "mtxB": 21
+    },
+    {
+     "type": 2,
+     "mtxA": 27,
+     "mtxB": 30
+    },
+    {
+     "type": 2,
+     "mtxA": 30,
+     "mtxB": 27
+    },
+    {
+     "type": 2,
+     "mtxA": 33,
+     "mtxB": 36
+    },
+    {
+     "type": 2,
+     "mtxA": 36,
+     "mtxB": 33
+    },
+    {
+     "type": 2,
+     "mtxA": 39,
+     "mtxB": 42
+    },
+    {
+     "type": 2,
+     "mtxA": 42,
+     "mtxB": 39
+    }
+   ],
+   "numjoints": 16,
+   "size": 45
+  },
+  "gun_kf7": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 21,
+     "mtxA": 18,
+     "mtxB": 18
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 15
+    }
+   ],
+   "numjoints": 7,
+   "size": 18
+  },
+  "gun_revolver": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 18,
+     "mtxB": 18
+    }
+   ],
+   "numjoints": 7,
+   "size": 21
+  },
+  "gun_unassigned": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 3
+  },
+  "g_weapon": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 18,
+     "mtxB": 18
+    },
+    {
+     "type": 2,
+     "mtxA": 21,
+     "mtxB": 21
+    },
+    {
+     "type": 2,
+     "mtxA": 24,
+     "mtxB": 24
+    },
+    {
+     "type": 2,
+     "mtxA": 27,
+     "mtxB": 27
+    },
+    {
+     "type": 2,
+     "mtxA": 30,
+     "mtxB": 30
+    },
+    {
+     "type": 2,
+     "mtxA": 33,
+     "mtxB": 33
+    },
+    {
+     "type": 2,
+     "mtxA": 36,
+     "mtxB": 36
+    }
+   ],
+   "numjoints": 13,
+   "size": 39
+  },
+  "player_gait_object": {
+   "joints": [
+    {
+     "type": 1025,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 18
+    },
+    {
+     "type": 2,
+     "mtxA": 18,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 21,
+     "mtxB": 24
+    },
+    {
+     "type": 2,
+     "mtxA": 24,
+     "mtxB": 21
+    },
+    {
+     "type": 2,
+     "mtxA": 27,
+     "mtxB": 30
+    },
+    {
+     "type": 2,
+     "mtxA": 30,
+     "mtxB": 27
+    },
+    {
+     "type": 2,
+     "mtxA": 33,
+     "mtxB": 36
+    },
+    {
+     "type": 2,
+     "mtxA": 36,
+     "mtxB": 33
+    },
+    {
+     "type": 2,
+     "mtxA": 39,
+     "mtxB": 42
+    },
+    {
+     "type": 2,
+     "mtxA": 42,
+     "mtxB": 39
+    }
+   ],
+   "numjoints": 16,
+   "size": 45
+  },
+  "cctv": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    }
+   ],
+   "numjoints": 2,
+   "size": 6
+  },
+  "console_one_screen": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 3
+  },
+  "console_four_screen": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 3
+  },
+  "tv_holder": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    }
+   ],
+   "numjoints": 5,
+   "size": 15
+  },
+  "rotating_stuff": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 15
+    }
+   ],
+   "numjoints": 6,
+   "size": 18
+  },
+  "eyelid_door": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    }
+   ],
+   "numjoints": 3,
+   "size": 9
+  },
+  "iris_door": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 18,
+     "mtxB": 18
+    },
+    {
+     "type": 2,
+     "mtxA": 21,
+     "mtxB": 21
+    },
+    {
+     "type": 2,
+     "mtxA": 24,
+     "mtxB": 24
+    },
+    {
+     "type": 2,
+     "mtxA": 27,
+     "mtxB": 27
+    },
+    {
+     "type": 2,
+     "mtxA": 30,
+     "mtxB": 30
+    },
+    {
+     "type": 2,
+     "mtxA": 33,
+     "mtxB": 33
+    },
+    {
+     "type": 2,
+     "mtxA": 36,
+     "mtxB": 36
+    }
+   ],
+   "numjoints": 13,
+   "size": 39
+  },
+  "walletbond": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 3
+  },
+  "car": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    }
+   ],
+   "numjoints": 5,
+   "size": 15
+  },
+  "flying": {
+   "joints": [
+    {
+     "type": 1025,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 21,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 21,
+     "mtxA": 4,
+     "mtxB": 4
+    },
+    {
+     "type": 21,
+     "mtxA": 5,
+     "mtxB": 5
+    }
+   ],
+   "numjoints": 5,
+   "size": 3
+  },
+  "door": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 3
+  },
+  "tank": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    }
+   ],
+   "numjoints": 5,
+   "size": 15
+  },
+  "hat": {
+   "joints": [
+    {
+     "type": 21,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 0
+  },
+  "prop_weapon": {
+   "joints": [
+    {
+     "type": 21,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 21,
+     "mtxA": 1,
+     "mtxB": 1
+    }
+   ],
+   "numjoints": 2,
+   "size": 0
+  },
+  "standard_gun": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 21,
+     "mtxA": 15,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 12
+    }
+   ],
+   "numjoints": 6,
+   "size": 15
+  },
+  "standard_object": {
+   "joints": [
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    }
+   ],
+   "numjoints": 1,
+   "size": 3
+  },
+  "suit_lf_hand": {
+   "joints": [
+    {
+     "type": 1025,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 0,
+     "mtxB": 0
+    },
+    {
+     "type": 2,
+     "mtxA": 3,
+     "mtxB": 3
+    },
+    {
+     "type": 2,
+     "mtxA": 6,
+     "mtxB": 6
+    },
+    {
+     "type": 2,
+     "mtxA": 9,
+     "mtxB": 12
+    },
+    {
+     "type": 2,
+     "mtxA": 12,
+     "mtxB": 9
+    },
+    {
+     "type": 2,
+     "mtxA": 15,
+     "mtxB": 18
+    },
+    {
+     "type": 2,
+     "mtxA": 18,
+     "mtxB": 15
+    },
+    {
+     "type": 2,
+     "mtxA": 21,
+     "mtxB": 24
+    },
+    {
+     "type": 2,
+     "mtxA": 24,
+     "mtxB": 21
+    },
+    {
+     "type": 2,
+     "mtxA": 27,
+     "mtxB": 30
+    },
+    {
+     "type": 2,
+     "mtxA": 30,
+     "mtxB": 27
+    },
+    {
+     "type": 2,
+     "mtxA": 33,
+     "mtxB": 36
+    },
+    {
+     "type": 2,
+     "mtxA": 36,
+     "mtxB": 33
+    },
+    {
+     "type": 2,
+     "mtxA": 39,
+     "mtxB": 42
+    },
+    {
+     "type": 2,
+     "mtxA": 42,
+     "mtxB": 39
+    },
+    {
+     "type": 21,
+     "mtxA": 45,
+     "mtxB": 45
+    },
+    {
+     "type": 21,
+     "mtxA": 46,
+     "mtxB": 46
+    },
+    {
+     "type": 21,
+     "mtxA": 47,
+     "mtxB": 47
+    }
+   ],
+   "numjoints": 19,
+   "size": 45
+  }
+ },
+ "body_skeleton": {
+  "CbaronsamediZ": "guard",
+  "CbluecamguardZ": "guard",
+  "CbluemanZ": "guard",
+  "CbluewomanZ": "guard",
+  "CboilerbondZ": "guard",
+  "CboilertrevZ": "guard",
+  "CborisZ": "guard",
+  "CcamguardZ": "guard",
+  "CcardimanZ": "guard",
+  "CcheckmanZ": "guard",
+  "CcommguardZ": "guard",
+  "CdjbondZ": "guard",
+  "CfattechwomanZ": "guard",
+  "CgreatguardZ": "guard",
+  "Cgreatguard2Z": "guard",
+  "CgreyguardZ": "guard",
+  "CgreymanZ": "guard",
+  "CjawsZ": "guard",
+  "CjeanwomanZ": "guard",
+  "CmaydayZ": "guard",
+  "CmoonfemaleZ": "guard",
+  "CmoonguardZ": "guard",
+  "CnatalyaZ": "guard",
+  "CnavyguardZ": "guard",
+  "CoddjobZ": "guard",
+  "ColiveguardZ": "guard",
+  "CorumovZ": "guard",
+  "CpilotZ": "guard",
+  "CredmanZ": "guard",
+  "CrusguardZ": "guard",
+  "CsnowbondZ": "guard",
+  "CsnowguardZ": "guard",
+  "CspicebondZ": "guard",
+  "CsuitbondZ": "guard",
+  "Csuit_lf_handZ": "suit_lf_hand",
+  "CtechmanZ": "guard",
+  "CtechwomanZ": "guard",
+  "CtimberbondZ": "guard",
+  "CtrevelyanZ": "guard",
+  "CtrevguardZ": "guard",
+  "CvalentinZ": "guard",
+  "CxeniaZ": "guard"
+ },
+ "hat_models": [
+  "PhatberetZ",
+  "PhattbirdZ",
+  "PhatpeakedZ",
+  "PhathelmetZ",
+  "PhatfurryZ",
+  "PhatmoonZ"
+ ],
+ "bodies": [
+  "BODY_Jungle_Commando",
+  "BODY_St_Petersburg_Guard",
+  "BODY_Russian_Soldier",
+  "BODY_Russian_Infantry",
+  "BODY_Janus_Special_Forces",
+  "BODY_Brosnan_Tuxedo",
+  "BODY_Boris",
+  "BODY_Ourumov",
+  "BODY_Trevelyan_Janus",
+  "BODY_Trevelyan_006",
+  "BODY_Valentin_",
+  "BODY_Xenia",
+  "BODY_Baron_Samedi",
+  "BODY_Jaws",
+  "BODY_Mayday",
+  "BODY_Oddjob",
+  "BODY_Natalya_Skirt",
+  "BODY_Janus_Marine",
+  "BODY_Russian_Commandant",
+  "BODY_Siberian_Guard_1_Mishkin",
+  "BODY_Naval_Officer",
+  "BODY_Siberian_Special_Forces",
+  "BODY_Special_Operations_Uniform",
+  "BODY_Formal_Wear",
+  "BODY_Jungle_Fatigues",
+  "BODY_Parka",
+  "BODY_Unused_Female",
+  "BODY_Rosika",
+  "BODY_Scientist_2_Female",
+  "BODY_Civilian_1_Female",
+  "BODY_Unused_Male_1",
+  "BODY_Unused_Male_2",
+  "BODY_Civilian_4",
+  "BODY_Civilian_2",
+  "BODY_Civilian_3",
+  "BODY_Scientist_1_Male",
+  "BODY_Helicopter_Pilot",
+  "BODY_Siberian_Guard_2",
+  "BODY_Arctic_Commando",
+  "BODY_Moonraker_Elite_1_Male",
+  "BODY_Moonraker_Elite_2_Female",
+  "BODY_Left_Suit_Hand_Floating_Arm"
+ ],
+ "heads": [
+  {
+   "id": 0,
+   "name": "HEAD_Male_Karl",
+   "model": "CheadkarlZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -1.6251900639,
+      16.613999361,
+      -27.04248
+     ],
+     "scale": [
+      1.1694109,
+      1.120654,
+      1.05959
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -5.486880213,
+      -10.079159787,
+      -33.41118213
+     ],
+     "scale": [
+      1.132916,
+      1.0,
+      1.080207
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.8519999787000001,
+      15.762000213000002,
+      -13.631999787
+     ],
+     "scale": [
+      1.132795,
+      1.167207,
+      1.035167
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.7135500213,
+      5.3164797870000005,
+      3.5357997869999997
+     ],
+     "scale": [
+      1.115045,
+      0.94169998,
+      1.042492
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 1,
+   "name": "HEAD_Male_Alan",
+   "model": "CheadalanZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -1.4973899574,
+      10.47747,
+      -17.755679574000002
+     ],
+     "scale": [
+      1.072812,
+      1.088326,
+      0.926121
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -2.1300000000000003,
+      9.105750213,
+      -10.277249787
+     ],
+     "scale": [
+      1.033368,
+      0.96552098,
+      0.929905
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      3.834000213,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.072214,
+      1.0,
+      1.0
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      5.0481,
+      20.8101,
+      -9.372
+     ],
+     "scale": [
+      1.178463,
+      1.14061,
+      1.143465
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -1.9233900213000001,
+      4.939470213,
+      2.6923197869999997
+     ],
+     "scale": [
+      0.99080002,
+      1.02,
+      0.8466
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      3.16305,
+      8.07909
+     ],
+     "scale": [
+      1.1548001,
+      0.99190003,
+      0.95139998
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 2,
+   "name": "HEAD_Male_Pete",
+   "model": "CheadpeteZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -3.156660213,
+      9.393300213,
+      3.67851
+     ],
+     "scale": [
+      1.050034,
+      1.0,
+      1.05445
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -10.52433,
+      -5.625329787,
+      -3.834000213
+     ],
+     "scale": [
+      0.90368301,
+      0.72551203,
+      1.001314
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      2.80734,
+      6.411321513000001,
+      33.4984887
+     ],
+     "scale": [
+      0.98799503,
+      1.0,
+      1.05445
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      15.553259787000002,
+      15.280620213
+     ],
+     "scale": [
+      1.1923,
+      1.1834,
+      1.091924
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      -15.802470639000001,
+      20.077380213
+     ],
+     "scale": [
+      0.98659998,
+      0.91689998,
+      0.94760001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      1.13955,
+      13.101630639000001,
+      22.9188
+     ],
+     "scale": [
+      1.05092,
+      0.90002,
+      1.122508
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 3,
+   "name": "HEAD_Male_Martin",
+   "model": "CheadmartinZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -1.7039999574000002,
+      2.3110500000000003,
+      -12.062189361
+     ],
+     "scale": [
+      1.192598,
+      1.079134,
+      1.199971
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -7.591320213,
+      -6.1152297870000005,
+      -7.870350213
+     ],
+     "scale": [
+      1.035176,
+      0.838543,
+      1.121092
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      1.3908900639,
+      -9.93432,
+      15.336000639000002
+     ],
+     "scale": [
+      1.050106,
+      1.0,
+      1.11042
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.7039999574000002,
+      10.40505,
+      1.9958099787
+     ],
+     "scale": [
+      1.158567,
+      1.2356189,
+      1.194388
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      -6.426210000000001,
+      12.662850213
+     ],
+     "scale": [
+      1.0671999,
+      1.0218,
+      1.0174
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      2.556,
+      -3.22695,
+      20.313810213
+     ],
+     "scale": [
+      1.124017,
+      0.966048,
+      1.206121
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 4,
+   "name": "HEAD_Male_Mark",
+   "model": "CheadmarkZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -4.113030213,
+      4.97142,
+      -13.813050639
+     ],
+     "scale": [
+      1.1800359,
+      1.0401829,
+      1.154537
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -7.716990213000001,
+      -2.8329000000000004,
+      -10.3518
+     ],
+     "scale": [
+      1.0536211,
+      1.0,
+      1.1495841
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      2.03415,
+      14.505299787,
+      16.784399787
+     ],
+     "scale": [
+      1.0152,
+      1.1926,
+      1.1308
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.75299,
+      7.817100213,
+      7.9662002130000005
+     ],
+     "scale": [
+      1.311748,
+      1.115972,
+      1.166244
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      3.7658400000000003,
+      11.17824
+     ],
+     "scale": [
+      1.0470001,
+      1.0218,
+      0.99800003
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      -2.0533200000000003,
+      17.678999574
+     ],
+     "scale": [
+      1.1109999,
+      0.85180199,
+      1.180503
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 5,
+   "name": "HEAD_Male_Duncan",
+   "model": "CheadduncanZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -3.9021600000000003,
+      6.841560213,
+      -26.371532130000002
+     ],
+     "scale": [
+      1.125683,
+      1.091681,
+      0.98079097
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -11.725649574,
+      -12.958919787000001,
+      -25.336328700000003
+     ],
+     "scale": [
+      1.023566,
+      0.8326,
+      1.0637
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      1.6358400852000001,
+      6.841560213,
+      -2.5155513
+     ],
+     "scale": [
+      1.059677,
+      1.091681,
+      1.000479
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      6.366570213,
+      -14.334899574000001
+     ],
+     "scale": [
+      1.1367,
+      1.0526,
+      0.99227399
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      0.6816000426000001,
+      -6.326099787
+     ],
+     "scale": [
+      1.0402,
+      0.92860001,
+      0.88690001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      5.725439787,
+      1.2226199787
+     ],
+     "scale": [
+      1.041842,
+      0.81959999,
+      0.99637401
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 6,
+   "name": "HEAD_Male_Shaun",
+   "model": "CheadshaunZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      1.6976100213000003,
+      7.47843,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0835
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      2.982,
+      4.18545,
+      -1.2438986787000001
+     ],
+     "scale": [
+      1.012674,
+      0.96799999,
+      1.098917
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      3.46977,
+      16.784399787,
+      22.88898
+     ],
+     "scale": [
+      0.92205501,
+      1.0688,
+      1.055297
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.5868500426,
+      18.05601,
+      15.295530213000001
+     ],
+     "scale": [
+      1.154819,
+      1.177258,
+      1.031684
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -0.30885,
+      1.0160099787,
+      19.129530426000002
+     ],
+     "scale": [
+      1.0404,
+      1.0,
+      0.94309998
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      6.933150213,
+      7.832010213000001,
+      19.981529574000003
+     ],
+     "scale": [
+      1.044217,
+      0.97841102,
+      1.127771
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 7,
+   "name": "HEAD_Male_Dwayne",
+   "model": "CheaddwayneZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -3.9021600000000003,
+      -1.2524400213,
+      -33.613530000000004
+     ],
+     "scale": [
+      1.095929,
+      0.96300697,
+      0.92348999
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -9.39543,
+      -13.810920213000001,
+      -39.172808700000004
+     ],
+     "scale": [
+      1.059271,
+      0.8326,
+      0.96849501
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      4.191839787,
+      -6.790439999999999,
+      -9.331551087000001
+     ],
+     "scale": [
+      1.070675,
+      1.053777,
+      0.88628101
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      6.366570213,
+      -17.708819574000003
+     ],
+     "scale": [
+      1.1154,
+      1.0328,
+      1.0036
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      -2.7157500000000003,
+      -11.099429574
+     ],
+     "scale": [
+      1.0402,
+      0.92180002,
+      0.8617
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      1.7039999574000002,
+      -5.0757900000000005,
+      -4.886241513
+     ],
+     "scale": [
+      1.063022,
+      0.80879998,
+      0.90789998
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 8,
+   "name": "HEAD_Male_B",
+   "model": "CheadbZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      2.48145,
+      12.520140639000001,
+      -27.89448
+     ],
+     "scale": [
+      1.136481,
+      1.0409,
+      1.065612
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -1.5037800638999999,
+      0.32376,
+      -26.392830000000004
+     ],
+     "scale": [
+      1.002256,
+      0.76669598,
+      1.029659
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      4.72434,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0852,
+      1.0,
+      1.0
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      1.3419000213,
+      16.10493,
+      -9.642509787
+     ],
+     "scale": [
+      1.2085,
+      1.1014,
+      1.0664001
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      1.3951499787000001,
+      -2.3366100000000003,
+      -7.44861
+     ],
+     "scale": [
+      1.0404,
+      0.90915602,
+      0.94940001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      7.1568000000000005,
+      1.7678999361000003
+     ],
+     "scale": [
+      1.150862,
+      0.94169998,
+      1.0
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 9,
+   "name": "HEAD_Male_Dave_Dr_Doak",
+   "model": "CheaddaveZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -1.1544600213,
+      5.768039787,
+      -1.7487299361
+     ],
+     "scale": [
+      1.0367,
+      1.0367,
+      1.0367
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      7.267559787000001,
+      -11.902439574,
+      -6.48372
+     ],
+     "scale": [
+      1.113436,
+      0.96799999,
+      1.076647
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      1.0543500000000001,
+      13.627740213,
+      25.939140000000002
+     ],
+     "scale": [
+      0.95099998,
+      1.1126,
+      1.0413001
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      11.425320426,
+      16.021860213
+     ],
+     "scale": [
+      1.1976,
+      1.1463,
+      1.1374
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -0.30885,
+      -13.791749574,
+      22.31813787
+     ],
+     "scale": [
+      0.95289999,
+      0.92180002,
+      0.90579998
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      3.4080000000000004,
+      13.169790425999999,
+      24.0327687
+     ],
+     "scale": [
+      1.083438,
+      0.91670603,
+      1.0666929
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 10,
+   "name": "HEAD_Male_Grant",
+   "model": "CheadgrantZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -5.50818,
+      19.932540426,
+      -5.24619
+     ],
+     "scale": [
+      1.1057,
+      1.0116,
+      1.0927
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -3.80844,
+      -6.669030213,
+      -11.778899361
+     ],
+     "scale": [
+      1.1071,
+      1.0,
+      1.071945
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      2.03415,
+      3.456990213,
+      10.681950213
+     ],
+     "scale": [
+      1.0506001,
+      1.0,
+      1.1032
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      1.7295600852000002,
+      4.8329699999999995,
+      10.799100639
+     ],
+     "scale": [
+      1.1071,
+      1.178908,
+      1.189239
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -0.30885,
+      -14.577720426,
+      11.516910425999999
+     ],
+     "scale": [
+      1.0470001,
+      0.92699999,
+      1.027078
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      -0.34932,
+      14.143199361
+     ],
+     "scale": [
+      1.2108999,
+      1.0,
+      1.0729001
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 11,
+   "name": "HEAD_Male_Des",
+   "model": "CheaddesZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -3.16731,
+      18.910139574000002,
+      -8.745780213
+     ],
+     "scale": [
+      1.110018,
+      0.98460901,
+      1.110518
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.02556000213,
+      -13.180439574000001,
+      -7.335698913000001
+     ],
+     "scale": [
+      1.099178,
+      0.916071,
+      1.054984
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.9137700000000001,
+      4.57737,
+      9.15474
+     ],
+     "scale": [
+      1.0455,
+      1.0688,
+      1.1514
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.02556000213,
+      -0.40044,
+      13.964301726
+     ],
+     "scale": [
+      1.1957231,
+      1.079964,
+      1.200996
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -0.30885,
+      -10.388009787000001,
+      9.565829787
+     ],
+     "scale": [
+      1.003074,
+      1.0,
+      0.98259997
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      8.434800000000001,
+      17.81106
+     ],
+     "scale": [
+      1.1622,
+      0.91339999,
+      1.066853
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 12,
+   "name": "HEAD_Male_Chris",
+   "model": "CheadchrisZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -6.183390213,
+      22.822947870000004,
+      -7.46352
+     ],
+     "scale": [
+      1.125893,
+      1.127159,
+      1.177758
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      -1.7039999574000002,
+      -7.9449000000000005
+     ],
+     "scale": [
+      1.099718,
+      1.0,
+      1.0947551
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      16.784399787,
+      13.732109787
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0963
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.5911099574,
+      32.87868,
+      4.21527
+     ],
+     "scale": [
+      1.1497999,
+      1.1835999,
+      1.0791
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -1.9233900213000001,
+      -2.3110500000000003,
+      14.688479787000002
+     ],
+     "scale": [
+      1.024099,
+      1.0,
+      0.98965299
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      13.467990426,
+      16.85469
+     ],
+     "scale": [
+      1.1081001,
+      0.93440002,
+      1.0779999
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 13,
+   "name": "HEAD_Male_Lee",
+   "model": "CheadleeZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      2.556,
+      8.520000213000001,
+      0.8519999787000001
+     ],
+     "scale": [
+      1.022947,
+      0.92226201,
+      1.004824
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.9137700000000001,
+      16.164569787,
+      27.466350000000002
+     ],
+     "scale": [
+      0.94440001,
+      1.0,
+      1.0551
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      11.629800000000001,
+      16.982489574000002
+     ],
+     "scale": [
+      1.1483001,
+      1.1267999,
+      1.1388
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      1.3866299787000003,
+      -11.570160426000001,
+      23.90924787
+     ],
+     "scale": [
+      0.93949997,
+      0.92699999,
+      0.93040001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      2.6944500000000002,
+      7.744679787,
+      22.9827
+     ],
+     "scale": [
+      1.1109999,
+      1.0,
+      1.1166
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 14,
+   "name": "HEAD_Male_Neil",
+   "model": "CheadneilZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -5.921400000000001,
+      27.1000113,
+      -11.772509574
+     ],
+     "scale": [
+      1.24701,
+      1.0737129,
+      1.118222
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -5.035319787000001,
+      12.396600426,
+      -6.5923502130000005
+     ],
+     "scale": [
+      1.225595,
+      1.077682,
+      1.066005
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      -1.7998500000000002,
+      14.505299787,
+      13.732109787
+     ],
+     "scale": [
+      1.1204081,
+      1.1927,
+      1.1308
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -2.90532,
+      21.768578700000003,
+      12.57765
+     ],
+     "scale": [
+      1.153587,
+      1.226897,
+      1.2252491
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -5.39742,
+      12.260280639000001,
+      8.213280000000001
+     ],
+     "scale": [
+      1.0405,
+      1.0405,
+      1.0585999
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      -2.6944500000000002,
+      12.95253,
+      15.165600213000001
+     ],
+     "scale": [
+      1.222,
+      1.0,
+      1.111666
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 15,
+   "name": "HEAD_Male_Jim",
+   "model": "CheadjimZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -9.87681,
+      29.75823,
+      -10.494510213000002
+     ],
+     "scale": [
+      1.1752,
+      1.0116,
+      1.1762
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -6.33888,
+      -2.2343699999999997,
+      -10.575449787
+     ],
+     "scale": [
+      1.2345999,
+      0.86470801,
+      1.077117
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      -2.4516299999999998,
+      15.66189,
+      12.207029361
+     ],
+     "scale": [
+      1.0759,
+      1.0,
+      1.1308
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -4.0257000000000005,
+      21.280830639,
+      5.10348
+     ],
+     "scale": [
+      1.2269,
+      1.2039,
+      1.1698999
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -5.39742,
+      -1.37811,
+      6.404910213000001
+     ],
+     "scale": [
+      1.0470001,
+      0.92699999,
+      1.0124
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      -2.6944500000000002,
+      13.048380639,
+      16.337100426
+     ],
+     "scale": [
+      1.2108999,
+      1.0,
+      1.096216
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 16,
+   "name": "HEAD_Male_Robin",
+   "model": "CheadrobinZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -10.954589787000002,
+      23.20422213,
+      -1.7487299361
+     ],
+     "scale": [
+      1.1003,
+      1.0316,
+      1.0278
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -11.348640426000001,
+      -2.781780213,
+      -5.537999787
+     ],
+     "scale": [
+      1.080464,
+      1.0,
+      1.019003
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      -4.19397,
+      9.783090213,
+      13.732109787
+     ],
+     "scale": [
+      0.96219999,
+      1.0,
+      1.0895
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -6.962970213,
+      24.36294,
+      9.951360213000001
+     ],
+     "scale": [
+      1.1339,
+      1.1339,
+      1.0436
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -6.364439787,
+      0.0,
+      8.824589787
+     ],
+     "scale": [
+      0.96219999,
+      1.0,
+      0.95630002
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      -3.757320213,
+      8.413500213,
+      18.467099574000002
+     ],
+     "scale": [
+      1.0972,
+      0.94625998,
+      1.0529979
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 17,
+   "name": "HEAD_Male_Steve_H",
+   "model": "CheadstevehZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      0.42600000000000005,
+      12.121830426,
+      -5.388899787000001
+     ],
+     "scale": [
+      1.1205291,
+      0.999475,
+      1.072994
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -1.75299,
+      -8.05992,
+      -8.147249787
+     ],
+     "scale": [
+      1.077682,
+      1.0,
+      1.066239
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.42600000000000005,
+      -4.06617,
+      19.319100213
+     ],
+     "scale": [
+      1.049657,
+      0.999475,
+      1.072994
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      12.897149574000002,
+      10.119630213
+     ],
+     "scale": [
+      1.1236,
+      1.1236,
+      1.1236
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      1.6528800426,
+      11.17824
+     ],
+     "scale": [
+      1.0403,
+      0.95950001,
+      0.98580003
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      4.377150213,
+      19.065630000000002
+     ],
+     "scale": [
+      1.1519721,
+      0.92378497,
+      1.0316401
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 18,
+   "name": "HEAD_Male_Terrorist",
+   "model": "CheadbalaclavaZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 19,
+   "name": "HEAD_Male_Biker",
+   "model": "CheadbikeZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 20,
+   "name": "HEAD_Male_Graeme",
+   "model": "CheadgrahamZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      1.7806799999999998,
+      -14.113379574,
+      3.026730213
+     ],
+     "scale": [
+      0.95139998,
+      1.090098,
+      0.92760003
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      2.43033,
+      -25.413030000000003,
+      -5.410200213
+     ],
+     "scale": [
+      0.98102301,
+      0.83667898,
+      0.88798702
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      3.1545300000000003,
+      -3.2716802130000002,
+      24.41405787
+     ],
+     "scale": [
+      0.91399997,
+      1.0,
+      0.94489998
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      -11.342250639000001,
+      7.58919
+     ],
+     "scale": [
+      1.0727,
+      1.0526,
+      1.0228
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      -14.60541,
+      23.90924787
+     ],
+     "scale": [
+      0.95959997,
+      0.92860001,
+      0.88690001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      1.7039999574000002,
+      -15.753480000000001,
+      20.5119
+     ],
+     "scale": [
+      1.1032,
+      0.875673,
+      0.97771698
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 21,
+   "name": "HEAD_Male_Steve_Ellis",
+   "model": "CheadsteveeZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -6.183390213,
+      22.822947870000004,
+      -7.46352
+     ],
+     "scale": [
+      1.125893,
+      1.127159,
+      1.177758
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      -1.7039999574000002,
+      -7.9449000000000005
+     ],
+     "scale": [
+      1.099718,
+      1.0,
+      1.0947551
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      16.784399787,
+      13.732109787
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0963
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.5911099574,
+      32.87868,
+      4.21527
+     ],
+     "scale": [
+      1.1497999,
+      1.1835999,
+      1.0791
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -1.9233900213000001,
+      -2.3110500000000003,
+      14.688479787000002
+     ],
+     "scale": [
+      1.024099,
+      1.0,
+      0.98965299
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      13.467990426,
+      16.85469
+     ],
+     "scale": [
+      1.1081001,
+      0.93440002,
+      1.0779999
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 22,
+   "name": "HEAD_Male_Joel",
+   "model": "CheadjoelZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -2.918099787,
+      6.0918213,
+      -6.864989787
+     ],
+     "scale": [
+      1.142894,
+      0.89638299,
+      1.15
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      -3.552840213,
+      -2.9074500000000003,
+      -9.297450213
+     ],
+     "scale": [
+      1.1452,
+      1.0,
+      1.061306
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      2.93088,
+      0.0,
+      15.250800426
+     ],
+     "scale": [
+      1.05312,
+      1.0,
+      1.0687751
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.5911099574,
+      20.00709,
+      5.66154
+     ],
+     "scale": [
+      1.1815,
+      1.1216,
+      1.0822999
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.1938999999999997,
+      -4.8329699999999995,
+      12.18786
+     ],
+     "scale": [
+      0.99080002,
+      1.02,
+      1.0034
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      2.92449,
+      16.918590426
+     ],
+     "scale": [
+      1.1813999,
+      0.86186302,
+      1.0998
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 23,
+   "name": "HEAD_Male_Scott",
+   "model": "CheadscottZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      2.556,
+      8.520000213000001,
+      0.8519999787000001
+     ],
+     "scale": [
+      1.022947,
+      0.92226201,
+      1.004824
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.9137700000000001,
+      16.164569787,
+      27.466350000000002
+     ],
+     "scale": [
+      0.94440001,
+      1.0,
+      1.0551
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      11.629800000000001,
+      16.982489574000002
+     ],
+     "scale": [
+      1.1483001,
+      1.1267999,
+      1.1388
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      1.3866299787000003,
+      -11.570160426000001,
+      23.90924787
+     ],
+     "scale": [
+      0.93949997,
+      0.92699999,
+      0.93040001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      2.6944500000000002,
+      7.744679787,
+      22.9827
+     ],
+     "scale": [
+      1.1109999,
+      1.0,
+      1.1166
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 24,
+   "name": "HEAD_Male_Joe_Altered",
+   "model": "Cheadjoe2Z",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      1.7806799999999998,
+      -14.113379574,
+      3.026730213
+     ],
+     "scale": [
+      0.95139998,
+      1.090098,
+      0.92760003
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      2.43033,
+      -25.413030000000003,
+      -5.410200213
+     ],
+     "scale": [
+      0.98102301,
+      0.83667898,
+      0.88798702
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      3.1545300000000003,
+      -3.2716802130000002,
+      24.41405787
+     ],
+     "scale": [
+      0.91399997,
+      1.0,
+      0.94489998
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      -11.342250639000001,
+      7.58919
+     ],
+     "scale": [
+      1.0727,
+      1.0526,
+      1.0228
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      -14.60541,
+      23.90924787
+     ],
+     "scale": [
+      0.95959997,
+      0.92860001,
+      0.88690001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      1.7039999574000002,
+      -15.753480000000001,
+      20.5119
+     ],
+     "scale": [
+      1.1032,
+      0.875673,
+      0.97771698
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 25,
+   "name": "HEAD_Male_Ken",
+   "model": "CheadkenZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      -6.183390213,
+      22.822947870000004,
+      -7.46352
+     ],
+     "scale": [
+      1.125893,
+      1.127159,
+      1.177758
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      -1.7039999574000002,
+      -7.9449000000000005
+     ],
+     "scale": [
+      1.099718,
+      1.0,
+      1.0947551
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      16.784399787,
+      13.732109787
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0963
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      -1.5911099574,
+      32.87868,
+      4.21527
+     ],
+     "scale": [
+      1.1497999,
+      1.1835999,
+      1.0791
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -1.9233900213000001,
+      -2.3110500000000003,
+      14.688479787000002
+     ],
+     "scale": [
+      1.024099,
+      1.0,
+      0.98965299
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      13.467990426,
+      16.85469
+     ],
+     "scale": [
+      1.1081001,
+      0.93440002,
+      1.0779999
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 26,
+   "name": "HEAD_Male_Joe",
+   "model": "CheadjoeZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      1.7806799999999998,
+      -14.113379574,
+      3.026730213
+     ],
+     "scale": [
+      0.95139998,
+      1.090098,
+      0.92760003
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      2.43033,
+      -25.413030000000003,
+      -5.410200213
+     ],
+     "scale": [
+      0.98102301,
+      0.83667898,
+      0.88798702
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      3.1545300000000003,
+      -3.2716802130000002,
+      24.41405787
+     ],
+     "scale": [
+      0.91399997,
+      1.0,
+      0.94489998
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      -11.342250639000001,
+      7.58919
+     ],
+     "scale": [
+      1.0727,
+      1.0526,
+      1.0228
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      -2.00646,
+      -14.60541,
+      23.90924787
+     ],
+     "scale": [
+      0.95959997,
+      0.92860001,
+      0.88690001
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      1.7039999574000002,
+      -15.753480000000001,
+      20.5119
+     ],
+     "scale": [
+      1.1032,
+      0.875673,
+      0.97771698
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 27,
+   "name": "HEAD_Male_Mishkin",
+   "model": "CheadmishkinZ",
+   "hats": {
+    "PhatberetZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "beret"
+    },
+    "PhattbirdZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "side cap"
+    },
+    "PhatpeakedZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "peaked cap"
+    },
+    "PhathelmetZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "helmet"
+    },
+    "PhatfurryZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "fur hat"
+    },
+    "PhatmoonZ": {
+     "offset": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "scale": [
+      1.0,
+      1.0,
+      1.0
+     ],
+     "hat": "moonraker helmet"
+    }
+   }
+  },
+  {
+   "id": 28,
+   "name": "HEAD_Female_Sally",
+   "model": "CheadsallyZ",
+   "hats": {}
+  },
+  {
+   "id": 29,
+   "name": "HEAD_Female_Marion_Rosika",
+   "model": "CheadmarionZ",
+   "hats": {}
+  },
+  {
+   "id": 30,
+   "name": "HEAD_Female_Mandy",
+   "model": "CheadmandyZ",
+   "hats": {}
+  },
+  {
+   "id": 31,
+   "name": "HEAD_Female_Vivien",
+   "model": "CheadvivienZ",
+   "hats": {}
+  },
+  {
+   "id": 32,
+   "name": "HEAD_Male_Brosnan_Boiler",
+   "model": "CheadbrosnanboilerZ",
+   "hats": {}
+  },
+  {
+   "id": 33,
+   "name": "HEAD_Male_Brosnan_Default",
+   "model": "CheadbrosnanZ",
+   "hats": {}
+  },
+  {
+   "id": 34,
+   "name": "HEAD_Male_Brosnan_Jungle",
+   "model": "CheadbrosnantimberZ",
+   "hats": {}
+  },
+  {
+   "id": 35,
+   "name": "HEAD_Male_Brosnan_Parka",
+   "model": "CheadbrosnansnowZ",
+   "hats": {}
+  },
+  {
+   "id": 36,
+   "name": "HEAD_Male_Brosnan_Tuxedo",
+   "model": "CheadbrosnansuitZ",
+   "hats": {}
+  }
+ ],
+ "roster": [
+  {
+   "body": "BODY_Russian_Soldier",
+   "body_id": 2,
+   "count": 151,
+   "levels": [
+    "arch",
+    "ark",
+    "dam",
+    "pete",
+    "sevbunker"
+   ]
+  },
+  {
+   "body": "BODY_Janus_Marine",
+   "body_id": 17,
+   "count": 89,
+   "levels": [
+    "depo",
+    "dest",
+    "tra"
+   ]
+  },
+  {
+   "body": "BODY_Russian_Infantry",
+   "body_id": 3,
+   "count": 84,
+   "levels": [
+    "cryp",
+    "silo",
+    "statue"
+   ]
+  },
+  {
+   "body": "BODY_Janus_Special_Forces",
+   "body_id": 4,
+   "count": 80,
+   "levels": [
+    "cave",
+    "crad",
+    "tra"
+   ]
+  },
+  {
+   "body": "BODY_Jungle_Commando",
+   "body_id": 0,
+   "count": 79,
+   "levels": [
+    "control",
+    "jun"
+   ]
+  },
+  {
+   "body": "BODY_Moonraker_Elite_1_Male",
+   "body_id": 39,
+   "count": 39,
+   "levels": [
+    "azt"
+   ]
+  },
+  {
+   "body": "BODY_Arctic_Commando",
+   "body_id": 38,
+   "count": 37,
+   "levels": [
+    "sevb",
+    "sevxb"
+   ]
+  },
+  {
+   "body": "BODY_Scientist_1_Male",
+   "body_id": 35,
+   "count": 30,
+   "levels": [
+    "ark",
+    "cave",
+    "silo"
+   ]
+  },
+  {
+   "body": "BODY_Siberian_Guard_2",
+   "body_id": 37,
+   "count": 24,
+   "levels": [
+    "dam",
+    "run"
+   ]
+  },
+  {
+   "body": "BODY_Siberian_Special_Forces",
+   "body_id": 21,
+   "count": 14,
+   "levels": [
+    "sevx",
+    "sevxb"
+   ]
+  },
+  {
+   "body": "BODY_Siberian_Guard_1_Mishkin",
+   "body_id": 19,
+   "count": 8,
+   "levels": [
+    "arch"
+   ]
+  },
+  {
+   "body": "BODY_Naval_Officer",
+   "body_id": 20,
+   "count": 6,
+   "levels": [
+    "dest"
+   ]
+  },
+  {
+   "body": "BODY_Trevelyan_Janus",
+   "body_id": 8,
+   "count": 4,
+   "levels": [
+    "cave",
+    "control",
+    "crad",
+    "tra"
+   ]
+  },
+  {
+   "body": "BODY_Natalya_Skirt",
+   "body_id": 16,
+   "count": 3,
+   "levels": [
+    "arch",
+    "sevb",
+    "tra"
+   ]
+  },
+  {
+   "body": "BODY_Natalya_Jungle_Fatigues",
+   "body_id": 79,
+   "count": 3,
+   "levels": [
+    "control",
+    "jun",
+    "len"
+   ]
+  },
+  {
+   "body": "BODY_Russian_Commandant",
+   "body_id": 18,
+   "count": 3,
+   "levels": [
+    "dam",
+    "sevbunker",
+    "sevx"
+   ]
+  },
+  {
+   "body": "BODY_Boris",
+   "body_id": 6,
+   "count": 2,
+   "levels": [
+    "control",
+    "sevbunker"
+   ]
+  },
+  {
+   "body": "BODY_Xenia",
+   "body_id": 11,
+   "count": 2,
+   "levels": [
+    "jun",
+    "tra"
+   ]
+  },
+  {
+   "body": "BODY_Valentin_",
+   "body_id": 10,
+   "count": 2,
+   "levels": [
+    "pete",
+    "statue"
+   ]
+  },
+  {
+   "body": "BODY_Ourumov",
+   "body_id": 7,
+   "count": 2,
+   "levels": [
+    "silo",
+    "tra"
+   ]
+  },
+  {
+   "body": "BODY_Trevelyan_006",
+   "body_id": 9,
+   "count": 1,
+   "levels": [
+    "ark"
+   ]
+  },
+  {
+   "body": "BODY_Jaws",
+   "body_id": 13,
+   "count": 1,
+   "levels": [
+    "azt"
+   ]
+  },
+  {
+   "body": "BODY_Baron_Samedi",
+   "body_id": 12,
+   "count": 1,
+   "levels": [
+    "cryp"
+   ]
+  }
+ ]
+}

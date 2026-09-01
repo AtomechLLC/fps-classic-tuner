@@ -1,0 +1,66 @@
+newmtl tex_1609_lit
+map_Kd ../images/1609_1609.png
+
+newmtl tex_1613_lit_w11
+map_Kd ../images/1613_1613.png
+
+newmtl tex_1616_lit_w11
+map_Kd ../images/1616_1616.png
+
+newmtl tex_1619_lit_w11
+map_Kd ../images/1619_1619.png
+
+newmtl tex_1622_lit_w11
+map_Kd ../images/1622_1622.png
+
+newmtl tex_1785_lit_w10
+map_Kd ../images/1785_1785.png
+
+newmtl tex_1786_lit_w01
+map_Kd ../images/1786_1786.png
+
+newmtl tex_1786_lit_w01_ovl
+map_Kd ../images/1786_1786.png
+
+newmtl tex_1917_lit
+map_Kd ../images/1917_1917.png
+
+newmtl tex_1931_lit
+map_Kd ../images/1931_1931.png
+
+newmtl tex_1932_lit
+map_Kd ../images/1932_1932.png
+
+newmtl tex_1933_lit
+map_Kd ../images/1933_1933.png
+
+newmtl tex_1934_lit
+map_Kd ../images/1934_1934.png
+
+newmtl tex_1935_lit_w01
+map_Kd ../images/1935_1935.png
+
+newmtl tex_1936_lit_w11
+map_Kd ../images/1936_1936.png
+
+newmtl tex_1937_lit_w11
+map_Kd ../images/1937_1937.png
+
+newmtl tex_1938_lit_w11
+map_Kd ../images/1938_1938.png
+
+newmtl tex_1939_lit_w11
+map_Kd ../images/1939_1939.png
+
+newmtl tex_1939_lit_w11_ovl
+map_Kd ../images/1939_1939.png
+
+newmtl tex_1940_lit
+map_Kd ../images/1940_1940.png
+
+newmtl tex_1941_lit
+map_Kd ../images/1941_1941.png
+
+newmtl tex_1942_lit_w11
+map_Kd ../images/1942_1942.png
+

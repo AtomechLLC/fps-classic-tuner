@@ -1,0 +1,9 @@
+newmtl tex_655_lit_env_sec_ds_w11_ovl
+map_Kd ../images/0655_655.png
+
+newmtl tex_77_lit_ds
+map_Kd ../images/0077_GAZ_SIDE.png
+
+newmtl tex_82_lit_ds
+map_Kd ../images/0082_82.png
+

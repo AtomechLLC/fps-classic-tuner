@@ -1,0 +1,6 @@
+newmtl tex_406_lit_ds
+map_Kd ../images/0406_406.png
+
+newmtl tex_410_lit_ds
+map_Kd ../images/0410_410.png
+

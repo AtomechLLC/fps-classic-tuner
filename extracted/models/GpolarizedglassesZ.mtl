@@ -1,0 +1,9 @@
+newmtl tex_1514_lit_sec
+map_Kd ../images/1514_1514.png
+
+newmtl tex_1514_lit_sec_ds
+map_Kd ../images/1514_1514.png
+
+newmtl tex_807_lit_env_sec_ds
+map_Kd ../images/0807_807.png
+

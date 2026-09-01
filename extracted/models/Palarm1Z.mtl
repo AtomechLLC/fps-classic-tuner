@@ -1,0 +1,6 @@
+newmtl tex_29_lit_ds
+map_Kd ../images/0029_BUZZERSWITCH.png
+
+newmtl tex_31_lit_sec_ds
+map_Kd ../images/0031_BELL.png
+
